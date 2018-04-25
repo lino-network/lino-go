@@ -8,6 +8,17 @@
   revision = "675abc5df3c5531bc741b56a765e35623459da6d"
 
 [[projects]]
+  branch = "develop"
+  name = "github.com/cosmos/cosmos-sdk"
+  packages = [
+    "baseapp",
+    "store",
+    "types",
+    "wire"
+  ]
+  revision = "85a49646eb62bb60dde93ff5dd2e69cf24294e1b"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -114,6 +125,20 @@
   revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
+  branch = "ZhimaoL-patch-1"
+  name = "github.com/lino-network/lino"
+  packages = [
+    "app",
+    "tx/account",
+    "tx/auth",
+    "tx/post",
+    "tx/register",
+    "tx/validator",
+    "types"
+  ]
+  revision = "d8f95d2b3dd7f1db1a5bbc5c4a13057b60edea5a"
+
+[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
@@ -201,6 +226,7 @@
     "client",
     "example/code",
     "example/kvstore",
+    "server",
     "types"
   ]
   revision = "78a8905690ef54f9d57e3b2b0ee7ad3a04ef3f1f"
@@ -227,6 +253,19 @@
   packages = ["."]
   revision = "915416979bf70efa4bcbf1c6cd5d64c5fff9fc19"
   version = "v0.6.2"
+
+[[projects]]
+  name = "github.com/tendermint/go-wire"
+  packages = ["."]
+  revision = "fa721242b042ecd4c6ed1a934ee740db4f74e45c"
+  source = "github.com/tendermint/go-amino"
+  version = "v0.7.3"
+
+[[projects]]
+  name = "github.com/tendermint/iavl"
+  packages = ["."]
+  revision = "fd37a0fa3a7454423233bc3d5ea828f38e0af787"
+  version = "v0.7.0"
 
 [[projects]]
   name = "github.com/tendermint/tendermint"
@@ -375,6 +414,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b537c1674a7890bed56324237ed6f43ba2ee2c487d43dd961dac87ce81c8706b"
+  inputs-digest = "3af7b6fd5d31487f72d50eedad59e7c60adc4e5c19d40f51adfe0c0fd4ca8125"
   solver-name = "gps-cdcl"
   solver-version = 1

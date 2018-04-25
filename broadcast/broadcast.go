@@ -1,32 +1,41 @@
 package broadcast
 
-// import (
-// 	"github.com/tendermint/go-crypto"
-// )
+import (
+	"encoding/json"
 
-// var (
-// 	cdc = app.MakeCodec()
-// )
+	"github.com/lino-network/lino-go/transport"
+	"github.com/tendermint/go-crypto"
+)
 
 // type BroadcastCallback func(result, error)
 
-// func BroadcastOperation(operation interface{}, rawPrivKey string, broadcastCallback BroadcastCallback) {
-// 	privKey, err := crypto.PrivKeyFromBytes([]byte(rawPrivKey))
-// 	if err != nil {
-// 		broadcastCallback(result, err)
-// 		return
-// 	}
+func BroadcastTransaction(transaction interface{}, rawPrivKey string) {
+	transport := transport.NewTransportFromViper()
+	privKey, _ := crypto.PrivKeyFromBytes([]byte(rawPrivKey))
+	txBytes, _ := SignAndBuild(transaction, privKey)
+	transport.BroadcastTx(txBytes)
+}
 
-// 	switch op := operation.(type) {
-// 	case TransferToAddress:
-// 		amount, err := sdk.NewRatFromDecimal(op.Amount)
-// 		if err != nil {
-// 			broadcastCallback(result, err)
-// 			return
-// 		}
-// 		msg := acc.NewTransferMsg(op.From, types.LNO(amount), op.Memo, acc.TransferToAddr(sdk.Address(op.ToAddress)))
-// 		SignBuildBroadcast(msg, cdc, privKey)
-// 	}
-// }
+func SignAndBuild(transaction interface{}, privKey crypto.PrivKey) ([]byte, error) {
+	// build
+	signMsg := sdk.StdSignMsg{
+		ChainID:   t.ChainID,
+		Sequences: []int64{t.Sequence},
+		Msg:       msg,
+	}
+	// sign
+	sig := privKey.Sign(signMsg.Bytes())
+	sigs := []sdk.StdSignature{{
+		PubKey:    privKey.PubKey(),
+		Signature: sig,
+		Sequence:  t.Sequence,
+	}}
 
-
+	// marshal bytes
+	tx := sdk.NewStdTx(signMsg.Msg, signMsg.Fee, sigs)
+	txBytes, err := json.Marshal(tx)
+	if err != nil {
+		return nil, err
+	}
+	return txBytes, nil
+}

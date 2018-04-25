@@ -1,4 +1,4 @@
-package broadcast
+package model
 
 type PublishPost struct {
 	PostID                  string            `json:"post_id"`

@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
+	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	cmn "github.com/tendermint/tmlibs/common"
 )
 
@@ -48,67 +49,29 @@ func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err er
 	return resp.Value, nil
 }
 
-// func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, error) {
-// 	node, err := t.GetNode()
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, error) {
+	node, err := t.GetNode()
+	if err != nil {
+		return nil, err
+	}
 
-// 	res, err := node.BroadcastTxCommit(tx)
-// 	if err != nil {
-// 		return res, err
-// 	}
+	res, err := node.BroadcastTxCommit(tx)
+	if err != nil {
+		return res, err
+	}
 
-// 	if res.CheckTx.Code != uint32(0) {
-// 		return res, errors.Errorf("CheckTx failed: (%d) %s",
-// 			res.CheckTx.Code,
-// 			res.CheckTx.Log)
-// 	}
-// 	if res.DeliverTx.Code != uint32(0) {
-// 		return res, errors.Errorf("DeliverTx failed: (%d) %s",
-// 			res.DeliverTx.Code,
-// 			res.DeliverTx.Log)
-// 	}
-// 	return res, err
-// }
-
-// func (t Transport) SignBuildBroadcast(
-// 	msg sdk.Msg, cdc *wire.Codec, privKey crypto.PrivKey) (*ctypes.ResultBroadcastTxCommit, error) {
-// 	// build
-// 	signMsg := sdk.StdSignMsg{
-// 		ChainID:   t.ChainID,
-// 		Sequences: []int64{t.Sequence},
-// 		Msg:       msg,
-// 	}
-
-// 	keybase, err := keys.GetKeyBase()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	// sign
-// 	bz := signMsg.Bytes()
-// 	sig, pubkey, err := keybase.Sign(name, passphrase, bz)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	sigs := []sdk.StdSignature{{
-// 		PubKey:    pubkey,
-// 		Signature: sig,
-// 		Sequence:  t.Sequence,
-// 	}}
-
-// 	// marshal bytes
-// 	tx := sdk.NewStdTx(signMsg.Msg, signMsg.Fee, sigs)
-// 	txBytes, err := cdc.MarshalBinary(tx)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	// broadcast
-// 	return ctx.BroadcastTx(txBytes)
-// }
+	if res.CheckTx.Code != uint32(0) {
+		return res, errors.Errorf("CheckTx failed: (%d) %s",
+			res.CheckTx.Code,
+			res.CheckTx.Log)
+	}
+	if res.DeliverTx.Code != uint32(0) {
+		return res, errors.Errorf("DeliverTx failed: (%d) %s",
+			res.DeliverTx.Code,
+			res.DeliverTx.Log)
+	}
+	return res, err
+}
 
 func (t Transport) GetNode() (rpcclient.Client, error) {
 	if t.Client == nil {
