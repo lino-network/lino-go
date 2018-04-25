@@ -2,30 +2,34 @@ package query
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
 )
 
-func GetAllValidators() error {
+func GetAllValidators() (*model.ValidatorList, error) {
 	transport := transport.NewTransportFromViper()
-	res, err := transport.Query(GetValidatorListKey(), ValidatorKVStoreKey)
+	resp, err := transport.Query(GetValidatorListKey(), ValidatorKVStoreKey)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	validatorList := new(model.ValidatorList)
-	if err := json.Unmarshal(res, validatorList); err != nil {
-		return err
+	if err := json.Unmarshal(resp, validatorList); err != nil {
+		return validatorList, err
 	}
+	return validatorList, nil
+}
 
-	// print out whole bank
-	output, err := json.MarshalIndent(validatorList, "", "  ")
+func GetValidator(username string) (*model.Validator, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(GetValidatorKey(username), ValidatorKVStoreKey)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	fmt.Println(string(output))
-
-	return nil
+	validator := new(model.Validator)
+	if err := json.Unmarshal(resp, validator); err != nil {
+		return nil, err
+	}
+	return validator, nil
 }

@@ -18,7 +18,7 @@ type Transport struct {
 
 func NewTransportFromViper() Transport {
 	var rpc rpcclient.Client
-	nodeURI := viper.GetString("localhost")
+	nodeURI := "localhost:46657"
 	if nodeURI != "" {
 		rpc = rpcclient.NewHTTP(nodeURI, "/websocket")
 	}
