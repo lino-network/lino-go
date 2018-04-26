@@ -104,16 +104,6 @@ func EncodeSignMsg(msgBytes []byte, chainId string, seq int64) ([]byte, error) {
 	return json.Marshal(stdSignMsg)
 }
 
-func GetMsgType(msg interface{}) (byte, error) {
-	switch msg := msg.(type) {
-	case model.TransferToAddress:
-		return msgTypeTransfer, nil
-	default:
-		fmt.Println("Cannot find this message", msg)
-		return 0, nil
-	}
-}
-
 func GetPubKeyTypeAndHex(pubKey crypto.PubKey) (byte, string, error) {
 	keyEd25519, ok := pubKey.(crypto.PubKeyEd25519)
 	if ok {
@@ -141,5 +131,50 @@ func GetSignatureTypeAndHex(sig crypto.Signature) (byte, string, error) {
 		return signatureTypeSecp256k1, hex.EncodeToString(sigSecp256k1[:]), nil
 	}
 	return 0, "", nil
+}
 
+func GetMsgType(msg interface{}) (byte, error) {
+	switch msg := msg.(type) {
+	case model.Follow:
+		return msgTypeFollow, nil
+	case model.Unfollow:
+		return msgTypeUnfollow, nil
+	case model.TransferToAddress:
+		return msgTypeTransfer, nil
+	case model.TransferToUsername:
+		return msgTypeTransfer, nil
+	case model.Like:
+		return msgTypeLike, nil
+	case model.Donate:
+		return msgTypeDonate, nil
+	case model.ValidatorWithdraw:
+		return msgTypeValidatorWithdraw, nil
+	case model.ValidatorRevoke:
+		return msgTypeValidatorRevoke, nil
+	case model.Claim:
+		return msgTypeClaim, nil
+	case model.VoterDeposit:
+		return msgTypeVoterDeposit, nil
+	case model.VoterRevoke:
+		return msgTypeVoterRevoke, nil
+	case model.VoterWithdraw:
+		return msgTypeVoterWithdraw, nil
+	case model.Delegate:
+		return msgTypeDelegate, nil
+	case model.DelegatorWithdraw:
+		return msgTypeDelegatorWithdraw, nil
+	case model.RevokeDelegation:
+		return msgTypeRevokeDelegation, nil
+	case model.Vote:
+		return msgTypeVote, nil
+	case model.DeveloperRegister:
+		return msgTypeDeveloperRegister, nil
+	case model.DeveloperRevoke:
+		return msgTypeDeveloperRevoke, nil
+	case model.ProviderReport:
+		return msgTypeProviderReport, nil
+	default:
+		fmt.Println("Cannot find this message", msg)
+		return 0, nil
+	}
 }
