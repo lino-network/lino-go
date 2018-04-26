@@ -1,11 +1,8 @@
 package transport
 
 import (
-	"encoding/json"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	crypto "github.com/tendermint/go-crypto"
@@ -19,7 +16,6 @@ type Transport struct {
 	nodeUrl  string
 	sequence int64
 	client   rpcclient.Client
-	cdc      *wire.Codec
 }
 
 func NewTransportFromViper() Transport {
@@ -33,7 +29,6 @@ func NewTransportFromViper() Transport {
 		nodeUrl:  nodeUrl,
 		sequence: viper.GetInt64("0"),
 		client:   rpc,
-		cdc:      MakeCodec(),
 	}
 }
 
@@ -79,57 +74,28 @@ func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, erro
 	return res, err
 }
 
-func (t Transport) SignBuildBroadcast(transaction interface{},
+func (t Transport) SignBuildBroadcast(msg interface{},
 	privKey crypto.PrivKey) (*ctypes.ResultBroadcastTxCommit, error) {
 	// build sign msg bytes
-	signMsgBytes, _ := t.BuildSignMsg(transaction)
-
+	msgBytes, err := EncodeMsg(msg)
+	if err != nil {
+		panic(err)
+	}
+	signMsgBytes, err := EncodeSignMsg(msgBytes, t.chainId, t.sequence)
+	if err != nil {
+		panic(err)
+	}
 	// sign
 	sig := privKey.Sign(signMsgBytes)
-	sigs := []sdk.StdSignature{{
-		PubKey:    privKey.PubKey(),
-		Signature: sig,
-		Sequence:  t.sequence,
-	}}
 
 	// build transaction bytes
-	txBytes, _ := t.BulidTx(transaction, sigs)
-
-	// StdTx.Msg is an interface.
-	//cdc := wire.NewCodec()
-	//txBytes, err := json.Marshal(txBytes)
-
+	txBytes, err := EncodeTx(msg, privKey.PubKey(), sig, t.sequence)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(txBytes))
 	// broadcast
 	return t.BroadcastTx(txBytes)
-}
-
-func (t Transport) BuildSignMsg(transaction interface{}) ([]byte, error) {
-	msgBytes, err := json.Marshal(transaction)
-	if err != nil {
-		panic(err)
-	}
-	bz, err := json.Marshal(sdk.StdSignDoc{
-		ChainID:   t.chainId,
-		Sequences: []int64{t.sequence},
-		MsgBytes:  msgBytes,
-	})
-	if err != nil {
-		panic(err)
-	}
-	return bz, nil
-}
-
-func (t Transport) BulidTx(transaction interface{}, sigs []sdk.StdSignature) ([]byte, error) {
-	tx := sdk.StdTx{
-		//Transaction: transaction,
-		Signatures: sigs,
-	}
-
-	txBytes, err := t.cdc.MarshalBinary(tx)
-	if err != nil {
-		return nil, err
-	}
-	return txBytes, nil
 }
 
 func (t Transport) GetNode() (rpcclient.Client, error) {
@@ -138,8 +104,3 @@ func (t Transport) GetNode() (rpcclient.Client, error) {
 	}
 	return t.client, nil
 }
-
-// type StdTx struct {
-// 	//Transaction interface{}        `json:"msg2"`
-// 	Signatures []sdk.StdSignature `json:"signatures"`
-// }
