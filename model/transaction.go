@@ -1,5 +1,6 @@
 package model
 
+type Transaction interface{}
 type PublishPost struct {
 	PostID                  string            `json:"post_id"`
 	Title                   string            `json:"title"`
