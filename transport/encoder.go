@@ -3,7 +3,9 @@ package transport
 import (
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 
+	"github.com/lino-network/lino-go/model"
 	crypto "github.com/tendermint/go-crypto"
 )
 
@@ -56,9 +58,20 @@ type SignMsg struct {
 }
 
 func EncodeTx(msg interface{}, pubKey crypto.PubKey, sig crypto.Signature, seq int64) ([]byte, error) {
-	typeMsg := GetMsgType(msg)
-	typeKey, hexKey := GetPubKeyTypeAndHex(pubKey)
-	typeSig, hexSig := GetSignatureTypeAndHex(sig)
+	typeMsg, err := GetMsgType(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	typeKey, hexKey, err := GetPubKeyTypeAndHex(pubKey)
+	if err != nil {
+		return nil, err
+	}
+
+	typeSig, hexSig, err := GetSignatureTypeAndHex(sig)
+	if err != nil {
+		return nil, err
+	}
 
 	stdSig := Signature{
 		PubKey:   []interface{}{typeKey, hexKey},
@@ -74,7 +87,10 @@ func EncodeTx(msg interface{}, pubKey crypto.PubKey, sig crypto.Signature, seq i
 }
 
 func EncodeMsg(msg interface{}) ([]byte, error) {
-	typeMsg := GetMsgType(msg)
+	typeMsg, err := GetMsgType(msg)
+	if err != nil {
+		return nil, err
+	}
 	stdMsg := []interface{}{typeMsg, msg}
 	return json.Marshal(stdMsg)
 }
@@ -88,29 +104,42 @@ func EncodeSignMsg(msgBytes []byte, chainId string, seq int64) ([]byte, error) {
 	return json.Marshal(stdSignMsg)
 }
 
-func GetMsgType(msg interface{}) byte {
-	return msgTypeTransfer
+func GetMsgType(msg interface{}) (byte, error) {
+	switch msg := msg.(type) {
+	case model.TransferToAddress:
+		return msgTypeTransfer, nil
+	default:
+		fmt.Println("Cannot find this message", msg)
+		return 0, nil
+	}
 }
 
-func GetPubKeyTypeAndHex(pubKey crypto.PubKey) (byte, string) {
+func GetPubKeyTypeAndHex(pubKey crypto.PubKey) (byte, string, error) {
 	keyEd25519, ok := pubKey.(crypto.PubKeyEd25519)
 	if ok {
 		rawBytes := [32]byte(keyEd25519)
-		return pubKeyTypeEd25519, hex.EncodeToString(rawBytes[:])
+		return pubKeyTypeEd25519, hex.EncodeToString(rawBytes[:]), nil
 	}
 
 	keySecp256k1, ok := pubKey.(crypto.PubKeySecp256k1)
-	rawBytes := [33]byte(keySecp256k1)
-	return pubKeyTypeSecp256k1, hex.EncodeToString(rawBytes[:])
+	if ok {
+		rawBytes := [33]byte(keySecp256k1)
+		return pubKeyTypeSecp256k1, hex.EncodeToString(rawBytes[:]), nil
+	}
+	return 0, "", nil
 }
 
-func GetSignatureTypeAndHex(sig crypto.Signature) (byte, string) {
+func GetSignatureTypeAndHex(sig crypto.Signature) (byte, string, error) {
 	sigEd25519, ok := sig.(crypto.SignatureEd25519)
 	if ok {
 		rawBytes := [64]byte(sigEd25519)
-		return signatureTypeEd25519, hex.EncodeToString(rawBytes[:])
+		return signatureTypeEd25519, hex.EncodeToString(rawBytes[:]), nil
 	}
 
 	sigSecp256k1, ok := sig.(crypto.SignatureSecp256k1)
-	return signatureTypeSecp256k1, hex.EncodeToString(sigSecp256k1[:])
+	if ok {
+		return signatureTypeSecp256k1, hex.EncodeToString(sigSecp256k1[:]), nil
+	}
+	return 0, "", nil
+
 }
