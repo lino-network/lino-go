@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/lino-network/lino-go/model"
 	crypto "github.com/tendermint/go-crypto"
@@ -43,6 +44,7 @@ const (
 type Transaction struct {
 	Msg  []interface{} `json:"msg"`
 	Sigs []interface{} `json:"signatures"`
+	Fee  Fee           `json:"fee"`
 }
 
 type Signature struct {
@@ -55,6 +57,12 @@ type SignMsg struct {
 	ChainID   string  `json:"chain_id"`
 	Sequences []int64 `json:"sequences"`
 	MsgBytes  []byte  `json:"msg_bytes"`
+	FeeBytes  []byte  `json:"fee_bytes"`
+}
+
+type Fee struct {
+	Amount []int64 `json"amount"`
+	Gas    int64   `json"gas"`
 }
 
 func EncodeTx(msg interface{}, pubKey crypto.PubKey, sig crypto.Signature, seq int64) ([]byte, error) {
@@ -74,14 +82,19 @@ func EncodeTx(msg interface{}, pubKey crypto.PubKey, sig crypto.Signature, seq i
 	}
 
 	stdSig := Signature{
-		PubKey:   []interface{}{typeKey, hexKey},
-		Sig:      []interface{}{typeSig, hexSig},
+		PubKey:   []interface{}{typeKey, strings.ToUpper(hexKey)},
+		Sig:      []interface{}{typeSig, strings.ToUpper(hexSig)},
 		Sequence: seq,
 	}
 
+	stdFee := Fee{
+		Amount: []int64{},
+		Gas:    0,
+	}
 	stdTx := Transaction{
 		Msg:  []interface{}{typeMsg, msg},
 		Sigs: []interface{}{stdSig},
+		Fee:  stdFee,
 	}
 	return json.Marshal(stdTx)
 }
@@ -96,10 +109,19 @@ func EncodeMsg(msg interface{}) ([]byte, error) {
 }
 
 func EncodeSignMsg(msgBytes []byte, chainId string, seq int64) ([]byte, error) {
+	stdFee := Fee{
+		Amount: []int64{},
+		Gas:    0,
+	}
+	feeBytes, err := json.Marshal(stdFee)
+	if err != nil {
+		return nil, err
+	}
 	stdSignMsg := SignMsg{
 		ChainID:   chainId,
 		MsgBytes:  msgBytes,
 		Sequences: []int64{seq},
+		FeeBytes:  feeBytes,
 	}
 	return json.Marshal(stdSignMsg)
 }

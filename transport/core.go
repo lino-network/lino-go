@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 	crypto "github.com/tendermint/go-crypto"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -25,9 +24,9 @@ func NewTransportFromViper() Transport {
 		rpc = rpcclient.NewHTTP(nodeUrl, "/websocket")
 	}
 	return Transport{
-		chainId:  viper.GetString("test"),
+		chainId:  "test-chain-iiMiw7",
 		nodeUrl:  nodeUrl,
-		sequence: viper.GetInt64("0"),
+		sequence: 2,
 		client:   rpc,
 	}
 }
@@ -93,6 +92,7 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(string(txBytes))
 	// broadcast
 	return t.BroadcastTx(txBytes)
 }
@@ -103,3 +103,14 @@ func (t Transport) GetNode() (rpcclient.Client, error) {
 	}
 	return t.client, nil
 }
+
+// {"msg":[4,{"sender":"Lino","receiver_addr":"89920E0CF4C7910B54AB543B46F30ECAAA19EBF3","amount":"8888888","memo":""}],
+// "signatures":[{"pub_key":[1,"4ae7021dc31e64ff63f9f2b3b21b02ad55a3ba82838d686ed37b5ae98d18b5cb"],
+// 								"signature":[1,"f6d12a7c63aa595a9e088f51330f3de61b4d8babb2ccd61ed4e164dc017c287a4d89d68a63f65a812269a8c35c0d939c983c490a69fee36bb48b57d6e2941b0b"],
+// 								"sequence":1}]}
+//
+//
+// {"msg":[4,{"sender":"Lino","receiver_name":"","receiver_addr":"89920E0CF4C7910B54AB543B46F30ECAAA19EBF3","amount":"8888888","memo":""}],
+// "fee":{"Amount":[],"Gas":0},
+// "signatures":[{"pub_key":[1,"4AE7021DC31E64FF63F9F2B3B21B02AD55A3BA82838D686ED37B5AE98D18B5CB"],
+// 	"signature":[1,"7E9BA04B446F033E15A13C86F9BDE68C5E060BBC7DC11130C99C46C354A19705966CF6CD245E62A9E9BF0027333FBFC05A250096C0AF8B6C23FE27D70A44620D"],"sequence":1}]}
