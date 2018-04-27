@@ -3,6 +3,7 @@ package model
 // Account related messages
 type TransferToAddressMsg struct {
 	Sender       string `json:"sender"`
+	ReceiverName string `json:"receiver_name"`
 	ReceiverAddr string `json:"receiver_addr"`
 	Amount       string `json:"amount"`
 	Memo         string `json:"memo"`

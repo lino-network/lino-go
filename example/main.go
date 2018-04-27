@@ -20,10 +20,23 @@ func main() {
 	output, _ = json.MarshalIndent(res1, "", "  ")
 	fmt.Println(string(output))
 
+	addr := "89920E0CF4C7910B54AB543B46F30ECAAA19EBF3"
+	// data, err := hex.DecodeString(addr)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// bz := []byte(addr)
+
+	// s := strings.ToUpper(hex.EncodeToString(bz))
+	// jbz := make([]byte, len(s)+2)
+	// jbz[0] = '"'
+	// copy(jbz[1:], []byte(s))
+	// jbz[len(jbz)-1] = '"'
+
 	// broadcast ransaction example
 	transferTx := model.TransferToAddressMsg{
 		Sender:       "Lino",
-		ReceiverAddr: "89920E0CF4C7910B54AB543B46F30ECAAA19EBF3",
+		ReceiverAddr: addr,
 		Amount:       "8888888",
 	}
 

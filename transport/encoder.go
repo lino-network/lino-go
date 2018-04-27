@@ -56,8 +56,9 @@ type Signature struct {
 type SignMsg struct {
 	ChainID   string  `json:"chain_id"`
 	Sequences []int64 `json:"sequences"`
-	MsgBytes  []byte  `json:"msg_bytes"`
 	FeeBytes  []byte  `json:"fee_bytes"`
+	MsgBytes  []byte  `json:"msg_bytes"`
+	AltBytes  []byte  `json:"alt_bytes"`
 }
 
 type Fee struct {
@@ -108,7 +109,7 @@ func EncodeMsg(msg interface{}) ([]byte, error) {
 	return json.Marshal(stdMsg)
 }
 
-func EncodeSignMsg(msgBytes []byte, chainId string, seq int64) ([]byte, error) {
+func EncodeSignMsg(msg interface{}, chainId string, seq int64) ([]byte, error) {
 	stdFee := Fee{
 		Amount: []int64{},
 		Gas:    0,
@@ -117,6 +118,12 @@ func EncodeSignMsg(msgBytes []byte, chainId string, seq int64) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	msgBytes, err := json.Marshal(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("message after marshal json ", string(msgBytes))
 	stdSignMsg := SignMsg{
 		ChainID:   chainId,
 		MsgBytes:  msgBytes,
