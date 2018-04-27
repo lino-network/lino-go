@@ -33,3 +33,70 @@ func GetValidator(username string) (*model.Validator, error) {
 	}
 	return validator, nil
 }
+
+func GetDelegation(voter string, delegator string) (*model.Delegation, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(GetDelegationKey(voter, delegator), VoteKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	delegation := new(model.Delegation)
+	if err := json.Unmarshal(resp, delegation); err != nil {
+		return nil, err
+	}
+	return delegation, nil
+}
+
+func GetInfraProvider(providerName string) (*model.InfraProvider, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(GetInfraProviderKey(providerName), InfraKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	provider := new(model.InfraProvider)
+	if err := json.Unmarshal(resp, provider); err != nil {
+		return nil, err
+	}
+	return provider, nil
+}
+
+func GetInfraProviders() (*model.InfraProviderList, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(GetInfraProviderListKey(), InfraKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	providerList := new(model.InfraProviderList)
+	if err := json.Unmarshal(resp, providerList); err != nil {
+		return nil, err
+	}
+	return providerList, nil
+}
+
+func GetDeveloper(developerName string) (*model.Developer, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(GetDeveloperKey(developerName), DeveloperKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	developer := new(model.Developer)
+	if err := json.Unmarshal(resp, developer); err != nil {
+		return nil, err
+	}
+	return developer, nil
+}
+
+func GetDevelopers() (*model.DeveloperList, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(GetDeveloperListKey(), DeveloperKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	developerList := new(model.DeveloperList)
+	if err := json.Unmarshal(resp, developerList); err != nil {
+		return nil, err
+	}
+	return developerList, nil
+}
