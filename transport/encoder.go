@@ -41,29 +41,9 @@ const (
 	signatureTypeSecp256k1 = 0x2
 )
 
-type Transaction struct {
-	Msg  []interface{} `json:"msg"`
-	Sigs []interface{} `json:"signatures"`
-	Fee  Fee           `json:"fee"`
-}
-
-type Signature struct {
-	PubKey   []interface{} `json:"pub_key"`
-	Sig      []interface{} `json:"signature"`
-	Sequence int64         `json:"sequence"`
-}
-
-type SignMsg struct {
-	ChainID   string  `json:"chain_id"`
-	Sequences []int64 `json:"sequences"`
-	FeeBytes  []byte  `json:"fee_bytes"`
-	MsgBytes  []byte  `json:"msg_bytes"`
-	AltBytes  []byte  `json:"alt_bytes"`
-}
-
-type Fee struct {
-	Amount []int64 `json"amount"`
-	Gas    int64   `json"gas"`
+var ZeroFee = Fee{
+	Amount: []int64{},
+	Gas:    0,
 }
 
 func EncodeTx(msg interface{}, pubKey crypto.PubKey, sig crypto.Signature, seq int64) ([]byte, error) {
@@ -88,14 +68,10 @@ func EncodeTx(msg interface{}, pubKey crypto.PubKey, sig crypto.Signature, seq i
 		Sequence: seq,
 	}
 
-	stdFee := Fee{
-		Amount: []int64{},
-		Gas:    0,
-	}
 	stdTx := Transaction{
 		Msg:  []interface{}{typeMsg, msg},
 		Sigs: []interface{}{stdSig},
-		Fee:  stdFee,
+		Fee:  ZeroFee,
 	}
 	return json.Marshal(stdTx)
 }
@@ -110,11 +86,7 @@ func EncodeMsg(msg interface{}) ([]byte, error) {
 }
 
 func EncodeSignMsg(msg interface{}, chainId string, seq int64) ([]byte, error) {
-	stdFee := Fee{
-		Amount: []int64{},
-		Gas:    0,
-	}
-	feeBytes, err := json.Marshal(stdFee)
+	feeBytes, err := json.Marshal(ZeroFee)
 	if err != nil {
 		return nil, err
 	}
@@ -122,8 +94,6 @@ func EncodeSignMsg(msg interface{}, chainId string, seq int64) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("message after marshal json ", string(msgBytes))
 	stdSignMsg := SignMsg{
 		ChainID:   chainId,
 		MsgBytes:  msgBytes,

@@ -26,7 +26,7 @@ func NewTransportFromViper() Transport {
 	return Transport{
 		chainId:  "test-chain-iiMiw7",
 		nodeUrl:  nodeUrl,
-		sequence: 4,
+		sequence: 6,
 		client:   rpc,
 	}
 }
@@ -75,11 +75,6 @@ func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, erro
 
 func (t Transport) SignBuildBroadcast(msg interface{},
 	privKey crypto.PrivKey) (*ctypes.ResultBroadcastTxCommit, error) {
-	// build sign msg bytes
-	// msgBytes, err := EncodeMsg(msg)
-	// if err != nil {
-	// 	panic(err)
-	// }
 	signMsgBytes, err := EncodeSignMsg(msg, t.chainId, t.sequence)
 	if err != nil {
 		panic(err)
@@ -87,15 +82,11 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	// sign
 	sig := privKey.Sign(signMsgBytes)
 
-	fmt.Println("sign message after marshal json ", string(signMsgBytes))
-	fmt.Println("sig is ", sig)
-
 	// build transaction bytes
 	txBytes, err := EncodeTx(msg, privKey.PubKey(), sig, t.sequence)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(txBytes))
 	// broadcast
 	return t.BroadcastTx(txBytes)
 }
@@ -106,14 +97,3 @@ func (t Transport) GetNode() (rpcclient.Client, error) {
 	}
 	return t.client, nil
 }
-
-//right
-// message is  {"chain_id":"test-chain-iiMiw7","sequences":[2],
-// 	"fee_bytes":"eyJBbW91bnQiOltdLCJHYXMiOjB9",
-// 	"msg_bytes":"eyJzZW5kZXIiOiJMaW5vIiwicmVjZWl2ZXJfbmFtZSI6IiIsInJlY2VpdmVyX2FkZHIiOiI4OTkyMEUwQ0Y0Qzc5MTBCNTRBQjU0M0I0NkYzMEVDQUFBMTlFQkYzIiwiYW1vdW50IjoiODg4ODg4OCIsIm1lbW8iOiIifQ==",
-// 	"alt_bytes":null}
-// sig is  {/70A3C9D6D81D.../}
-
-// me
-
-// me
