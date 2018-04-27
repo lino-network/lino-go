@@ -21,7 +21,7 @@ func main() {
 	fmt.Println(string(output))
 
 	// broadcast ransaction example
-	transferTx := model.TransferToAddress{
+	transferTx := model.TransferToAddressMsg{
 		Sender:       "Lino",
 		ReceiverAddr: "89920E0CF4C7910B54AB543B46F30ECAAA19EBF3",
 		Amount:       "8888888",

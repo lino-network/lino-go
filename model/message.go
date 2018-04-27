@@ -1,35 +1,31 @@
 package model
 
-import (
-	"github.com/lino-network/lino/types"
-)
-
 // Account related messages
-type TransferToAddress struct {
+type TransferToAddressMsg struct {
 	Sender       string `json:"sender"`
 	ReceiverAddr string `json:"receiver_addr"`
 	Amount       string `json:"amount"`
 	Memo         string `json:"memo"`
 }
 
-type TransferToUsername struct {
+type TransferToUsernameMsg struct {
 	Sender       string `json:"sender"`
 	ReceiverName string `json:"receiver_name"`
 	Amount       string `json:"amount"`
 	Memo         string `json:"memo"`
 }
 
-type Follow struct {
+type FollowMsg struct {
 	Follower string `json:"follower"`
 	Followee string `json:"followee"`
 }
 
-type Unfollow struct {
+type UnfollowMsg struct {
 	Follower string `json:"follower"`
 	Followee string `json:"followee"`
 }
 
-type Claim struct {
+type ClaimMsg struct {
 	Username string `json:"username"`
 }
 
@@ -47,22 +43,22 @@ type Claim struct {
 // 	RedistributionSplitRate sdk.Rat                `json:"redistribution_split_rate"`
 // }
 
-type Like struct {
+type LikeMsg struct {
 	Username string
 	Weight   int64
 	Author   string
 	PostID   string
 }
 
-type Donate struct {
+type DonateMsg struct {
 	Username string
-	Amount   types.LNO
+	Amount   string
 	Author   string
 	PostID   string
 	FromApp  string
 }
 
-type ReportOrUpvote struct {
+type ReportOrUpvoteMsg struct {
 	Username string
 	Author   string
 	PostID   string
@@ -77,20 +73,20 @@ type ReportOrUpvote struct {
 // 	ValPubKey crypto.PubKey `json:"validator_public_key"`
 // }
 
-type ValidatorWithdraw struct {
+type ValidatorWithdrawMsg struct {
 	Username string `json:"username"`
 	Amount   string `json:"amount"`
 }
 
-type ValidatorRevoke struct {
+type ValidatorRevokeMsg struct {
 	Username string `json:"username"`
 }
 
 // Vote related messages
-type Vote struct {
-	Voter      string            `json:"voter"`
-	ProposalID types.ProposalKey `json:"proposal_id"`
-	Result     bool              `json:"result"`
+type VoteMsg struct {
+	Voter      string `json:"voter"`
+	ProposalID string `json:"proposal_id"`
+	Result     bool   `json:"result"`
 }
 
 // type CreateProposal struct {
@@ -98,49 +94,49 @@ type Vote struct {
 // 	model.ChangeParameterDescription
 // }
 
-type VoterDeposit struct {
+type VoterDepositMsg struct {
 	Username string `json:"username"`
 	Deposit  string `json:"deposit"`
 }
 
-type VoterWithdraw struct {
+type VoterWithdrawMsg struct {
 	Username string `json:"username"`
 	Amount   string `json:"amount"`
 }
 
-type VoterRevoke struct {
+type VoterRevokeMsg struct {
 	Username string `json:"username"`
 }
 
-type Delegate struct {
+type DelegateMsg struct {
 	Delegator string `json:"delegator"`
 	Voter     string `json:"voter"`
 	Amount    string `json:"amount"`
 }
 
-type DelegatorWithdraw struct {
+type DelegatorWithdrawMsg struct {
 	Delegator string `json:"delegator"`
 	Voter     string `json:"voter"`
 	Amount    string `json:"amount"`
 }
 
-type RevokeDelegation struct {
+type RevokeDelegationMsg struct {
 	Delegator string `json:"delegator"`
 	Voter     string `json:"voter"`
 }
 
 // developer related messages
-type DeveloperRegister struct {
+type DeveloperRegisterMsg struct {
 	Username string `json:"username"`
 	Deposit  string `json:"deposit"`
 }
 
-type DeveloperRevoke struct {
+type DeveloperRevokeMsg struct {
 	Username string `json:"username"`
 }
 
 // infra related messages
-type ProviderReport struct {
+type ProviderReportMsg struct {
 	Username string `json:"username"`
 	Usage    int64  `json:"usage"`
 }

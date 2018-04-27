@@ -135,43 +135,43 @@ func GetSignatureTypeAndHex(sig crypto.Signature) (byte, string, error) {
 
 func GetMsgType(msg interface{}) (byte, error) {
 	switch msg := msg.(type) {
-	case model.Follow:
+	case model.FollowMsg:
 		return msgTypeFollow, nil
-	case model.Unfollow:
+	case model.UnfollowMsg:
 		return msgTypeUnfollow, nil
-	case model.TransferToAddress:
+	case model.TransferToAddressMsg:
 		return msgTypeTransfer, nil
-	case model.TransferToUsername:
+	case model.TransferToUsernameMsg:
 		return msgTypeTransfer, nil
-	case model.Like:
+	case model.LikeMsg:
 		return msgTypeLike, nil
-	case model.Donate:
+	case model.DonateMsg:
 		return msgTypeDonate, nil
-	case model.ValidatorWithdraw:
+	case model.ValidatorWithdrawMsg:
 		return msgTypeValidatorWithdraw, nil
-	case model.ValidatorRevoke:
+	case model.ValidatorRevokeMsg:
 		return msgTypeValidatorRevoke, nil
-	case model.Claim:
+	case model.ClaimMsg:
 		return msgTypeClaim, nil
-	case model.VoterDeposit:
+	case model.VoterDepositMsg:
 		return msgTypeVoterDeposit, nil
-	case model.VoterRevoke:
+	case model.VoterRevokeMsg:
 		return msgTypeVoterRevoke, nil
-	case model.VoterWithdraw:
+	case model.VoterWithdrawMsg:
 		return msgTypeVoterWithdraw, nil
-	case model.Delegate:
+	case model.DelegateMsg:
 		return msgTypeDelegate, nil
-	case model.DelegatorWithdraw:
+	case model.DelegatorWithdrawMsg:
 		return msgTypeDelegatorWithdraw, nil
-	case model.RevokeDelegation:
+	case model.RevokeDelegationMsg:
 		return msgTypeRevokeDelegation, nil
-	case model.Vote:
+	case model.VoteMsg:
 		return msgTypeVote, nil
-	case model.DeveloperRegister:
+	case model.DeveloperRegisterMsg:
 		return msgTypeDeveloperRegister, nil
-	case model.DeveloperRevoke:
+	case model.DeveloperRevokeMsg:
 		return msgTypeDeveloperRevoke, nil
-	case model.ProviderReport:
+	case model.ProviderReportMsg:
 		return msgTypeProviderReport, nil
 	default:
 		fmt.Println("Cannot find this message", msg)
