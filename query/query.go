@@ -9,7 +9,7 @@ import (
 
 func GetAllValidators() (*model.ValidatorList, error) {
 	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(GetValidatorListKey(), ValidatorKVStoreKey)
+	resp, err := transport.Query(getValidatorListKey(), ValidatorKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func GetAllValidators() (*model.ValidatorList, error) {
 
 func GetValidator(username string) (*model.Validator, error) {
 	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(GetValidatorKey(username), ValidatorKVStoreKey)
+	resp, err := transport.Query(getValidatorKey(username), ValidatorKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func GetValidator(username string) (*model.Validator, error) {
 
 func GetDelegation(voter string, delegator string) (*model.Delegation, error) {
 	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(GetDelegationKey(voter, delegator), VoteKVStoreKey)
+	resp, err := transport.Query(getDelegationKey(voter, delegator), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -47,9 +47,22 @@ func GetDelegation(voter string, delegator string) (*model.Delegation, error) {
 	return delegation, nil
 }
 
+func GetVoter(voterName string) (*model.Voter, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getVoterKey(voterName), VoteKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	voter := new(model.Voter)
+	if err := json.Unmarshal(resp, voter); err != nil {
+		return nil, err
+	}
+	return voter, nil
+}
+
 func GetInfraProvider(providerName string) (*model.InfraProvider, error) {
 	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(GetInfraProviderKey(providerName), InfraKVStoreKey)
+	resp, err := transport.Query(getInfraProviderKey(providerName), InfraKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +75,7 @@ func GetInfraProvider(providerName string) (*model.InfraProvider, error) {
 
 func GetInfraProviders() (*model.InfraProviderList, error) {
 	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(GetInfraProviderListKey(), InfraKVStoreKey)
+	resp, err := transport.Query(getInfraProviderListKey(), InfraKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +89,7 @@ func GetInfraProviders() (*model.InfraProviderList, error) {
 
 func GetDeveloper(developerName string) (*model.Developer, error) {
 	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(GetDeveloperKey(developerName), DeveloperKVStoreKey)
+	resp, err := transport.Query(getDeveloperKey(developerName), DeveloperKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +102,7 @@ func GetDeveloper(developerName string) (*model.Developer, error) {
 
 func GetDevelopers() (*model.DeveloperList, error) {
 	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(GetDeveloperListKey(), DeveloperKVStoreKey)
+	resp, err := transport.Query(getDeveloperListKey(), DeveloperKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +124,7 @@ func GetAccountSequence(username string) (int64, error) {
 
 func GetAccountMeta(username string) (*model.AccountMeta, error) {
 	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(GetAccountMetaKey(username), AccountKVStoreKey)
+	resp, err := transport.Query(getAccountMetaKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -124,12 +137,13 @@ func GetAccountMeta(username string) (*model.AccountMeta, error) {
 
 func GetAccountBank(address string) (*model.AccountBank, error) {
 	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(GetAccountBankKey(address), AccountKVStoreKey)
+	resp, err := transport.Query(getAccountBankKey(address), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	bank := new(model.AccountBank)
 	if err := json.Unmarshal(resp, bank); err != nil {
+		panic(err)
 		return nil, err
 	}
 	return bank, nil

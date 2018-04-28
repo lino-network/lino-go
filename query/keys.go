@@ -1,5 +1,7 @@
 package query
 
+import "encoding/hex"
+
 const (
 	MainKVStoreKey      = "main"
 	AccountKVStoreKey   = "account"
@@ -37,66 +39,67 @@ var (
 	AccountGrantListSubstore         = []byte{0x08}
 )
 
-func GetValidatorKey(accKey string) []byte {
+func getValidatorKey(accKey string) []byte {
 	return append(ValidatorSubstore, accKey...)
 }
 
-func GetValidatorListKey() []byte {
+func getValidatorListKey() []byte {
 	return ValidatorListSubstore
 }
 
-func GetVotePrefix(id string) []byte {
+func getVotePrefix(id string) []byte {
 	return append(append(VoteSubstore, id...), KeySeparator...)
 }
 
-func GetVoteKey(proposalID string, voter string) []byte {
-	return append(GetVotePrefix(proposalID), voter...)
+func getVoteKey(proposalID string, voter string) []byte {
+	return append(getVotePrefix(proposalID), voter...)
 }
 
-func GetProposalKey(proposalID string) []byte {
+func getProposalKey(proposalID string) []byte {
 	return append(ProposalSubstore, proposalID...)
 }
 
-func GetProposalListKey() []byte {
+func getProposalListKey() []byte {
 	return ProposalListSubStore
 }
 
-func GetDelegatorPrefix(me string) []byte {
+func getDelegatorPrefix(me string) []byte {
 	return append(append(DelegatorSubstore, me...), KeySeparator...)
 }
 
-func GetDelegationKey(me string, myDelegator string) []byte {
-	return append(GetDelegatorPrefix(me), myDelegator...)
+func getDelegationKey(me string, myDelegator string) []byte {
+	return append(getDelegatorPrefix(me), myDelegator...)
 }
 
-func GetVoterKey(me string) []byte {
+func getVoterKey(me string) []byte {
 	return append(VoterSubstore, me...)
 }
 
-func GetDeveloperKey(accKey string) []byte {
+func getDeveloperKey(accKey string) []byte {
 	return append(DeveloperSubstore, accKey...)
 }
 
-func GetDeveloperListKey() []byte {
+func getDeveloperListKey() []byte {
 	return DeveloperListSubstore
 }
 
-func GetInfraProviderKey(accKey string) []byte {
+func getInfraProviderKey(accKey string) []byte {
 	return append(InfraProviderSubstore, accKey...)
 }
 
-func GetInfraProviderListKey() []byte {
+func getInfraProviderListKey() []byte {
 	return InfraProviderListSubstore
 }
 
-func GetAccountInfoKey(accKey string) []byte {
+func getAccountInfoKey(accKey string) []byte {
 	return append(AccountInfoSubstore, accKey...)
 }
 
-func GetAccountBankKey(address string) []byte {
-	return append(AccountBankSubstore, address...)
+func getAccountBankKey(address string) []byte {
+	bz, _ := hex.DecodeString(address)
+	return append(AccountBankSubstore, []byte(bz)...)
 }
 
-func GetAccountMetaKey(accKey string) []byte {
+func getAccountMetaKey(accKey string) []byte {
 	return append(AccountMetaSubstore, accKey...)
 }
