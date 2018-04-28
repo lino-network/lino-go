@@ -5,7 +5,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	crypto "github.com/tendermint/go-crypto"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	cmn "github.com/tendermint/tmlibs/common"
@@ -69,7 +68,12 @@ func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, erro
 }
 
 func (t Transport) SignBuildBroadcast(msg interface{},
-	privKey crypto.PrivKey, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
+	privKeyHex string, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
+	privKey, err := GetPrivKeyFromHex(privKeyHex)
+	if err != nil {
+		panic(err)
+		return nil, err
+	}
 	signMsgBytes, err := EncodeSignMsg(msg, t.chainId, seq)
 	if err != nil {
 		return nil, err

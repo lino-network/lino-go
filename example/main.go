@@ -6,9 +6,6 @@ import (
 )
 
 func main() {
-	privKeyBytes := [64]byte{107, 8, 232, 225, 15, 189, 53, 24, 10, 59, 201, 237, 229, 207, 233, 11, 166, 87, 140, 246, 215, 231, 64, 110, 64, 19, 94,
-		75, 9, 209, 117, 38, 253, 242, 42, 63, 91, 251, 94, 100, 100, 140, 176, 157, 223, 124, 6, 155, 36, 106, 35, 53, 164, 115, 237, 3, 163, 116, 47,
-		111, 230, 205, 0, 150}
 	// // query example
 	// res, _ := query.GetAllValidators()
 	// output, _ := json.MarshalIndent(res, "", "  ")
@@ -50,25 +47,14 @@ func main() {
 	// output, _ = json.MarshalIndent(res9, "", "  ")
 	// fmt.Println(string(output))
 	//
+
 	//broadcast ransaction example
+	LinoPrivKey := "016b08e8e10fbd35180a3bc9ede5cfe90ba6578cf6d7e7406e40135e4b09d17526fdf22a3f5bfb5e64648cb09ddf7c069b246a2335a473ed03a3742f6fe6cd0096"
 	transferTx := model.TransferMsg{
 		Sender:       "Lino",
 		ReceiverAddr: "89920E0CF4C7910B54AB543B46F30ECAAA19EBF3",
 		Amount:       "8888888",
 	}
-	broadcast.BroadcastTransaction(transferTx, privKeyBytes)
-	broadcast.BroadcastTransaction(transferTx, privKeyBytes)
-
-	// followTx := model.FollowMsg{
-	// 	Follower: "Lino",
-	// 	Followee: "Zhimao",
-	// }
-	// broadcast.BroadcastTransaction(followTx, privKeyBytes)
-	//
-	// unfollowTx := model.UnfollowMsg{
-	// 	Follower: "Lino",
-	// 	Followee: "Zhimao",
-	// }
-	// broadcast.BroadcastTransaction(unfollowTx, privKeyBytes)
+	broadcast.BroadcastTransaction(transferTx, LinoPrivKey)
 
 }

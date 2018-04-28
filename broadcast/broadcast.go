@@ -7,13 +7,11 @@ import (
 
 	"github.com/lino-network/lino-go/transport"
 	types "github.com/lino-network/lino-go/types"
-	"github.com/tendermint/go-crypto"
 )
 
-func BroadcastTransaction(transaction interface{}, rawPrivKey [64]byte) {
+func BroadcastTransaction(transaction interface{}, privKeyHex string) {
 	transport := transport.NewTransportFromViper()
-	privKey := crypto.PrivKeyEd25519(rawPrivKey)
-	res, err := transport.SignBuildBroadcast(transaction, privKey, 0)
+	res, err := transport.SignBuildBroadcast(transaction, privKeyHex, 0)
 
 	var reg = regexp.MustCompile(`expected (\d+)`)
 	var tries = 1
@@ -26,7 +24,7 @@ func BroadcastTransaction(transaction interface{}, rawPrivKey [64]byte) {
 			fmt.Println("Get Sequence number failed ! ", err)
 			return
 		}
-		res, err = transport.SignBuildBroadcast(transaction, privKey, seq)
+		res, err = transport.SignBuildBroadcast(transaction, privKeyHex, seq)
 		tries += 1
 	}
 

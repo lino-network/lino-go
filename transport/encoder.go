@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/lino-network/lino-go/model"
 	crypto "github.com/tendermint/go-crypto"
@@ -37,6 +36,9 @@ const (
 	pubKeyTypeEd25519   = 0x1
 	pubKeyTypeSecp256k1 = 0x2
 
+	priveKeyTypeEd25519   = 0x1
+	priveKeyTypeSecp256k1 = 0x2
+
 	signatureTypeEd25519   = 0x1
 	signatureTypeSecp256k1 = 0x2
 )
@@ -63,8 +65,8 @@ func EncodeTx(msg interface{}, pubKey crypto.PubKey, sig crypto.Signature, seq i
 	}
 
 	stdSig := Signature{
-		PubKey:   []interface{}{typeKey, strings.ToUpper(hexKey)},
-		Sig:      []interface{}{typeSig, strings.ToUpper(hexSig)},
+		PubKey:   []interface{}{typeKey, hexKey},
+		Sig:      []interface{}{typeSig, hexSig},
 		Sequence: seq,
 	}
 
@@ -101,6 +103,19 @@ func EncodeSignMsg(msg interface{}, chainId string, seq int64) ([]byte, error) {
 		FeeBytes:  feeBytes,
 	}
 	return json.Marshal(stdSignMsg)
+}
+
+func GetPrivKeyFromHex(privKeyHex string) (crypto.PrivKey, error) {
+	keyBytes, err := hex.DecodeString(privKeyHex)
+	if err != nil {
+		return nil, err
+	}
+	if keyBytes[0] == priveKeyTypeEd25519 {
+		var keyBytesArr [64]byte
+		copy(keyBytesArr[:], keyBytes[1:])
+		return crypto.PrivKeyEd25519(keyBytesArr), nil
+	}
+	return nil, nil
 }
 
 func GetPubKeyTypeAndHex(pubKey crypto.PubKey) (byte, string, error) {

@@ -61,11 +61,11 @@ type ReportOrUpvoteMsg struct {
 }
 
 // Validator related messages
-// type ValidatorDeposit struct {
-// 	Username  string        `json:"username"`
-// 	Deposit   string        `json:"deposit"`
-// 	ValPubKey crypto.PubKey `json:"validator_public_key"`
-// }
+type ValidatorDeposit struct {
+	Username  string `json:"username"`
+	Deposit   string `json:"deposit"`
+	ValPubKey string `json:"validator_public_key"`
+}
 
 type ValidatorWithdrawMsg struct {
 	Username string `json:"username"`
@@ -127,6 +127,13 @@ type DeveloperRegisterMsg struct {
 
 type DeveloperRevokeMsg struct {
 	Username string `json:"username"`
+}
+
+type GrantDeveloperMsg struct {
+	Username        string `json:"username"`
+	AuthenticateApp string `json:"authenticate_app"`
+	ValidityPeriod  int64  `json:"validity_period"`
+	GrantLevel      int64  `json:"grant_level"`
 }
 
 // infra related messages

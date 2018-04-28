@@ -7,6 +7,9 @@ import (
 	"github.com/lino-network/lino-go/transport"
 )
 
+func IsPrivKeyMatchUsername(username string, privKey string) (bool, error) {
+	return true, nil
+}
 func GetAllValidators() (*model.ValidatorList, error) {
 	transport := transport.NewTransportFromViper()
 	resp, err := transport.Query(getValidatorListKey(), ValidatorKVStoreKey)
