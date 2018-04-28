@@ -11,10 +11,9 @@ import (
 )
 
 type Transport struct {
-	chainId  string
-	nodeUrl  string
-	sequence int64
-	client   rpcclient.Client
+	chainId string
+	nodeUrl string
+	client  rpcclient.Client
 }
 
 func NewTransportFromViper() Transport {
@@ -24,10 +23,9 @@ func NewTransportFromViper() Transport {
 		rpc = rpcclient.NewHTTP(nodeUrl, "/websocket")
 	}
 	return Transport{
-		chainId:  "test-chain-iiMiw7",
-		nodeUrl:  nodeUrl,
-		sequence: 6,
-		client:   rpc,
+		chainId: "test-chain-NVQwvW",
+		nodeUrl: nodeUrl,
+		client:  rpc,
 	}
 }
 
@@ -74,8 +72,8 @@ func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, erro
 }
 
 func (t Transport) SignBuildBroadcast(msg interface{},
-	privKey crypto.PrivKey) (*ctypes.ResultBroadcastTxCommit, error) {
-	signMsgBytes, err := EncodeSignMsg(msg, t.chainId, t.sequence)
+	privKey crypto.PrivKey, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
+	signMsgBytes, err := EncodeSignMsg(msg, t.chainId, seq)
 	if err != nil {
 		panic(err)
 	}
@@ -83,7 +81,7 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	sig := privKey.Sign(signMsgBytes)
 
 	// build transaction bytes
-	txBytes, err := EncodeTx(msg, privKey.PubKey(), sig, t.sequence)
+	txBytes, err := EncodeTx(msg, privKey.PubKey(), sig, seq)
 	if err != nil {
 		panic(err)
 	}

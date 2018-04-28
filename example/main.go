@@ -20,15 +20,15 @@ func main() {
 	output, _ = json.MarshalIndent(res1, "", "  ")
 	fmt.Println(string(output))
 
-	// broadcast ransaction example
+	//broadcast ransaction example
 	transferTx := model.TransferToAddressMsg{
 		Sender:       "Lino",
 		ReceiverAddr: "89920E0CF4C7910B54AB543B46F30ECAAA19EBF3",
 		Amount:       "8888888",
 	}
 
-	privKeyBytes := [64]byte{114, 23, 52, 48, 243, 151, 28, 4, 144, 106, 26, 13, 109, 194, 18, 91, 181, 192, 228, 82, 232, 243, 134, 250, 3, 160, 178, 183, 87, 133, 44, 106, 74, 231, 2, 29, 195,
-		30, 100, 255, 99, 249, 242, 179, 178, 27, 2, 173, 85, 163, 186, 130, 131, 141, 104, 110, 211, 123, 90, 233, 141, 24, 181, 203}
+	privKeyBytes := [64]byte{107, 8, 232, 225, 15, 189, 53, 24, 10, 59, 201, 237, 229, 207, 233, 11, 166, 87, 140, 246, 215, 231, 64, 110, 64, 19, 94,
+		75, 9, 209, 117, 38, 253, 242, 42, 63, 91, 251, 94, 100, 100, 140, 176, 157, 223, 124, 6, 155, 36, 106, 35, 53, 164, 115, 237, 3, 163, 116, 47, 111, 230, 205, 0, 150}
 	broadcast.BroadcastTransaction(transferTx, privKeyBytes)
 
 }

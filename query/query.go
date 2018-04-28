@@ -100,3 +100,37 @@ func GetDevelopers() (*model.DeveloperList, error) {
 	}
 	return developerList, nil
 }
+
+func GetAccountSequence(username string) (int64, error) {
+	meta, err := GetAccountMeta(username)
+	if err != nil {
+		return -1, err
+	}
+	return meta.Sequence, nil
+}
+
+func GetAccountMeta(username string) (*model.AccountMeta, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(GetAccountMetaKey(username), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	meta := new(model.AccountMeta)
+	if err := json.Unmarshal(resp, meta); err != nil {
+		return nil, err
+	}
+	return meta, nil
+}
+
+func GetAccountBank(address string) (*model.AccountBank, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(GetAccountBankKey(address), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	bank := new(model.AccountBank)
+	if err := json.Unmarshal(resp, bank); err != nil {
+		return nil, err
+	}
+	return bank, nil
+}

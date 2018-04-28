@@ -57,3 +57,24 @@ type InfraProviderList struct {
 }
 
 // account related
+type AccountMeta struct {
+	Sequence            int64            `json:"sequence"`
+	LastActivity        int64            `json:"last_activity"`
+	TransactionCapacity map[string]int64 `json:"transaction_capacity"`
+}
+
+//
+// type AccountInfo struct {
+// 	Username string        `json:"username"`
+// 	Created  int64         `json:"created"`
+// 	PostKey  crypto.PubKey `json:"post_key"`
+// 	OwnerKey crypto.PubKey `json:"owner_key"`
+// 	Address  string        `json:"address"`
+// }
+
+type AccountBank struct {
+	Address  string           `json:"address"`
+	Balance  map[string]int64 `json:"balance"`
+	Username string           `json:"username"`
+	Stake    map[string]int64 `json:"stake"`
+}

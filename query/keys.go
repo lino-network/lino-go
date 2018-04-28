@@ -25,6 +25,16 @@ var (
 	DeveloperListSubstore          = []byte("Developer/DeveloperListKey")
 	InfraProviderSubstore          = []byte("InfraProvider/")
 	InfraProviderListSubstore      = []byte("InfraProvider/InfraProviderListKey")
+
+	AccountInfoSubstore              = []byte{0x00}
+	AccountBankSubstore              = []byte{0x01}
+	AccountMetaSubstore              = []byte{0x02}
+	AccountFollowerSubstore          = []byte{0x03}
+	AccountFollowingSubstore         = []byte{0x04}
+	AccountRewardSubstore            = []byte{0x05}
+	AccountPendingStakeQueueSubstore = []byte{0x06}
+	AccountRelationshipSubstore      = []byte{0x07}
+	AccountGrantListSubstore         = []byte{0x08}
 )
 
 func GetValidatorKey(accKey string) []byte {
@@ -77,4 +87,16 @@ func GetInfraProviderKey(accKey string) []byte {
 
 func GetInfraProviderListKey() []byte {
 	return InfraProviderListSubstore
+}
+
+func GetAccountInfoKey(accKey string) []byte {
+	return append(AccountInfoSubstore, accKey...)
+}
+
+func GetAccountBankKey(address string) []byte {
+	return append(AccountBankSubstore, address...)
+}
+
+func GetAccountMetaKey(accKey string) []byte {
+	return append(AccountMetaSubstore, accKey...)
 }

@@ -3,6 +3,7 @@ package broadcast
 import (
 	"fmt"
 
+	"github.com/lino-network/lino-go/query"
 	"github.com/lino-network/lino-go/transport"
 	"github.com/tendermint/go-crypto"
 )
@@ -10,7 +11,11 @@ import (
 func BroadcastTransaction(transaction interface{}, rawPrivKey [64]byte) {
 	transport := transport.NewTransportFromViper()
 	privKey := crypto.PrivKeyEd25519(rawPrivKey)
-	res, err := transport.SignBuildBroadcast(transaction, privKey)
+	seq, err := query.GetAccountSequence("Lino")
+	if err != nil {
+		panic(err)
+	}
+	res, err := transport.SignBuildBroadcast(transaction, privKey, seq)
 	if err != nil {
 		panic(err)
 	}
