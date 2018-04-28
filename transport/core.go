@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 	crypto "github.com/tendermint/go-crypto"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -17,13 +18,20 @@ type Transport struct {
 }
 
 func NewTransportFromViper() Transport {
+	v := viper.New()
+	viper.SetConfigType("json")
+	v.SetConfigName("config")
+	v.AddConfigPath("$GOPATH/src/github.com/lino-network/lino-go/")
+	v.AutomaticEnv()
+	v.ReadInConfig()
+
 	var rpc rpcclient.Client
-	nodeUrl := "localhost:46657"
+	nodeUrl := v.GetString("node_url")
 	if nodeUrl != "" {
 		rpc = rpcclient.NewHTTP(nodeUrl, "/websocket")
 	}
 	return Transport{
-		chainId: "test-chain-NVQwvW",
+		chainId: v.GetString("chain_id"),
 		nodeUrl: nodeUrl,
 		client:  rpc,
 	}
