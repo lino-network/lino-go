@@ -114,12 +114,12 @@ func GetDevelopers() (*model.DeveloperList, error) {
 	return developerList, nil
 }
 
-func GetAccountSequence(username string) (int64, error) {
+func GetAccountSequence(username string) int64 {
 	meta, err := GetAccountMeta(username)
 	if err != nil {
-		return -1, err
+		return 0
 	}
-	return meta.Sequence, nil
+	return meta.Sequence
 }
 
 func GetAccountMeta(username string) (*model.AccountMeta, error) {

@@ -65,17 +65,6 @@ func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, erro
 	if err != nil {
 		return res, err
 	}
-
-	if res.CheckTx.Code != uint32(0) {
-		return res, errors.Errorf("CheckTx failed: (%d) %s",
-			res.CheckTx.Code,
-			res.CheckTx.Log)
-	}
-	if res.DeliverTx.Code != uint32(0) {
-		return res, errors.Errorf("DeliverTx failed: (%d) %s",
-			res.DeliverTx.Code,
-			res.DeliverTx.Log)
-	}
 	return res, err
 }
 
@@ -83,7 +72,7 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	privKey crypto.PrivKey, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
 	signMsgBytes, err := EncodeSignMsg(msg, t.chainId, seq)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	// sign
 	sig := privKey.Sign(signMsgBytes)
@@ -91,7 +80,7 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	// build transaction bytes
 	txBytes, err := EncodeTx(msg, privKey.PubKey(), sig, seq)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	// broadcast
 	return t.BroadcastTx(txBytes)

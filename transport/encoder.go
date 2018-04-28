@@ -138,9 +138,7 @@ func GetMsgType(msg interface{}) (byte, error) {
 		return msgTypeFollow, nil
 	case model.UnfollowMsg:
 		return msgTypeUnfollow, nil
-	case model.TransferToAddressMsg:
-		return msgTypeTransfer, nil
-	case model.TransferToUsernameMsg:
+	case model.TransferMsg:
 		return msgTypeTransfer, nil
 	case model.LikeMsg:
 		return msgTypeLike, nil
