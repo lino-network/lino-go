@@ -3,7 +3,6 @@ package model
 import (
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 )
 
 // Account related messages
@@ -13,11 +12,13 @@ type RegisterMsg struct {
 }
 
 func (msg RegisterMsg) MarshalJSON() ([]byte, error) {
-	bytes, _ := hex.DecodeString(msg.NewPubKey)
+	bytes, err := hex.DecodeString(msg.NewPubKey)
+	if err != nil {
+		return nil, err
+	}
 	prefix := bytes[0]
 	rawKey := hex.EncodeToString(bytes[1:])
 
-	fmt.Println(len(bytes))
 	return json.Marshal(&struct {
 		NewPubKey []interface{} `json:"new_public_key"`
 		NewUser   string        `json:"new_user"`
@@ -50,18 +51,27 @@ type ClaimMsg struct {
 }
 
 // Post related messages
-// type CreatePost struct {
-// 	PostID                  string                 `json:"post_id"`
-// 	Title                   string                 `json:"title"`
-// 	Content                 string                 `json:"content"`
-// 	Author                  string                 `json:"author"`
-// 	ParentAuthor            string                 `json:"parent_author"`
-// 	ParentPostID            string                 `json:"parent_postID"`
-// 	SourceAuthor            string                 `json:"source_author"`
-// 	SourcePostID            string                 `json:"source_postID"`
-// 	Links                   []types.IDToURLMapping `json:"links"`
-// 	RedistributionSplitRate sdk.Rat                `json:"redistribution_split_rate"`
-// }
+type CreatePostMsg struct {
+	PostCreateParams
+}
+
+type PostCreateParams struct {
+	PostID                  string           `json:"post_id"`
+	Title                   string           `json:"title"`
+	Content                 string           `json:"content"`
+	Author                  string           `json:"author"`
+	ParentAuthor            string           `json:"parent_author"`
+	ParentPostID            string           `json:"parent_postID"`
+	SourceAuthor            string           `json:"source_author"`
+	SourcePostID            string           `json:"source_postID"`
+	Links                   []IDToURLMapping `json:"links"`
+	RedistributionSplitRate string           `json:"redistribution_split_rate"`
+}
+
+type IDToURLMapping struct {
+	Identifier string `json:"identifier"`
+	URL        string `json:"url"`
+}
 
 type LikeMsg struct {
 	Username string

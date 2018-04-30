@@ -63,14 +63,13 @@ type AccountMeta struct {
 	TransactionCapacity map[string]int64 `json:"transaction_capacity"`
 }
 
-//
-// type AccountInfo struct {
-// 	Username string        `json:"username"`
-// 	Created  int64         `json:"created"`
-// 	PostKey  crypto.PubKey `json:"post_key"`
-// 	OwnerKey crypto.PubKey `json:"owner_key"`
-// 	Address  string        `json:"address"`
-// }
+type AccountInfo struct {
+	Username string  `json:"username"`
+	Created  float64 `json:"created"`
+	PostKey  string  `json:"post_key"`
+	OwnerKey string  `json:"owner_key"`
+	Address  string  `json:"address"`
+}
 
 type AccountBank struct {
 	Address  string           `json:"address"`

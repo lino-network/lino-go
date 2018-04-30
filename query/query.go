@@ -41,10 +41,23 @@ func GetAccountBank(address string) (*model.AccountBank, error) {
 	}
 	bank := new(model.AccountBank)
 	if err := json.Unmarshal(resp, bank); err != nil {
-		panic(err)
 		return nil, err
 	}
 	return bank, nil
+}
+
+func GetAccountInfo(username string) (*model.AccountInfo, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	info := new(model.AccountInfo)
+	if err := json.Unmarshal(resp, info); err != nil {
+		panic(err)
+		return nil, err
+	}
+	return info, nil
 }
 
 // Post related query

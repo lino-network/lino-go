@@ -85,7 +85,7 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(txBytes))
+	fmt.Println("Tx:", string(txBytes))
 	// broadcast
 	return t.BroadcastTx(txBytes)
 }
