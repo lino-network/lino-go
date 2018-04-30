@@ -1,6 +1,32 @@
 package model
 
+import (
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+)
+
 // Account related messages
+type RegisterMsg struct {
+	NewUser   string `json:"new_user"`
+	NewPubKey string `json:"new_public_key"`
+}
+
+func (msg RegisterMsg) MarshalJSON() ([]byte, error) {
+	bytes, _ := hex.DecodeString(msg.NewPubKey)
+	prefix := bytes[0]
+	rawKey := hex.EncodeToString(bytes[1:])
+
+	fmt.Println(len(bytes))
+	return json.Marshal(&struct {
+		NewPubKey []interface{} `json:"new_public_key"`
+		NewUser   string        `json:"new_user"`
+	}{
+		NewPubKey: []interface{}{prefix, rawKey},
+		NewUser:   msg.NewUser,
+	})
+}
+
 type TransferMsg struct {
 	Sender       string `json:"sender"`
 	ReceiverName string `json:"receiver_name"`

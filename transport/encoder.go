@@ -115,6 +115,7 @@ func GetPrivKeyFromHex(privKeyHex string) (crypto.PrivKey, error) {
 		copy(keyBytesArr[:], keyBytes[1:])
 		return crypto.PrivKeyEd25519(keyBytesArr), nil
 	}
+	panic("Do not support other type of keys!")
 	return nil, nil
 }
 
@@ -149,6 +150,8 @@ func GetSignatureTypeAndHex(sig crypto.Signature) (byte, string, error) {
 
 func GetMsgType(msg interface{}) (byte, error) {
 	switch msg := msg.(type) {
+	case model.RegisterMsg:
+		return msgTypeRegister, nil
 	case model.FollowMsg:
 		return msgTypeFollow, nil
 	case model.UnfollowMsg:

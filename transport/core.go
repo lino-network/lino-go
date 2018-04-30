@@ -71,7 +71,6 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	privKeyHex string, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
 	privKey, err := GetPrivKeyFromHex(privKeyHex)
 	if err != nil {
-		panic(err)
 		return nil, err
 	}
 	signMsgBytes, err := EncodeSignMsg(msg, t.chainId, seq)
@@ -86,6 +85,7 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(txBytes))
 	// broadcast
 	return t.BroadcastTx(txBytes)
 }

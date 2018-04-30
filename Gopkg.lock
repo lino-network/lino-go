@@ -8,17 +8,6 @@
   revision = "675abc5df3c5531bc741b56a765e35623459da6d"
 
 [[projects]]
-  branch = "develop"
-  name = "github.com/cosmos/cosmos-sdk"
-  packages = [
-    "baseapp",
-    "store",
-    "types",
-    "wire"
-  ]
-  revision = "85a49646eb62bb60dde93ff5dd2e69cf24294e1b"
-
-[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -125,20 +114,6 @@
   revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
-  branch = "ZhimaoL-patch-1"
-  name = "github.com/lino-network/lino"
-  packages = [
-    "app",
-    "tx/account",
-    "tx/auth",
-    "tx/post",
-    "tx/register",
-    "tx/validator",
-    "types"
-  ]
-  revision = "d8f95d2b3dd7f1db1a5bbc5c4a13057b60edea5a"
-
-[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
@@ -226,7 +201,6 @@
     "client",
     "example/code",
     "example/kvstore",
-    "server",
     "types"
   ]
   revision = "78a8905690ef54f9d57e3b2b0ee7ad3a04ef3f1f"
@@ -245,27 +219,14 @@
 [[projects]]
   name = "github.com/tendermint/go-amino"
   packages = ["."]
-  revision = "42246108ff925a457fb709475070a03dfd3e2b5c"
-  version = "0.9.6"
+  revision = "3668c02a8feace009f80754a5e5a8541e5d7b996"
+  version = "0.9.8"
 
 [[projects]]
   name = "github.com/tendermint/go-crypto"
   packages = ["."]
   revision = "915416979bf70efa4bcbf1c6cd5d64c5fff9fc19"
   version = "v0.6.2"
-
-[[projects]]
-  name = "github.com/tendermint/go-wire"
-  packages = ["."]
-  revision = "fa721242b042ecd4c6ed1a934ee740db4f74e45c"
-  source = "github.com/tendermint/go-amino"
-  version = "v0.7.3"
-
-[[projects]]
-  name = "github.com/tendermint/iavl"
-  packages = ["."]
-  revision = "fd37a0fa3a7454423233bc3d5ea828f38e0af787"
-  version = "v0.7.0"
 
 [[projects]]
   name = "github.com/tendermint/tendermint"
@@ -299,8 +260,8 @@
     "types/priv_validator",
     "version"
   ]
-  revision = "a2930cd7233f04f5a651020669289296545e70dc"
-  version = "v0.19.0"
+  revision = "26f633ed48441f72895b710f0e87b7b6c6791066"
+  version = "v0.19.1"
 
 [[projects]]
   name = "github.com/tendermint/tmlibs"
@@ -331,7 +292,7 @@
     "ripemd160",
     "salsa20/salsa"
   ]
-  revision = "b0697eccbea9adec5b7ba8008f4c33d98d733388"
+  revision = "ae8bce0030810cf999bb2b9868ae5c7c58e6343b"
 
 [[projects]]
   branch = "master"
@@ -352,7 +313,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "79b0c6888797020a994db17c8510466c72fe75d9"
+  revision = "4adea008a5e5f820b6028611ae0b6b3fbcec534b"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -379,7 +340,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "7fd901a49ba6a7f87732eb344f6e3c5b19d1b200"
+  revision = "86e600f69ee4704c6efbf6a2a40a5c10700e76c2"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -414,6 +375,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3af7b6fd5d31487f72d50eedad59e7c60adc4e5c19d40f51adfe0c0fd4ca8125"
+  inputs-digest = "a699867f2f91bc04ef50bf1b6e132790d1d0533b80f660468eaeef6e8b6a9aa2"
   solver-name = "gps-cdcl"
   solver-version = 1
