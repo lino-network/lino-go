@@ -1,6 +1,6 @@
 package model
 
-import "github.com/tendermint/go-crypto"
+import crypto "github.com/tendermint/go-crypto"
 
 type Msg interface{}
 
@@ -79,7 +79,7 @@ type ReportOrUpvoteMsg struct {
 }
 
 // Validator related messages
-type ValidatorDeposit struct {
+type ValidatorDepositMsg struct {
 	Username  string        `json:"username"`
 	Deposit   string        `json:"deposit"`
 	ValPubKey crypto.PubKey `json:"validator_public_key"`

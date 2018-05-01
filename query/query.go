@@ -39,6 +39,7 @@ func GetAccountBank(address string) (*model.AccountBank, error) {
 	}
 	bank := new(model.AccountBank)
 	if err := transport.Cdc.UnmarshalJSON(resp, bank); err != nil {
+		panic(err)
 		return nil, err
 	}
 	return bank, nil
