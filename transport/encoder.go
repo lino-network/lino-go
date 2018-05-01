@@ -1,6 +1,9 @@
 package transport
 
 import (
+	"encoding/hex"
+	"encoding/json"
+
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/lino-network/lino-go/model"
 	crypto "github.com/tendermint/go-crypto"
@@ -58,11 +61,11 @@ func EncodeTx(cdc *wire.Codec, msg interface{}, pubKey crypto.PubKey,
 }
 
 func EncodeSignMsg(cdc *wire.Codec, msg interface{}, chainId string, seq int64) ([]byte, error) {
-	feeBytes, err := cdc.MarshalJSON(ZeroFee)
+	feeBytes, err := json.Marshal(ZeroFee)
 	if err != nil {
 		return nil, err
 	}
-	msgBytes, err := cdc.MarshalJSON(msg)
+	msgBytes, err := json.Marshal(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -73,4 +76,12 @@ func EncodeSignMsg(cdc *wire.Codec, msg interface{}, chainId string, seq int64) 
 		FeeBytes:  feeBytes,
 	}
 	return cdc.MarshalJSON(stdSignMsg)
+}
+
+func GetPrivKeyFromHex(privHex string) (crypto.PrivKey, error) {
+	keyBytes, err := hex.DecodeString(privHex)
+	if err != nil {
+		return nil, err
+	}
+	return crypto.PrivKeyFromBytes(keyBytes)
 }

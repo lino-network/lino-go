@@ -3,8 +3,6 @@ package transport
 import (
 	"fmt"
 
-	"github.com/tendermint/go-crypto"
-
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -73,12 +71,17 @@ func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, erro
 }
 
 func (t Transport) SignBuildBroadcast(msg interface{},
-	privKey crypto.PrivKey, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
+	privKeyHex string, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
+	privKey, err := GetPrivKeyFromHex(privKeyHex)
+	if err != nil {
+		return nil, err
+	}
+
 	signMsgBytes, err := EncodeSignMsg(t.Cdc, msg, t.chainId, seq)
 	if err != nil {
 		return nil, err
 	}
-	// sign
+	// SignatureFromBytes
 	sig := privKey.Sign(signMsgBytes)
 
 	// build transaction bytes

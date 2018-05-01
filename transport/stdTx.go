@@ -7,8 +7,8 @@ import (
 
 type Transaction struct {
 	Msg  model.Msg   `json:"msg"`
-	Sigs []Signature `json:"signatures"`
 	Fee  Fee         `json:"fee"`
+	Sigs []Signature `json:"signatures"`
 }
 
 type Signature struct {

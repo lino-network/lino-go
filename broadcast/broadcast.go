@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/lino-network/lino-go/transport"
-	types "github.com/lino-network/lino-go/types"
+	"github.com/lino-network/lino-go/types"
 )
 
 func BroadcastTransaction(transaction interface{}, privKeyHex string) {
