@@ -1,12 +1,11 @@
 package main
 
 import (
-	"encoding/hex"
-	"strings"
+	"fmt"
+	"time"
 
 	"github.com/lino-network/lino-go/broadcast"
 	"github.com/lino-network/lino-go/model"
-	crypto "github.com/tendermint/go-crypto"
 )
 
 func main() {
@@ -56,41 +55,45 @@ func main() {
 	// fmt.Println(string(output))
 
 	//broadcast ransaction example
-	user1 := "yukai"
-	priv1 := crypto.GenPrivKeyEd25519()
-	pub1 := priv1.PubKey()
-	addr1 := pub1.Address()
-
-	addrHex1 := strings.ToUpper(hex.EncodeToString(addr1))
-	privHex1 := hex.EncodeToString(priv1.Bytes())
-
-	registerTx := model.RegisterMsg{
-		NewUser:   user1,
-		NewPubKey: pub1,
-	}
+	// user1 := "yukai"
+	// priv1 := crypto.GenPrivKeyEd25519()
+	// pub1 := priv1.PubKey()
+	// addr1 := pub1.Address()
+	//
+	// addrHex1 := strings.ToUpper(hex.EncodeToString(addr1))
+	// privHex1 := hex.EncodeToString(priv1.Bytes())
+	//
+	// registerTx := model.RegisterMsg{
+	// 	NewUser:   user1,
+	// 	NewPubKey: pub1,
+	// }
 	LinoPrivKey := "a328891240d81fadfd185ff29d0230dd312ff0ded236c15293e635ba1fe3047726546eece62e3126ab8083dc1d845c319ce3002757c036a489818830ceb85b884693940369"
 	transferTx := model.TransferMsg{
 		Sender:       "Lino",
-		ReceiverAddr: addrHex1,
+		ReceiverAddr: "123456",
 		Amount:       "10000",
 	}
-	postParam := model.PostCreateParams{
-		PostID:       "TestPostID",
-		Title:        "this is a test",
-		Content:      "dummy content",
-		Author:       "Lino",
-		ParentAuthor: "",
-		ParentPostID: "",
-		SourceAuthor: "",
-		SourcePostID: "",
-		Links:        []model.IDToURLMapping{{Identifier: "id1", URL: "url1"}},
-		RedistributionSplitRate: "0",
-	}
-	postTx := model.CreatePostMsg{
-		PostCreateParams: postParam,
-	}
-	broadcast.BroadcastTransaction(postTx, LinoPrivKey)
-	broadcast.BroadcastTransaction(transferTx, LinoPrivKey)
-	broadcast.BroadcastTransaction(registerTx, privHex1)
+	// postParam := model.PostCreateParams{
+	// 	PostID:       "TestPostID",
+	// 	Title:        "this is a test",
+	// 	Content:      "dummy content",
+	// 	Author:       "Lino",
+	// 	ParentAuthor: "",
+	// 	ParentPostID: "",
+	// 	SourceAuthor: "",
+	// 	SourcePostID: "",
+	// 	Links:        []model.IDToURLMapping{{Identifier: "id1", URL: "url1"}},
+	// 	RedistributionSplitRate: "0",
+	// }
+	// postTx := model.CreatePostMsg{
+	// 	PostCreateParams: postParam,
+	// }
+	//broadcast.BroadcastTransaction(postTx, LinoPrivKey)
+	broadcast.BroadcastTransaction(transferTx, LinoPrivKey, func(err error, result string) {
+		fmt.Println(result)
+	})
+
+	time.Sleep(10 * time.Second)
+	//broadcast.BroadcastTransaction(registerTx, privHex1)
 
 }
