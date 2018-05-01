@@ -1,5 +1,7 @@
 package model
 
+import "github.com/tendermint/go-crypto"
+
 // validator related struct
 type ValidatorList struct {
 	OncallValidators   []string         `json:"oncall_validators"`
@@ -64,11 +66,11 @@ type AccountMeta struct {
 }
 
 type AccountInfo struct {
-	Username string  `json:"username"`
-	Created  float64 `json:"created"`
-	PostKey  string  `json:"post_key"`
-	OwnerKey string  `json:"owner_key"`
-	Address  string  `json:"address"`
+	Username string        `json:"username"`
+	Created  int64         `json:"created"`
+	PostKey  crypto.PubKey `json:"post_key"`
+	OwnerKey crypto.PubKey `json:"owner_key"`
+	Address  string        `json:"address"`
 }
 
 type AccountBank struct {

@@ -1,8 +1,6 @@
 package query
 
 import (
-	"encoding/json"
-
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
 )
@@ -27,7 +25,7 @@ func GetAccountMeta(username string) (*model.AccountMeta, error) {
 		return nil, err
 	}
 	meta := new(model.AccountMeta)
-	if err := json.Unmarshal(resp, meta); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, meta); err != nil {
 		return nil, err
 	}
 	return meta, nil
@@ -40,7 +38,7 @@ func GetAccountBank(address string) (*model.AccountBank, error) {
 		return nil, err
 	}
 	bank := new(model.AccountBank)
-	if err := json.Unmarshal(resp, bank); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, bank); err != nil {
 		return nil, err
 	}
 	return bank, nil
@@ -53,7 +51,7 @@ func GetAccountInfo(username string) (*model.AccountInfo, error) {
 		return nil, err
 	}
 	info := new(model.AccountInfo)
-	if err := json.Unmarshal(resp, info); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, info); err != nil {
 		panic(err)
 		return nil, err
 	}
@@ -70,7 +68,7 @@ func GetValidator(username string) (*model.Validator, error) {
 		return nil, err
 	}
 	validator := new(model.Validator)
-	if err := json.Unmarshal(resp, validator); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, validator); err != nil {
 		return nil, err
 	}
 	return validator, nil
@@ -84,7 +82,7 @@ func GetAllValidators() (*model.ValidatorList, error) {
 	}
 
 	validatorList := new(model.ValidatorList)
-	if err := json.Unmarshal(resp, validatorList); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, validatorList); err != nil {
 		return validatorList, err
 	}
 	return validatorList, nil
@@ -98,7 +96,7 @@ func GetDelegation(voter string, delegator string) (*model.Delegation, error) {
 		return nil, err
 	}
 	delegation := new(model.Delegation)
-	if err := json.Unmarshal(resp, delegation); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, delegation); err != nil {
 		return nil, err
 	}
 	return delegation, nil
@@ -111,7 +109,7 @@ func GetVoter(voterName string) (*model.Voter, error) {
 		return nil, err
 	}
 	voter := new(model.Voter)
-	if err := json.Unmarshal(resp, voter); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, voter); err != nil {
 		return nil, err
 	}
 	return voter, nil
@@ -125,7 +123,7 @@ func GetDeveloper(developerName string) (*model.Developer, error) {
 		return nil, err
 	}
 	developer := new(model.Developer)
-	if err := json.Unmarshal(resp, developer); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, developer); err != nil {
 		return nil, err
 	}
 	return developer, nil
@@ -139,7 +137,7 @@ func GetDevelopers() (*model.DeveloperList, error) {
 	}
 
 	developerList := new(model.DeveloperList)
-	if err := json.Unmarshal(resp, developerList); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, developerList); err != nil {
 		return nil, err
 	}
 	return developerList, nil
@@ -153,7 +151,7 @@ func GetInfraProvider(providerName string) (*model.InfraProvider, error) {
 		return nil, err
 	}
 	provider := new(model.InfraProvider)
-	if err := json.Unmarshal(resp, provider); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, provider); err != nil {
 		return nil, err
 	}
 	return provider, nil
@@ -167,7 +165,7 @@ func GetInfraProviders() (*model.InfraProviderList, error) {
 	}
 
 	providerList := new(model.InfraProviderList)
-	if err := json.Unmarshal(resp, providerList); err != nil {
+	if err := transport.Cdc.UnmarshalJSON(resp, providerList); err != nil {
 		return nil, err
 	}
 	return providerList, nil

@@ -1,31 +1,13 @@
 package model
 
-import (
-	"encoding/hex"
-	"encoding/json"
-)
+import "github.com/tendermint/go-crypto"
+
+type Msg interface{}
 
 // Account related messages
 type RegisterMsg struct {
-	NewUser   string `json:"new_user"`
-	NewPubKey string `json:"new_public_key"`
-}
-
-func (msg RegisterMsg) MarshalJSON() ([]byte, error) {
-	bytes, err := hex.DecodeString(msg.NewPubKey)
-	if err != nil {
-		return nil, err
-	}
-	prefix := bytes[0]
-	rawKey := hex.EncodeToString(bytes[1:])
-
-	return json.Marshal(&struct {
-		NewPubKey []interface{} `json:"new_public_key"`
-		NewUser   string        `json:"new_user"`
-	}{
-		NewPubKey: []interface{}{prefix, rawKey},
-		NewUser:   msg.NewUser,
-	})
+	NewUser   string        `json:"new_user"`
+	NewPubKey crypto.PubKey `json:"new_public_key"`
 }
 
 type TransferMsg struct {
@@ -98,9 +80,9 @@ type ReportOrUpvoteMsg struct {
 
 // Validator related messages
 type ValidatorDeposit struct {
-	Username  string `json:"username"`
-	Deposit   string `json:"deposit"`
-	ValPubKey string `json:"validator_public_key"`
+	Username  string        `json:"username"`
+	Deposit   string        `json:"deposit"`
+	ValPubKey crypto.PubKey `json:"validator_public_key"`
 }
 
 type ValidatorWithdrawMsg struct {

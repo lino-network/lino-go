@@ -1,15 +1,20 @@
 package transport
 
+import (
+	"github.com/lino-network/lino-go/model"
+	"github.com/tendermint/go-crypto"
+)
+
 type Transaction struct {
-	Msg  []interface{} `json:"msg"`
-	Sigs []interface{} `json:"signatures"`
-	Fee  Fee           `json:"fee"`
+	Msg  model.Msg   `json:"msg"`
+	Sigs []Signature `json:"signatures"`
+	Fee  Fee         `json:"fee"`
 }
 
 type Signature struct {
-	PubKey   []interface{} `json:"pub_key"`
-	Sig      []interface{} `json:"signature"`
-	Sequence int64         `json:"sequence"`
+	PubKey   crypto.PubKey    `json:"pub_key"`
+	Sig      crypto.Signature `json:"signature"`
+	Sequence int64            `json:"sequence"`
 }
 
 type SignMsg struct {

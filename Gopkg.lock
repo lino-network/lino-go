@@ -8,6 +8,12 @@
   revision = "675abc5df3c5531bc741b56a765e35623459da6d"
 
 [[projects]]
+  name = "github.com/cosmos/cosmos-sdk"
+  packages = ["wire"]
+  revision = "0fb189777c2d573a8504582343fb7d39c2cd26e3"
+  version = "v0.15.1"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -375,6 +381,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a699867f2f91bc04ef50bf1b6e132790d1d0533b80f660468eaeef6e8b6a9aa2"
+  inputs-digest = "20e69ddf15b34ebfd2e8c4d46de9ebb18dd36d8fc5c72a00c23a43cae2ace2e0"
   solver-name = "gps-cdcl"
   solver-version = 1

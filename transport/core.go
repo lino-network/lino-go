@@ -3,6 +3,9 @@ package transport
 import (
 	"fmt"
 
+	"github.com/tendermint/go-crypto"
+
+	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
@@ -14,6 +17,7 @@ type Transport struct {
 	chainId string
 	nodeUrl string
 	client  rpcclient.Client
+	Cdc     *wire.Codec
 }
 
 func NewTransportFromViper() Transport {
@@ -33,6 +37,7 @@ func NewTransportFromViper() Transport {
 		chainId: v.GetString("chain_id"),
 		nodeUrl: nodeUrl,
 		client:  rpc,
+		Cdc:     MakeCodec(),
 	}
 }
 
@@ -68,12 +73,8 @@ func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, erro
 }
 
 func (t Transport) SignBuildBroadcast(msg interface{},
-	privKeyHex string, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
-	privKey, err := GetPrivKeyFromHex(privKeyHex)
-	if err != nil {
-		return nil, err
-	}
-	signMsgBytes, err := EncodeSignMsg(msg, t.chainId, seq)
+	privKey crypto.PrivKey, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
+	signMsgBytes, err := EncodeSignMsg(t.Cdc, msg, t.chainId, seq)
 	if err != nil {
 		return nil, err
 	}
@@ -81,11 +82,10 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	sig := privKey.Sign(signMsgBytes)
 
 	// build transaction bytes
-	txBytes, err := EncodeTx(msg, privKey.PubKey(), sig, seq)
+	txBytes, err := EncodeTx(t.Cdc, msg, privKey.PubKey(), sig, seq)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Tx:", string(txBytes))
 	// broadcast
 	return t.BroadcastTx(txBytes)
 }

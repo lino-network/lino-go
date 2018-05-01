@@ -9,48 +9,48 @@ import (
 
 func main() {
 	// // query example
-	// res, _ := query.GetAllValidators()
-	// output, _ := json.MarshalIndent(res, "", "  ")
-	// fmt.Println(string(output))
-	//
-	// res1, _ := query.GetValidator("Lino")
-	// output, _ = json.MarshalIndent(res1, "", "  ")
-	// fmt.Println(string(output))
-	//
-	// res2, _ := query.GetDeveloper("Lino")
-	// output, _ = json.MarshalIndent(res2, "", "  ")
-	// fmt.Println(string(output))
-	//
-	// res3, _ := query.GetDevelopers()
-	// output, _ = json.MarshalIndent(res3, "", "  ")
-	// fmt.Println(string(output))
-	//
-	// res4, _ := query.GetInfraProvider("Lino")
-	// output, _ = json.MarshalIndent(res4, "", "  ")
-	// fmt.Println(string(output))
-	//
-	// res5, _ := query.GetInfraProviders()
-	// output, _ = json.MarshalIndent(res5, "", "  ")
-	// fmt.Println(string(output))
-	//
-	// res6, _ := query.GetAccountBank("178BDA21C11D86E9F751639092B595DA7EF55B8A")
-	// output, _ = json.MarshalIndent(res6, "", "  ")
-	// fmt.Println(string(output))
-	//
-	// res7, _ := query.GetAccountMeta("Lino")
-	// output, _ = json.MarshalIndent(res7, "", "  ")
-	// fmt.Println(string(output))
-	//
-	// res8 := query.GetAccountSequence("Lino")
-	// output, _ = json.MarshalIndent(res8, "", "  ")
-	// fmt.Println(string(output))
-	//
-	// res9, _ := query.GetVoter("Lino")
-	// output, _ = json.MarshalIndent(res9, "", "  ")
-	// fmt.Println(string(output))
+	res, _ := query.GetAllValidators()
+	output, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println(string(output))
+
+	res1, _ := query.GetValidator("Lino")
+	output, _ = json.MarshalIndent(res1, "", "  ")
+	fmt.Println(string(output))
+
+	res2, _ := query.GetDeveloper("Lino")
+	output, _ = json.MarshalIndent(res2, "", "  ")
+	fmt.Println(string(output))
+
+	res3, _ := query.GetDevelopers()
+	output, _ = json.MarshalIndent(res3, "", "  ")
+	fmt.Println(string(output))
+
+	res4, _ := query.GetInfraProvider("Lino")
+	output, _ = json.MarshalIndent(res4, "", "  ")
+	fmt.Println(string(output))
+
+	res5, _ := query.GetInfraProviders()
+	output, _ = json.MarshalIndent(res5, "", "  ")
+	fmt.Println(string(output))
+
+	res6, _ := query.GetAccountBank("8F38568B955BBC3E567A570E858292FA77137845")
+	output, _ = json.MarshalIndent(res6, "", "  ")
+	fmt.Println(string(output))
+
+	res7, _ := query.GetAccountMeta("Lino")
+	output, _ = json.MarshalIndent(res7, "", "  ")
+	fmt.Println(string(output))
+
+	res8 := query.GetAccountSequence("Lino")
+	output, _ = json.MarshalIndent(res8, "", "  ")
+	fmt.Println(string(output))
+
+	res9, _ := query.GetVoter("Lino")
+	output, _ = json.MarshalIndent(res9, "", "  ")
+	fmt.Println(string(output))
 
 	res10, _ := query.GetAccountInfo("Lino")
-	output, _ := json.MarshalIndent(res10, "", "  ")
+	output, _ = json.MarshalIndent(res10, "", "  ")
 	fmt.Println(string(output))
 
 	//broadcast ransaction example
