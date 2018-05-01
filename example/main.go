@@ -55,7 +55,7 @@ func main() {
 	// fmt.Println(string(output))
 
 	//broadcast ransaction example
-	user1 := "yukai-tu"
+	user1 := "yukai-tu3"
 	priv1 := crypto.GenPrivKeyEd25519()
 	pub1 := priv1.PubKey()
 	addr1 := pub1.Address()
@@ -65,7 +65,7 @@ func main() {
 	linoPrivHex := "a328891240d81fadfd185ff29d0230dd312ff0ded236c15293e635ba1fe3047726546eece62e3126ab8083dc1d845c319ce3002757c036a489818830ceb85b884693940369"
 
 	links := map[string]string{}
-	err := broadcast.CreatePost("test8", "a test", "dummy", "Lino", "", "", "", "", "0", linoPrivHex, links)
+	err := broadcast.CreatePost("test10", "a test", "dummy", "Lino", "", "", "", "", "0", linoPrivHex, links)
 	if err != nil {
 		panic(err)
 	}

@@ -264,16 +264,13 @@ func broadcastTransaction(transaction interface{}, privKeyHex string) error {
 	}
 
 	if err != nil {
-		fmt.Println("Build and Sign message failed ! ", err)
 		return err
 	}
 	if res.CheckTx.Code != uint32(0) {
-		fmt.Println("CheckTx failed ! code: ", res.CheckTx.Code, res.CheckTx.Log)
-		return err
+		return fmt.Errorf("CheckTx failed ! (%d) %s", res.CheckTx.Code, res.CheckTx.Log)
 	}
 	if res.DeliverTx.Code != uint32(0) {
-		fmt.Println("DeliverTx failed ! code: ", res.DeliverTx.Code, res.DeliverTx.Log)
-		return err
+		return fmt.Errorf("DeliverTx failed ! (%d) %s ", res.DeliverTx.Code, res.DeliverTx.Log)
 	}
 	fmt.Printf("Committed at block %d. Hash: %s\n", res.Height, res.Hash.String())
 	return nil
