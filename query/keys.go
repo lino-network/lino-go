@@ -1,6 +1,8 @@
 package query
 
-import "encoding/hex"
+import (
+	"encoding/hex"
+)
 
 const (
 	MainKVStoreKey      = "main"
@@ -102,4 +104,37 @@ func getAccountBankKey(address string) []byte {
 
 func getAccountMetaKey(accKey string) []byte {
 	return append(AccountMetaSubstore, accKey...)
+}
+func getGrantKeyListKey(accKey string) []byte {
+	return append(AccountGrantListSubstore, accKey...)
+}
+
+func getRewardKey(accKey string) []byte {
+	return append(AccountRewardSubstore, accKey...)
+}
+
+func getRelationshipPrefix(me string) []byte {
+	return append(append(AccountRelationshipSubstore, me...), KeySeparator...)
+}
+
+func getRelationshipKey(me string, other string) []byte {
+	return append(getRelationshipPrefix(me), other...)
+}
+
+func getFollowerPrefix(me string) []byte {
+	return append(append(AccountFollowerSubstore, me...), KeySeparator...)
+}
+
+func getFollowingPrefix(me string) []byte {
+	return append(append(AccountFollowingSubstore, me...), KeySeparator...)
+}
+
+// "follower substore" + "me" + "my follower"
+func getFollowerKey(me string, myFollower string) []byte {
+	return append(getFollowerPrefix(me), myFollower...)
+}
+
+// "following substore" + "me" + "my following"
+func getFollowingKey(me string, myFollowing string) []byte {
+	return append(getFollowingPrefix(me), myFollowing...)
 }

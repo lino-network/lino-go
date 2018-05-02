@@ -57,6 +57,76 @@ func GetAccountInfo(username string) (*model.AccountInfo, error) {
 	return info, nil
 }
 
+func GetGrantList(username string) (*model.GrantKeyList, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getGrantKeyListKey(username), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	grantKeyList := new(model.GrantKeyList)
+	if err := transport.Cdc.UnmarshalJSON(resp, grantKeyList); err != nil {
+		return grantKeyList, err
+	}
+	return grantKeyList, nil
+}
+
+func GetReward(username string) (*model.Reward, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getRewardKey(username), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	reward := new(model.Reward)
+	if err := transport.Cdc.UnmarshalJSON(resp, reward); err != nil {
+		return reward, err
+	}
+	return reward, nil
+}
+
+func GetRelationship(me, other string) (*model.Relationship, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getRelationshipKey(me, other), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	relationship := new(model.Relationship)
+	if err := transport.Cdc.UnmarshalJSON(resp, relationship); err != nil {
+		return relationship, err
+	}
+	return relationship, nil
+}
+
+func GetFollowerMeta(me, myFollower string) (*model.FollowerMeta, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getFollowerKey(me, myFollower), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	followerMeta := new(model.FollowerMeta)
+	if err := transport.Cdc.UnmarshalJSON(resp, followerMeta); err != nil {
+		return followerMeta, err
+	}
+	return followerMeta, nil
+}
+
+func GetFollowingMeta(me, myFollowing string) (*model.FollowingMeta, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getFollowerKey(me, myFollowing), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	followingMeta := new(model.FollowingMeta)
+	if err := transport.Cdc.UnmarshalJSON(resp, followingMeta); err != nil {
+		return followingMeta, err
+	}
+	return followingMeta, nil
+}
+
 // Post related query
 
 // Validator related query

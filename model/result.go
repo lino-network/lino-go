@@ -79,3 +79,34 @@ type AccountBank struct {
 	Username string           `json:"username"`
 	Stake    map[string]int64 `json:"stake"`
 }
+
+type GrantKeyList struct {
+	GrantPubKeyList []GrantPubKey `json:"grant_public_key_list"`
+}
+
+type GrantPubKey struct {
+	Username string        `json:"username"`
+	PubKey   crypto.PubKey `json:"public_key"`
+	Expire   int64         `json:"expire"`
+}
+
+type Reward struct {
+	OriginalIncome map[string]int64 `json:"original_income"`
+	FrictionIncome map[string]int64 `json:"friction_income"`
+	ActualReward   map[string]int64 `json:"actual_reward"`
+	UnclaimReward  map[string]int64 `json:"unclaim_reward"`
+}
+
+type Relationship struct {
+	DonationTimes int64 `json:"donation_times"`
+}
+
+type FollowerMeta struct {
+	CreatedAt    int64  `json:"created_at"`
+	FollowerName string `json:"follower_name"`
+}
+
+type FollowingMeta struct {
+	CreatedAt     int64  `json:"created_at"`
+	FollowingName string `json:"following_name"`
+}

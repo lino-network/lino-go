@@ -1,11 +1,10 @@
 package main
 
 import (
-	"encoding/hex"
-	"strings"
+	"encoding/json"
+	"fmt"
 
-	"github.com/lino-network/lino-go/broadcast"
-	crypto "github.com/tendermint/go-crypto"
+	"github.com/lino-network/lino-go/query"
 )
 
 func main() {
@@ -54,28 +53,32 @@ func main() {
 	// output, _ = json.Marshal(res10)
 	// fmt.Println(string(output))
 
+	res11, _ := query.GetGrantList("Lino")
+	output, _ := json.Marshal(res11)
+	fmt.Println(string(output))
+
 	//broadcast ransaction example
-	user1 := "yukai-tu3"
-	priv1 := crypto.GenPrivKeyEd25519()
-	pub1 := priv1.PubKey()
-	addr1 := pub1.Address()
-
-	addrHex1 := strings.ToUpper(hex.EncodeToString(addr1))
-	privHex1 := hex.EncodeToString(priv1.Bytes())
-	linoPrivHex := "a328891240d81fadfd185ff29d0230dd312ff0ded236c15293e635ba1fe3047726546eece62e3126ab8083dc1d845c319ce3002757c036a489818830ceb85b884693940369"
-
-	links := map[string]string{}
-	err := broadcast.CreatePost("test10", "a test", "dummy", "Lino", "", "", "", "", "0", linoPrivHex, links)
-	if err != nil {
-		panic(err)
-	}
-	err = broadcast.Transfer("Lino", "", addrHex1, "10000", "", linoPrivHex)
-	if err != nil {
-		panic(err)
-	}
-	err = broadcast.Register(user1, privHex1)
-	if err != nil {
-		panic(err)
-	}
+	// user1 := "yukai-tu4"
+	// priv1 := crypto.GenPrivKeyEd25519()
+	// pub1 := priv1.PubKey()
+	// addr1 := pub1.Address()
+	//
+	// addrHex1 := strings.ToUpper(hex.EncodeToString(addr1))
+	// privHex1 := hex.EncodeToString(priv1.Bytes())
+	// linoPrivHex := "a328891240d81fadfd185ff29d0230dd312ff0ded236c15293e635ba1fe3047726546eece62e3126ab8083dc1d845c319ce3002757c036a489818830ceb85b884693940369"
+	//
+	// links := map[string]string{}
+	// err := broadcast.CreatePost("test11", "a test", "dummy", "Lino", "", "", "", "", "0", linoPrivHex, links)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// err = broadcast.Transfer("Lino", "", addrHex1, "10000", "", linoPrivHex)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// err = broadcast.Register(user1, privHex1)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 }
