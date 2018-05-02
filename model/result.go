@@ -1,27 +1,33 @@
 package model
 
-import "github.com/tendermint/go-crypto"
+import (
+	"github.com/tendermint/go-crypto"
+)
+
+type Coin struct {
+	Amount int64 `json:"amount"`
+}
 
 // validator related struct
 type ValidatorList struct {
-	OncallValidators   []string         `json:"oncall_validators"`
-	AllValidators      []string         `json:"all_validators"`
-	PreBlockValidators []string         `json:"pre_block_validators"`
-	LowestPower        map[string]int64 `json:"lowest_power"`
-	LowestValidator    string           `json:"lowest_validator"`
+	OncallValidators   []string `json:"oncall_validators"`
+	AllValidators      []string `json:"all_validators"`
+	PreBlockValidators []string `json:"pre_block_validators"`
+	LowestPower        Coin     `json:"lowest_power"`
+	LowestValidator    string   `json:"lowest_validator"`
 }
 
 type Validator struct {
-	Username     string           `json:"username"`
-	Deposit      map[string]int64 `json:"deposit"`
-	AbsentCommit int              `json:"absent_commit"`
+	Username     string `json:"username"`
+	Deposit      Coin   `json:"deposit"`
+	AbsentCommit int    `json:"absent_commit"`
 }
 
 // vote related struct
 type Voter struct {
-	Username       string           `json:"username"`
-	Deposit        map[string]int64 `json:"deposit"`
-	DelegatedPower map[string]int64 `json:"delegated_power"`
+	Username       string `json:"username"`
+	Deposit        Coin   `json:"deposit"`
+	DelegatedPower Coin   `json:"delegated_power"`
 }
 
 type Vote struct {
@@ -30,8 +36,8 @@ type Vote struct {
 }
 
 type Delegation struct {
-	Delegator string           `json:"delegator"`
-	Amount    map[string]int64 `json:"amount"`
+	Delegator string `json:"delegator"`
+	Amount    Coin   `json:"amount"`
 }
 
 // post related
@@ -54,15 +60,15 @@ type Like struct {
 }
 
 type Donation struct {
-	Amount  map[string]int64 `json:"amount"`
-	Created int64            `json:"created"`
+	Amount  Coin  `json:"amount"`
+	Created int64 `json:"created"`
 }
 
 type ReportOrUpvote struct {
-	Username string           `json:"username"`
-	Stake    map[string]int64 `json:"stake"`
-	Created  int64            `json:"created"`
-	IsReport bool             `json:"is_report"`
+	Username string `json:"username"`
+	Stake    Coin   `json:"stake"`
+	Created  int64  `json:"created"`
+	IsReport bool   `json:"is_report"`
 }
 
 type PostInfo struct {
@@ -78,26 +84,26 @@ type PostInfo struct {
 }
 
 type PostMeta struct {
-	Created            int64            `json:"created"`
-	LastUpdate         int64            `json:"last_update"`
-	LastActivity       int64            `json:"last_activity"`
-	AllowReplies       bool             `json:"allow_replies"`
-	TotalLikeCount     int64            `json:"total_like_count"`
-	TotalDonateCount   int64            `json:"total_donate_count"`
-	TotalLikeWeight    int64            `json:"total_like_weight"`
-	TotalDislikeWeight int64            `json:"total_dislike_weight"`
-	TotalReportStake   map[string]int64 `json:"total_report_stake"`
-	TotalUpvoteStake   map[string]int64 `json:"total_upvote_stake"`
-	TotalReward        map[string]int64 `json:"reward"`
-	// PenaltyScore            sdk.Rat    `json:"penalty_score"`
-	// RedistributionSplitRate sdk.Rat    `json:"redistribution_split_rate"`
+	Created            int64 `json:"created"`
+	LastUpdate         int64 `json:"last_update"`
+	LastActivity       int64 `json:"last_activity"`
+	AllowReplies       bool  `json:"allow_replies"`
+	TotalLikeCount     int64 `json:"total_like_count"`
+	TotalDonateCount   int64 `json:"total_donate_count"`
+	TotalLikeWeight    int64 `json:"total_like_weight"`
+	TotalDislikeWeight int64 `json:"total_dislike_weight"`
+	TotalReportStake   Coin  `json:"total_report_stake"`
+	TotalUpvoteStake   Coin  `json:"total_upvote_stake"`
+	TotalReward        Coin  `json:"reward"`
+	// PenaltyScore            big.Rat `json:"penalty_score"`
+	// RedistributionSplitRate big.Rat `json:"redistribution_split_rate"`
 }
 
 // developer related
 type Developer struct {
-	Username       string           `json:"username"`
-	Deposit        map[string]int64 `json:"deposit"`
-	AppConsumption map[string]int64 `json:"app_consumption"`
+	Username       string `json:"username"`
+	Deposit        Coin   `json:"deposit"`
+	AppConsumption Coin   `json:"app_consumption"`
 }
 
 type DeveloperList struct {
@@ -117,9 +123,9 @@ type InfraProviderList struct {
 
 // account related
 type AccountMeta struct {
-	Sequence            int64            `json:"sequence"`
-	LastActivity        int64            `json:"last_activity"`
-	TransactionCapacity map[string]int64 `json:"transaction_capacity"`
+	Sequence            int64 `json:"sequence"`
+	LastActivity        int64 `json:"last_activity"`
+	TransactionCapacity Coin  `json:"transaction_capacity"`
 }
 
 type AccountInfo struct {
@@ -131,10 +137,10 @@ type AccountInfo struct {
 }
 
 type AccountBank struct {
-	Address  string           `json:"address"`
-	Balance  map[string]int64 `json:"balance"`
-	Username string           `json:"username"`
-	Stake    map[string]int64 `json:"stake"`
+	Address  string `json:"address"`
+	Balance  Coin   `json:"balance"`
+	Username string `json:"username"`
+	Stake    Coin   `json:"stake"`
 }
 
 type GrantKeyList struct {
@@ -148,10 +154,10 @@ type GrantPubKey struct {
 }
 
 type Reward struct {
-	OriginalIncome map[string]int64 `json:"original_income"`
-	FrictionIncome map[string]int64 `json:"friction_income"`
-	ActualReward   map[string]int64 `json:"actual_reward"`
-	UnclaimReward  map[string]int64 `json:"unclaim_reward"`
+	OriginalIncome Coin `json:"original_income"`
+	FrictionIncome Coin `json:"friction_income"`
+	ActualReward   Coin `json:"actual_reward"`
+	UnclaimReward  Coin `json:"unclaim_reward"`
 }
 
 type Relationship struct {
@@ -167,3 +173,15 @@ type FollowingMeta struct {
 	CreatedAt     int64  `json:"created_at"`
 	FollowingName string `json:"following_name"`
 }
+
+// unmarshalJSON
+// func (v *PostMeta) UnmarshalJSON(b []byte) error {
+// 	var stuff map[string]interface{}
+// 	err := json.Unmarshal(b, &stuff)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	v.Username = stuff["username"].(string)
+//
+// 	return nil
+// }

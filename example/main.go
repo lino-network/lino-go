@@ -1,5 +1,12 @@
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/lino-network/lino-go/query"
+)
+
 func main() {
 	// // query example
 	// res, _ := query.GetAllValidators()
@@ -39,7 +46,7 @@ func main() {
 	// fmt.Println(string(output))
 	//
 	// res9, _ := query.GetVoter("Lino")
-	// output, _ = json.Marshal(res9)
+	// output, _ := json.Marshal(res9)
 	// fmt.Println(string(output))
 	//
 	// res10, _ := query.GetAccountInfo("Lino")
@@ -54,9 +61,9 @@ func main() {
 	// output, _ := json.Marshal(res12)
 	// fmt.Println(string(output))
 
-	// res13, _ := query.GetPostMeta("Lino", "test11")
-	// output, _ := json.Marshal(res13)
-	// fmt.Println(string(output))
+	res13, _ := query.GetPostMeta("Lino", "test11")
+	output, _ := json.Marshal(res13)
+	fmt.Println(string(output))
 
 	//broadcast ransaction example
 	// user1 := "yukai-tu4"
