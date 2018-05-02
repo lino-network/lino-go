@@ -149,6 +149,10 @@ func getPostInfoKey(postKey string) []byte {
 	return append([]byte(postInfoSubStore), postKey...)
 }
 
+func getPostKey(author string, postID string) string {
+	return string(string(author) + "#" + postID)
+}
+
 func getPostMetaKey(postKey string) []byte {
 	return append([]byte(postMetaSubStore), postKey...)
 }

@@ -128,7 +128,8 @@ func GetFollowingMeta(me, myFollowing string) (*model.FollowingMeta, error) {
 }
 
 // Post related query
-func GetPostComment(postKey, commentPostKey string) (*model.Comment, error) {
+func GetPostComment(author, postID, commentPostKey string) (*model.Comment, error) {
+	postKey := getPostKey(author, postID)
 	transport := transport.NewTransportFromViper()
 	resp, err := transport.Query(getPostCommentKey(postKey, commentPostKey), PostKVStoreKey)
 	if err != nil {
@@ -141,7 +142,8 @@ func GetPostComment(postKey, commentPostKey string) (*model.Comment, error) {
 	return comment, nil
 }
 
-func GetPostView(postKey, viewUser string) (*model.View, error) {
+func GetPostView(author, postID, viewUser string) (*model.View, error) {
+	postKey := getPostKey(author, postID)
 	transport := transport.NewTransportFromViper()
 	resp, err := transport.Query(getPostViewKey(postKey, viewUser), PostKVStoreKey)
 	if err != nil {
@@ -154,7 +156,8 @@ func GetPostView(postKey, viewUser string) (*model.View, error) {
 	return view, nil
 }
 
-func GetPostDonation(postKey, donateUser string) (*model.Donation, error) {
+func GetPostDonation(author, postID, donateUser string) (*model.Donation, error) {
+	postKey := getPostKey(author, postID)
 	transport := transport.NewTransportFromViper()
 	resp, err := transport.Query(getPostDonationKey(postKey, donateUser), PostKVStoreKey)
 	if err != nil {
@@ -167,7 +170,8 @@ func GetPostDonation(postKey, donateUser string) (*model.Donation, error) {
 	return donation, nil
 }
 
-func GetPostReportOrUpvote(postKey string, user string) (*model.ReportOrUpvote, error) {
+func GetPostReportOrUpvote(author, postID string, user string) (*model.ReportOrUpvote, error) {
+	postKey := getPostKey(author, postID)
 	transport := transport.NewTransportFromViper()
 	resp, err := transport.Query(getPostReportOrUpvoteKey(postKey, user), PostKVStoreKey)
 	if err != nil {
@@ -178,6 +182,34 @@ func GetPostReportOrUpvote(postKey string, user string) (*model.ReportOrUpvote, 
 		return nil, err
 	}
 	return reportOrUpvote, nil
+}
+
+func GetPostInfo(author, postID string) (*model.PostInfo, error) {
+	postKey := getPostKey(author, postID)
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getPostInfoKey(postKey), PostKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	postInfo := new(model.PostInfo)
+	if err := transport.Cdc.UnmarshalJSON(resp, postInfo); err != nil {
+		return nil, err
+	}
+	return postInfo, nil
+}
+
+func GetPostMeta(author, postID string) (*model.PostMeta, error) {
+	postKey := getPostKey(author, postID)
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getPostMetaKey(postKey), PostKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	postMeta := new(model.PostMeta)
+	if err := transport.Cdc.UnmarshalJSON(resp, postMeta); err != nil {
+		return nil, err
+	}
+	return postMeta, nil
 }
 
 // Validator related query

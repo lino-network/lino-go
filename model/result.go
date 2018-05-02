@@ -65,6 +65,34 @@ type ReportOrUpvote struct {
 	IsReport bool             `json:"is_report"`
 }
 
+type PostInfo struct {
+	PostID       string           `json:"post_id"`
+	Title        string           `json:"title"`
+	Content      string           `json:"content"`
+	Author       string           `json:"author"`
+	ParentAuthor string           `json:"parent_author"`
+	ParentPostID string           `json:"parent_postID"`
+	SourceAuthor string           `json:"source_author"`
+	SourcePostID string           `json:"source_postID"`
+	Links        []IDToURLMapping `json:"links"`
+}
+
+type PostMeta struct {
+	Created            int64            `json:"created"`
+	LastUpdate         int64            `json:"last_update"`
+	LastActivity       int64            `json:"last_activity"`
+	AllowReplies       bool             `json:"allow_replies"`
+	TotalLikeCount     int64            `json:"total_like_count"`
+	TotalDonateCount   int64            `json:"total_donate_count"`
+	TotalLikeWeight    int64            `json:"total_like_weight"`
+	TotalDislikeWeight int64            `json:"total_dislike_weight"`
+	TotalReportStake   map[string]int64 `json:"total_report_stake"`
+	TotalUpvoteStake   map[string]int64 `json:"total_upvote_stake"`
+	TotalReward        map[string]int64 `json:"reward"`
+	// PenaltyScore            sdk.Rat    `json:"penalty_score"`
+	// RedistributionSplitRate sdk.Rat    `json:"redistribution_split_rate"`
+}
+
 // developer related
 type Developer struct {
 	Username       string           `json:"username"`
