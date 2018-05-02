@@ -128,6 +128,57 @@ func GetFollowingMeta(me, myFollowing string) (*model.FollowingMeta, error) {
 }
 
 // Post related query
+func GetPostComment(postKey, commentPostKey string) (*model.Comment, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getPostCommentKey(postKey, commentPostKey), PostKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	comment := new(model.Comment)
+	if err := transport.Cdc.UnmarshalJSON(resp, comment); err != nil {
+		return nil, err
+	}
+	return comment, nil
+}
+
+func GetPostView(postKey, viewUser string) (*model.View, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getPostViewKey(postKey, viewUser), PostKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	view := new(model.View)
+	if err := transport.Cdc.UnmarshalJSON(resp, view); err != nil {
+		return nil, err
+	}
+	return view, nil
+}
+
+func GetPostDonation(postKey, donateUser string) (*model.Donation, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getPostDonationKey(postKey, donateUser), PostKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	donation := new(model.Donation)
+	if err := transport.Cdc.UnmarshalJSON(resp, donation); err != nil {
+		return nil, err
+	}
+	return donation, nil
+}
+
+func GetPostReportOrUpvote(postKey string, user string) (*model.ReportOrUpvote, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getPostReportOrUpvoteKey(postKey, user), PostKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	reportOrUpvote := new(model.ReportOrUpvote)
+	if err := transport.Cdc.UnmarshalJSON(resp, reportOrUpvote); err != nil {
+		return nil, err
+	}
+	return reportOrUpvote, nil
+}
 
 // Validator related query
 func GetValidator(username string) (*model.Validator, error) {

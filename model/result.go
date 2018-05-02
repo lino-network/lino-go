@@ -35,6 +35,35 @@ type Delegation struct {
 }
 
 // post related
+type Comment struct {
+	Author  string `json:"author"`
+	PostID  string `json:"post_key"`
+	Created int64  `json:"created"`
+}
+
+type View struct {
+	Username string `json:"username"`
+	Created  int64  `json:"created"`
+	Times    int64  `jons:"times"`
+}
+
+type Like struct {
+	Username string `json:"username"`
+	Weight   int64  `json:"weight"`
+	Created  int64  `json:"created"`
+}
+
+type Donation struct {
+	Amount  map[string]int64 `json:"amount"`
+	Created int64            `json:"created"`
+}
+
+type ReportOrUpvote struct {
+	Username string           `json:"username"`
+	Stake    map[string]int64 `json:"stake"`
+	Created  int64            `json:"created"`
+	IsReport bool             `json:"is_report"`
+}
 
 // developer related
 type Developer struct {

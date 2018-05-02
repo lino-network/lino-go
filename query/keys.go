@@ -39,6 +39,14 @@ var (
 	AccountPendingStakeQueueSubstore = []byte{0x06}
 	AccountRelationshipSubstore      = []byte{0x07}
 	AccountGrantListSubstore         = []byte{0x08}
+
+	postInfoSubStore           = []byte{0x00} // SubStore for all post info
+	postMetaSubStore           = []byte{0x01} // SubStore for all post mata info
+	postLikeSubStore           = []byte{0x02} // SubStore for all like to post
+	postReportOrUpvoteSubStore = []byte{0x03} // SubStore for all like to post
+	postCommentSubStore        = []byte{0x04} // SubStore for all comments
+	postViewsSubStore          = []byte{0x05} // SubStore for all views
+	postDonationsSubStore      = []byte{0x06} // SubStore for all donations
 )
 
 func getValidatorKey(accKey string) []byte {
@@ -129,12 +137,58 @@ func getFollowingPrefix(me string) []byte {
 	return append(append(AccountFollowingSubstore, me...), KeySeparator...)
 }
 
-// "follower substore" + "me" + "my follower"
 func getFollowerKey(me string, myFollower string) []byte {
 	return append(getFollowerPrefix(me), myFollower...)
 }
 
-// "following substore" + "me" + "my following"
 func getFollowingKey(me string, myFollowing string) []byte {
 	return append(getFollowingPrefix(me), myFollowing...)
+}
+
+func getPostInfoKey(postKey string) []byte {
+	return append([]byte(postInfoSubStore), postKey...)
+}
+
+func getPostMetaKey(postKey string) []byte {
+	return append([]byte(postMetaSubStore), postKey...)
+}
+
+func getPostLikePrefix(postKey string) []byte {
+	return append(append([]byte(postLikeSubStore), postKey...), KeySeparator...)
+}
+
+func getPostLikeKey(postKey string, likeUser string) []byte {
+	return append(getPostLikePrefix(postKey), likeUser...)
+}
+
+func getPostReportOrUpvotePrefix(postKey string) []byte {
+	return append(append([]byte(postReportOrUpvoteSubStore), postKey...), KeySeparator...)
+}
+
+func getPostReportOrUpvoteKey(postKey string, user string) []byte {
+	return append(getPostReportOrUpvotePrefix(postKey), user...)
+}
+
+func getPostViewPrefix(postKey string) []byte {
+	return append(append([]byte(postViewsSubStore), postKey...), KeySeparator...)
+}
+
+func getPostViewKey(postKey string, viewUser string) []byte {
+	return append(getPostViewPrefix(postKey), viewUser...)
+}
+
+func getPostCommentPrefix(postKey string) []byte {
+	return append(append([]byte(postCommentSubStore), postKey...), KeySeparator...)
+}
+
+func getPostCommentKey(postKey string, commentPostKey string) []byte {
+	return append(getPostCommentPrefix(postKey), commentPostKey...)
+}
+
+func getPostDonationPrefix(postKey string) []byte {
+	return append(append([]byte(postDonationsSubStore), postKey...), KeySeparator...)
+}
+
+func getPostDonationKey(postKey string, donateUser string) []byte {
+	return append(getPostDonationPrefix(postKey), donateUser...)
 }
