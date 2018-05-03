@@ -202,6 +202,7 @@ func GetPostMeta(author, postID string) (*model.PostMeta, error) {
 	postKey := getPostKey(author, postID)
 	transport := transport.NewTransportFromViper()
 	resp, err := transport.Query(getPostMetaKey(postKey), PostKVStoreKey)
+
 	if err != nil {
 		return nil, err
 	}

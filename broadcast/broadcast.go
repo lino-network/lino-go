@@ -11,17 +11,27 @@ import (
 )
 
 // Account related tx
-func Register(username, privKeyHex string) error {
-	privKey, err := transport.GetPrivKeyFromHex(privKeyHex)
+func Register(username, masterPubKeyHex, postPubKeyHex, transactionPubKeyHex, masterPrivKeyHex string) error {
+	masterPubKey, err := transport.GetPubKeyFromHex(masterPubKeyHex)
+	if err != nil {
+		return nil
+	}
+	postPubKey, err := transport.GetPubKeyFromHex(postPubKeyHex)
+	if err != nil {
+		return nil
+	}
+	txPubKey, err := transport.GetPubKeyFromHex(transactionPubKeyHex)
 	if err != nil {
 		return err
 	}
 
 	msg := model.RegisterMsg{
-		NewUser:   username,
-		NewPubKey: privKey.PubKey(),
+		NewUser:              username,
+		NewMasterPubKey:      masterPubKey,
+		NewPostPubKey:        postPubKey,
+		NewTransactionPubKey: txPubKey,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcastTransaction(msg, masterPrivKeyHex)
 }
 
 func Transfer(sender, receiverName, receiverAddr, amount, memo, privKeyHex string) error {

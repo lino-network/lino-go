@@ -18,23 +18,25 @@ func MakeCodec() *wire.Codec {
 	cdc := wire.NewCodec()
 
 	cdc.RegisterInterface((*model.Msg)(nil), nil)
-	cdc.RegisterConcrete(model.RegisterMsg{}, "register/register", nil)
-	cdc.RegisterConcrete(model.FollowMsg{}, "account/follow", nil)
-	cdc.RegisterConcrete(model.UnfollowMsg{}, "account/unfollow", nil)
-	cdc.RegisterConcrete(model.TransferMsg{}, "account/transfer", nil)
-	cdc.RegisterConcrete(model.CreatePostMsg{}, "post/post", nil)
-	cdc.RegisterConcrete(model.LikeMsg{}, "post/like", nil)
-	cdc.RegisterConcrete(model.DonateMsg{}, "post/donate", nil)
-	cdc.RegisterConcrete(model.ValidatorWithdrawMsg{}, "post/withdraw", nil)
-	cdc.RegisterConcrete(model.ValidatorRevokeMsg{}, "post/revoke", nil)
-	cdc.RegisterConcrete(model.ClaimMsg{}, "account/claim", nil)
+	cdc.RegisterConcrete(model.RegisterMsg{}, "register", nil)
+	cdc.RegisterConcrete(model.FollowMsg{}, "follow", nil)
+	cdc.RegisterConcrete(model.UnfollowMsg{}, "unfollow", nil)
+	cdc.RegisterConcrete(model.TransferMsg{}, "transfer", nil)
+	cdc.RegisterConcrete(model.ClaimMsg{}, "claim", nil)
+	cdc.RegisterConcrete(model.CreatePostMsg{}, "post", nil)
+	cdc.RegisterConcrete(model.LikeMsg{}, "like", nil)
+	cdc.RegisterConcrete(model.DonateMsg{}, "donate", nil)
+	cdc.RegisterConcrete(model.ReportOrUpvoteMsg{}, "reportOrUpvote", nil)
+	cdc.RegisterConcrete(model.ValidatorDepositMsg{}, "val/deposit", nil)
+	cdc.RegisterConcrete(model.ValidatorWithdrawMsg{}, "val/withdraw", nil)
+	cdc.RegisterConcrete(model.ValidatorRevokeMsg{}, "val/revoke", nil)
 	cdc.RegisterConcrete(model.VoterDepositMsg{}, "vote/deposit", nil)
 	cdc.RegisterConcrete(model.VoterRevokeMsg{}, "vote/revoke", nil)
 	cdc.RegisterConcrete(model.VoterWithdrawMsg{}, "vote/withdraw", nil)
-	cdc.RegisterConcrete(model.DelegateMsg{}, "vote/delegate", nil)
-	cdc.RegisterConcrete(model.DelegatorWithdrawMsg{}, "vote/delegate/withdraw", nil)
-	cdc.RegisterConcrete(model.RevokeDelegationMsg{}, "vote/delegate/revoke", nil)
-	cdc.RegisterConcrete(model.VoteMsg{}, "vote/vote", nil)
+	cdc.RegisterConcrete(model.DelegateMsg{}, "delegate", nil)
+	cdc.RegisterConcrete(model.DelegatorWithdrawMsg{}, "delegate/withdraw", nil)
+	cdc.RegisterConcrete(model.RevokeDelegationMsg{}, "delegate/revoke", nil)
+	cdc.RegisterConcrete(model.VoteMsg{}, "vote", nil)
 	cdc.RegisterConcrete(model.DeveloperRegisterMsg{}, "developer/register", nil)
 	cdc.RegisterConcrete(model.DeveloperRevokeMsg{}, "developer/revoke", nil)
 	cdc.RegisterConcrete(model.ProviderReportMsg{}, "provider/report", nil)
@@ -84,4 +86,12 @@ func GetPrivKeyFromHex(privHex string) (crypto.PrivKey, error) {
 		return nil, err
 	}
 	return crypto.PrivKeyFromBytes(keyBytes)
+}
+
+func GetPubKeyFromHex(pubHex string) (crypto.PubKey, error) {
+	keyBytes, err := hex.DecodeString(pubHex)
+	if err != nil {
+		return nil, err
+	}
+	return crypto.PubKeyFromBytes(keyBytes)
 }

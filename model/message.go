@@ -1,13 +1,17 @@
 package model
 
-import crypto "github.com/tendermint/go-crypto"
+import (
+	crypto "github.com/tendermint/go-crypto"
+)
 
 type Msg interface{}
 
 // Account related messages
 type RegisterMsg struct {
-	NewUser   string        `json:"new_user"`
-	NewPubKey crypto.PubKey `json:"new_public_key"`
+	NewUser              string        `json:"new_user"`
+	NewMasterPubKey      crypto.PubKey `json:"new_master_public_key"`
+	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
+	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
 }
 
 type TransferMsg struct {
