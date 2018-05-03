@@ -21,8 +21,8 @@ type Transport struct {
 func NewTransportFromViper() Transport {
 	v := viper.New()
 	viper.SetConfigType("json")
-	v.SetConfigName(".linogo")
-	v.AddConfigPath("$HOME/")
+	v.SetConfigName("config")
+	v.AddConfigPath("$HOME/.lino-go/")
 	v.AutomaticEnv()
 	v.ReadInConfig()
 
@@ -53,6 +53,10 @@ func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err er
 	resp := result.Response
 	if resp.Code != uint32(0) {
 		return res, errors.Errorf("Query failed: (%d) %s", resp.Code, resp.Log)
+	}
+
+	if resp.Value == nil || len(resp.Value) == 0 {
+		return nil, errors.Errorf("Empty response !")
 	}
 	return resp.Value, nil
 }

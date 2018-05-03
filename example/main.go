@@ -1,14 +1,10 @@
 package main
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"strings"
 
-	"github.com/lino-network/lino-go/broadcast"
 	"github.com/lino-network/lino-go/query"
-	crypto "github.com/tendermint/go-crypto"
 )
 
 func main() {
@@ -17,10 +13,10 @@ func main() {
 	output, _ := json.Marshal(res)
 	fmt.Println(string(output))
 
-	// res1, _ := query.GetValidator("Lino")
-	// output, _ = json.Marshal(res1)
-	// fmt.Println(string(output))
-	//
+	res1, _ := query.GetValidator("Lino")
+	output, _ = json.Marshal(res1)
+	fmt.Println(string(output))
+
 	// res2, _ := query.GetDeveloper("Lino")
 	// output, _ = json.Marshal(res2)
 	// fmt.Println(string(output))
@@ -70,38 +66,38 @@ func main() {
 	// fmt.Println(string(output))
 
 	//broadcast ransaction example
-	user := "yukai-tu"
-	masterPriv := crypto.GenPrivKeyEd25519()
-	txPriv := crypto.GenPrivKeyEd25519()
-	postPriv := crypto.GenPrivKeyEd25519()
-
-	masterPub := masterPriv.PubKey()
-	txPub := txPriv.PubKey()
-	postPub := postPriv.PubKey()
-
-	addr := masterPub.Address()
-
-	addrHex := strings.ToUpper(hex.EncodeToString(addr))
-	masterPrivHex := hex.EncodeToString(masterPriv.Bytes())
-	masterPubHex := hex.EncodeToString(masterPub.Bytes())
-	txPubHex := hex.EncodeToString(txPub.Bytes())
-	postPubHex := hex.EncodeToString(postPub.Bytes())
-
-	linoTxPriv := "A32889124067E8FDA45CB7FC07C4DE02E6E78F46A82A9D40FB41024C219EE5A21852E84F20638D16DEA1030F8DD58270638048080C699DA02342420155693330E1FF4272BD"
-
-	links := map[string]string{}
-	err := broadcast.CreatePost("test12", "a test", "dummy", "Lino", "", "", "", "", "0", linoTxPriv, links)
-	if err != nil {
-		panic(err)
-	}
-
-	err = broadcast.Transfer("Lino", "", addrHex, "10000", "", linoTxPriv)
-	if err != nil {
-		panic(err)
-	}
-	err = broadcast.Register(user, masterPubHex, postPubHex, txPubHex, masterPrivHex)
-	if err != nil {
-		panic(err)
-	}
+	// user := "yukai-tu"
+	// masterPriv := crypto.GenPrivKeyEd25519()
+	// txPriv := crypto.GenPrivKeyEd25519()
+	// postPriv := crypto.GenPrivKeyEd25519()
+	//
+	// masterPub := masterPriv.PubKey()
+	// txPub := txPriv.PubKey()
+	// postPub := postPriv.PubKey()
+	//
+	// addr := masterPub.Address()
+	//
+	// addrHex := strings.ToUpper(hex.EncodeToString(addr))
+	// masterPrivHex := hex.EncodeToString(masterPriv.Bytes())
+	// masterPubHex := hex.EncodeToString(masterPub.Bytes())
+	// txPubHex := hex.EncodeToString(txPub.Bytes())
+	// postPubHex := hex.EncodeToString(postPub.Bytes())
+	//
+	// linoTxPriv := "A32889124067E8FDA45CB7FC07C4DE02E6E78F46A82A9D40FB41024C219EE5A21852E84F20638D16DEA1030F8DD58270638048080C699DA02342420155693330E1FF4272BD"
+	//
+	// links := map[string]string{}
+	// err := broadcast.CreatePost("test12", "a test", "dummy", "Lino", "", "", "", "", "0", linoTxPriv, links)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	//
+	// err = broadcast.Transfer("Lino", "", addrHex, "10000", "", linoTxPriv)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// err = broadcast.Register(user, masterPubHex, postPubHex, txPubHex, masterPrivHex)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 }
