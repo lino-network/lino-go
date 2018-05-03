@@ -129,11 +129,12 @@ type AccountMeta struct {
 }
 
 type AccountInfo struct {
-	Username string        `json:"username"`
-	Created  int64         `json:"created"`
-	PostKey  crypto.PubKey `json:"post_key"`
-	OwnerKey crypto.PubKey `json:"owner_key"`
-	Address  string        `json:"address"`
+	Username       string        `json:"username"`
+	Created        int64         `json:"created"`
+	MasterKey      crypto.PubKey `json:"master_key"`
+	TransactionKey crypto.PubKey `json:"transaction_key"`
+	PostKey        crypto.PubKey `json:"post_key"`
+	Address        string        `json:"address"`
 }
 
 type AccountBank struct {

@@ -13,9 +13,9 @@ func main() {
 	output, _ := json.Marshal(res)
 	fmt.Println(string(output))
 
-	res1, _ := query.GetValidator("Lino")
-	output, _ = json.Marshal(res1)
-	fmt.Println(string(output))
+	// res1, _ := query.GetValidator("Lino")
+	// output, _ = json.Marshal(res1)
+	// fmt.Println(string(output))
 
 	// res2, _ := query.GetDeveloper("Lino")
 	// output, _ = json.Marshal(res2)
@@ -49,9 +49,9 @@ func main() {
 	// output, _ = json.Marshal(res9)
 	// fmt.Println(string(output))
 	//
-	// res10, _ := query.GetAccountInfo("Lino")
-	// output, _ = json.Marshal(res10)
-	// fmt.Println(string(output))
+	res10, _ := query.GetAccountInfo("Lino")
+	output, _ = json.Marshal(res10)
+	fmt.Println(string(output))
 	//
 	// res11, _ := query.GetGrantList("Lino")
 	// output, _ = json.Marshal(res11)
