@@ -21,16 +21,16 @@ type Transport struct {
 func NewTransportFromViper() Transport {
 	v := viper.New()
 	viper.SetConfigType("json")
-	v.SetConfigName("config")
-	v.AddConfigPath("$GOPATH/src/github.com/lino-network/lino-go/")
+	v.SetConfigName(".linogo")
+	v.AddConfigPath("$HOME/")
 	v.AutomaticEnv()
 	v.ReadInConfig()
 
-	var rpc rpcclient.Client
 	nodeUrl := v.GetString("node_url")
-	if nodeUrl != "" {
-		rpc = rpcclient.NewHTTP(nodeUrl, "/websocket")
+	if nodeUrl == "" {
+		nodeUrl = "localhost:46657"
 	}
+	rpc := rpcclient.NewHTTP(nodeUrl, "/websocket")
 	return Transport{
 		chainId: v.GetString("chain_id"),
 		nodeUrl: nodeUrl,

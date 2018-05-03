@@ -9,10 +9,10 @@ import (
 
 func main() {
 	// // query example
-	// res, _ := query.GetAllValidators()
-	// output, _ := json.Marshal(res)
-	// fmt.Println(string(output))
-	//
+	res, _ := query.GetAllValidators()
+	output, _ := json.Marshal(res)
+	fmt.Println(string(output))
+
 	// res1, _ := query.GetValidator("Lino")
 	// output, _ = json.Marshal(res1)
 	// fmt.Println(string(output))
@@ -61,9 +61,9 @@ func main() {
 	// output, _ := json.Marshal(res12)
 	// fmt.Println(string(output))
 
-	res13, _ := query.GetPostMeta("Lino", "test11")
-	output, _ := json.Marshal(res13)
-	fmt.Println(string(output))
+	// res13, _ := query.GetPostMeta("Lino", "test11")
+	// output, _ := json.Marshal(res13)
+	// fmt.Println(string(output))
 
 	//broadcast ransaction example
 	// user1 := "yukai-tu4"
