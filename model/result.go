@@ -8,6 +8,11 @@ type Coin struct {
 	Amount int64 `json:"amount"`
 }
 
+type Rat struct {
+	Num   int64 `json:"num"`
+	Denom int64 `json:"denom"`
+}
+
 // validator related struct
 type ValidatorList struct {
 	OncallValidators   []string `json:"oncall_validators"`
@@ -84,19 +89,19 @@ type PostInfo struct {
 }
 
 type PostMeta struct {
-	Created            int64 `json:"created"`
-	LastUpdate         int64 `json:"last_update"`
-	LastActivity       int64 `json:"last_activity"`
-	AllowReplies       bool  `json:"allow_replies"`
-	TotalLikeCount     int64 `json:"total_like_count"`
-	TotalDonateCount   int64 `json:"total_donate_count"`
-	TotalLikeWeight    int64 `json:"total_like_weight"`
-	TotalDislikeWeight int64 `json:"total_dislike_weight"`
-	TotalReportStake   Coin  `json:"total_report_stake"`
-	TotalUpvoteStake   Coin  `json:"total_upvote_stake"`
-	TotalReward        Coin  `json:"reward"`
-	// PenaltyScore            big.Rat `json:"penalty_score"`
-	// RedistributionSplitRate big.Rat `json:"redistribution_split_rate"`
+	Created                 int64 `json:"created"`
+	LastUpdate              int64 `json:"last_update"`
+	LastActivity            int64 `json:"last_activity"`
+	AllowReplies            bool  `json:"allow_replies"`
+	TotalLikeCount          int64 `json:"total_like_count"`
+	TotalDonateCount        int64 `json:"total_donate_count"`
+	TotalLikeWeight         int64 `json:"total_like_weight"`
+	TotalDislikeWeight      int64 `json:"total_dislike_weight"`
+	TotalReportStake        Coin  `json:"total_report_stake"`
+	TotalUpvoteStake        Coin  `json:"total_upvote_stake"`
+	TotalReward             Coin  `json:"reward"`
+	PenaltyScore            Rat   `json:"penalty_score"`
+	RedistributionSplitRate Rat   `json:"redistribution_split_rate"`
 }
 
 // developer related
@@ -174,15 +179,3 @@ type FollowingMeta struct {
 	CreatedAt     int64  `json:"created_at"`
 	FollowingName string `json:"following_name"`
 }
-
-// unmarshalJSON
-// func (v *PostMeta) UnmarshalJSON(b []byte) error {
-// 	var stuff map[string]interface{}
-// 	err := json.Unmarshal(b, &stuff)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	v.Username = stuff["username"].(string)
-//
-// 	return nil
-// }

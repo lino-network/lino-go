@@ -36,6 +36,22 @@ type ClaimMsg struct {
 	Username string `json:"username"`
 }
 
+type RecoverMsg struct {
+	Username             string        `json:"username"`
+	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
+	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
+}
+
+type SavingToCheckingMsg struct {
+	Username string `json:"username"`
+	Amount   string `json:"amount"`
+}
+
+type CheckingToSavingMsg struct {
+	Username string `json:"username"`
+	Amount   string `json:"amount"`
+}
+
 // Post related messages
 type CreatePostMsg struct {
 	PostCreateParams
@@ -105,11 +121,6 @@ type VoteMsg struct {
 	Result     bool   `json:"result"`
 }
 
-// type CreateProposal struct {
-// 	Creator string `json:"creator"`
-// 	model.ChangeParameterDescription
-// }
-
 type VoterDepositMsg struct {
 	Username string `json:"username"`
 	Deposit  string `json:"deposit"`
@@ -162,4 +173,60 @@ type GrantDeveloperMsg struct {
 type ProviderReportMsg struct {
 	Username string `json:"username"`
 	Usage    int64  `json:"usage"`
+}
+
+// proposal related messages
+type DeletePostContentMsg struct {
+	Creator  string `json:"creator"`
+	PermLink string `json:"permLink"`
+}
+
+type ChangeGlobalAllocationParamMsg struct {
+	Creator   string                `json:"creator"`
+	Parameter GlobalAllocationParam `json:"parameter"`
+}
+
+type ChangeEvaluateOfContentValueParamMsg struct {
+	Creator   string                      `json:"creator"`
+	Parameter EvaluateOfContentValueParam `json:"parameter"`
+}
+
+type ChangeInfraInternalAllocationParamMsg struct {
+	Creator   string                       `json:"creator"`
+	Parameter InfraInternalAllocationParam `json:"parameter"`
+}
+
+type ChangeVoteParamMsg struct {
+	Creator   string    `json:"creator"`
+	Parameter VoteParam `json:"parameter"`
+}
+
+type ChangeProposalParamMsg struct {
+	Creator   string        `json:"creator"`
+	Parameter ProposalParam `json:"parameter"`
+}
+
+type ChangeDeveloperParamMsg struct {
+	Creator   string         `json:"creator"`
+	Parameter DeveloperParam `json:"parameter"`
+}
+
+type ChangeValidatorParamMsg struct {
+	Creator   string         `json:"creator"`
+	Parameter ValidatorParam `json:"parameter"`
+}
+
+type ChangeCoinDayParamMsg struct {
+	Creator   string       `json:"creator"`
+	Parameter CoinDayParam `json:"parameter"`
+}
+
+type ChangeBandwidthParamMsg struct {
+	Creator   string         `json:"creator"`
+	Parameter BandwidthParam `json:"parameter"`
+}
+
+type ChangeAccountParamMsg struct {
+	Creator   string       `json:"creator"`
+	Parameter AccountParam `json:"parameter"`
 }

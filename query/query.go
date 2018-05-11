@@ -6,10 +6,6 @@ import (
 )
 
 // Account related query
-func IsPrivKeyMatchUsername(username string, privKey string) (bool, error) {
-	return true, nil
-}
-
 func GetAccountSequence(username string) int64 {
 	meta, err := GetAccountMeta(username)
 	if err != nil {

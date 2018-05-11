@@ -68,6 +68,22 @@ func Claim(username, privKeyHex string) error {
 	return broadcastTransaction(msg, privKeyHex)
 }
 
+func SavingToChecking(username, amount, privKeyHex string) error {
+	msg := model.SavingToCheckingMsg{
+		Username: username,
+		Amount:   amount,
+	}
+	return broadcastTransaction(msg, privKeyHex)
+}
+
+func CheckingToSaving(username, amount, privKeyHex string) error {
+	msg := model.CheckingToSavingMsg{
+		Username: username,
+		Amount:   amount,
+	}
+	return broadcastTransaction(msg, privKeyHex)
+}
+
 // Post related tx
 func CreatePost(postID, title, content, author, parentAuthor, parentPostID,
 	sourceAuthor, sourcePostID, redistributionSplitRate, privKeyHex string, links map[string]string) error {
