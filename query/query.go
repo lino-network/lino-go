@@ -319,3 +319,173 @@ func GetInfraProviders() (*model.InfraProviderList, error) {
 	}
 	return providerList, nil
 }
+
+// param related query
+func GetEvaluateOfContentValueParam() (*model.EvaluateOfContentValueParam, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getEvaluateOfContentValueParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.EvaluateOfContentValueParam)
+	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+func GetGlobalAllocationParam() (*model.GlobalAllocationParam, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getGlobalAllocationParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.GlobalAllocationParam)
+	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+func GetInfraInternalAllocationParam() (*model.InfraInternalAllocationParam, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getInfraInternalAllocationParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.InfraInternalAllocationParam)
+	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+func GetDeveloperParam() (*model.DeveloperParam, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getDeveloperParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.DeveloperParam)
+	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+func GetVoteParam() (*model.VoteParam, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getVoteParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.VoteParam)
+	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+func GetProposalParam() (*model.ProposalParam, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getProposalParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.ProposalParam)
+	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+func GetValidatorParam() (*model.ValidatorParam, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getValidatorParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.ValidatorParam)
+	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+func GetCoinDayParam() (*model.CoinDayParam, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getCoinDayParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.CoinDayParam)
+	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+func GetBandwidthParam() (*model.BandwidthParam, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getBandwidthParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.BandwidthParam)
+	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+func GetAccountParam() (*model.AccountParam, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getAccountParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.AccountParam)
+	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+// proposal related query
+func GetProposalList() (*model.ProposalList, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getProposalListKey(), ProposalKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	proposalList := new(model.ProposalList)
+	if err := transport.Cdc.UnmarshalJSON(resp, proposalList); err != nil {
+		return nil, err
+	}
+	return proposalList, nil
+}
+
+func GetProposal(proposalID string) (model.Proposal, error) {
+	transport := transport.NewTransportFromViper()
+	resp, err := transport.Query(getProposalKey(proposalID), ProposalKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	proposal := new(model.Proposal)
+	if err := transport.Cdc.UnmarshalJSON(resp, proposal); err != nil {
+		return nil, err
+	}
+	return *proposal, nil
+}

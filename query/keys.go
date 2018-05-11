@@ -13,22 +13,26 @@ const (
 	VoteKVStoreKey      = "vote"
 	InfraKVStoreKey     = "infra"
 	DeveloperKVStoreKey = "developer"
+	ParamKVStoreKey     = "param"
+	ProposalKVStoreKey  = "proposal"
 )
 
 var (
-	DelegatorSubstore              = []byte{0x00}
-	VoterSubstore                  = []byte{0x01}
-	ProposalSubstore               = []byte{0x02}
-	VoteSubstore                   = []byte{0x03}
-	ProposalListSubStore           = []byte{0x04}
-	ValidatorReferenceListSubStore = []byte{0x05}
-	KeySeparator                   = "/"
-	ValidatorSubstore              = []byte("Validator/")
-	ValidatorListSubstore          = []byte("ValidatorList/ValidatorListKey")
-	DeveloperSubstore              = []byte("Developer/")
-	DeveloperListSubstore          = []byte("Developer/DeveloperListKey")
-	InfraProviderSubstore          = []byte("InfraProvider/")
-	InfraProviderListSubstore      = []byte("InfraProvider/InfraProviderListKey")
+	DelegatorSubstore     = []byte{0x00}
+	VoterSubstore         = []byte{0x01}
+	VoteSubstore          = []byte{0x02}
+	ReferenceListSubStore = []byte{0x03}
+
+	ProposalSubstore     = []byte{0x00}
+	ProposalListSubStore = []byte{0x01}
+
+	KeySeparator              = "/"
+	ValidatorSubstore         = []byte("Validator/")
+	ValidatorListSubstore     = []byte("ValidatorList/ValidatorListKey")
+	DeveloperSubstore         = []byte("Developer/")
+	DeveloperListSubstore     = []byte("Developer/DeveloperListKey")
+	InfraProviderSubstore     = []byte("InfraProvider/")
+	InfraProviderListSubstore = []byte("InfraProvider/InfraProviderListKey")
 
 	AccountInfoSubstore              = []byte{0x00}
 	AccountBankSubstore              = []byte{0x01}
@@ -47,8 +51,20 @@ var (
 	postCommentSubStore        = []byte{0x04} // SubStore for all comments
 	postViewsSubStore          = []byte{0x05} // SubStore for all views
 	postDonationsSubStore      = []byte{0x06} // SubStore for all donations
+
+	allocationParamSubStore              = []byte{0x00} // SubStore for allocation
+	infraInternalAllocationParamSubStore = []byte{0x01} // SubStore for infrat internal allocation
+	evaluateOfContentValueParamSubStore  = []byte{0x02} // Substore for evaluate of content value
+	developerParamSubStore               = []byte{0x03} // Substore for developer param
+	voteParamSubStore                    = []byte{0x04} // Substore for vote param
+	proposalParamSubStore                = []byte{0x05} // Substore for proposal param
+	validatorParamSubStore               = []byte{0x06} // Substore for validator param
+	coinDayParamSubStore                 = []byte{0x07} // Substore for coin day param
+	bandwidthParamSubStore               = []byte{0x08} // Substore for bandwidth param
+	accountParamSubstore                 = []byte{0x09} // Substore for account param
 )
 
+//  validator related
 func getValidatorKey(accKey string) []byte {
 	return append(ValidatorSubstore, accKey...)
 }
@@ -57,20 +73,13 @@ func getValidatorListKey() []byte {
 	return ValidatorListSubstore
 }
 
+// vote related
 func getVotePrefix(id string) []byte {
 	return append(append(VoteSubstore, id...), KeySeparator...)
 }
 
 func getVoteKey(proposalID string, voter string) []byte {
 	return append(getVotePrefix(proposalID), voter...)
-}
-
-func getProposalKey(proposalID string) []byte {
-	return append(ProposalSubstore, proposalID...)
-}
-
-func getProposalListKey() []byte {
-	return ProposalListSubStore
 }
 
 func getDelegatorPrefix(me string) []byte {
@@ -85,6 +94,7 @@ func getVoterKey(me string) []byte {
 	return append(VoterSubstore, me...)
 }
 
+// developer related
 func getDeveloperKey(accKey string) []byte {
 	return append(DeveloperSubstore, accKey...)
 }
@@ -93,6 +103,7 @@ func getDeveloperListKey() []byte {
 	return DeveloperListSubstore
 }
 
+// infra related
 func getInfraProviderKey(accKey string) []byte {
 	return append(InfraProviderSubstore, accKey...)
 }
@@ -101,6 +112,7 @@ func getInfraProviderListKey() []byte {
 	return InfraProviderListSubstore
 }
 
+// account related
 func getAccountInfoKey(accKey string) []byte {
 	return append(AccountInfoSubstore, accKey...)
 }
@@ -145,6 +157,7 @@ func getFollowingKey(me string, myFollowing string) []byte {
 	return append(getFollowingPrefix(me), myFollowing...)
 }
 
+// post related
 func getPostInfoKey(postKey string) []byte {
 	return append([]byte(postInfoSubStore), postKey...)
 }
@@ -195,4 +208,54 @@ func getPostDonationPrefix(postKey string) []byte {
 
 func getPostDonationKey(postKey string, donateUser string) []byte {
 	return append(getPostDonationPrefix(postKey), donateUser...)
+}
+
+// proposal related
+func getProposalKey(proposalID string) []byte {
+	return append(ProposalSubstore, proposalID...)
+}
+
+func getProposalListKey() []byte {
+	return ProposalListSubStore
+}
+
+// param related
+func getEvaluateOfContentValueParamKey() []byte {
+	return evaluateOfContentValueParamSubStore
+}
+
+func getGlobalAllocationParamKey() []byte {
+	return allocationParamSubStore
+}
+
+func getInfraInternalAllocationParamKey() []byte {
+	return infraInternalAllocationParamSubStore
+}
+
+func getDeveloperParamKey() []byte {
+	return developerParamSubStore
+}
+
+func getVoteParamKey() []byte {
+	return voteParamSubStore
+}
+
+func getValidatorParamKey() []byte {
+	return validatorParamSubStore
+}
+
+func getProposalParamKey() []byte {
+	return proposalParamSubStore
+}
+
+func getCoinDayParamKey() []byte {
+	return coinDayParamSubStore
+}
+
+func getBandwidthParamKey() []byte {
+	return bandwidthParamSubStore
+}
+
+func getAccountParamKey() []byte {
+	return accountParamSubstore
 }

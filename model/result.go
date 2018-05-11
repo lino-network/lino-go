@@ -143,10 +143,19 @@ type AccountInfo struct {
 }
 
 type AccountBank struct {
-	Address  string `json:"address"`
-	Balance  Coin   `json:"balance"`
-	Username string `json:"username"`
-	Stake    Coin   `json:"stake"`
+	Address         string        `json:"address"`
+	Saving          Coin          `json:"saving"`
+	Checking        Coin          `json:"checking"`
+	Username        string        `json:"username"`
+	Stake           Coin          `json:"stake"`
+	FrozenMoneyList []FrozenMoney `json:"frozen_money_list"`
+}
+
+type FrozenMoney struct {
+	Amount   Coin  `json:"amount"`
+	StartAt  int64 `json:"start_at"`
+	Times    int64 `json:"times"`
+	Interval int64 `json:"interval"`
 }
 
 type GrantKeyList struct {
@@ -178,4 +187,35 @@ type FollowerMeta struct {
 type FollowingMeta struct {
 	CreatedAt     int64  `json:"created_at"`
 	FollowingName string `json:"following_name"`
+}
+
+// proposal related
+type ProposalList struct {
+	OngoingProposal []string `json:"ongoing_proposal"`
+	PastProposal    []string `json:"past_proposal"`
+}
+
+type Proposal interface{}
+
+type ProposalInfo struct {
+	Creator       string `json:"creator"`
+	ProposalID    string `json:"proposal_id"`
+	AgreeVotes    Coin   `json:"agree_vote"`
+	DisagreeVotes Coin   `json:"disagree_vote"`
+	Result        int    `json:"result"`
+}
+
+type ChangeParamProposal struct {
+	ProposalInfo
+	Param Parameter `json:"param"`
+}
+
+type ContentCensorshipProposal struct {
+	ProposalInfo
+	PermLink string `json:"perm_link"`
+}
+
+type ProtocolUpgradeProposal struct {
+	ProposalInfo
+	Link string `json:"link"`
 }
