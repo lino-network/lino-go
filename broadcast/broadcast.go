@@ -146,6 +146,45 @@ func ReportOrUpvote(username, author, postID, privKeyHex string, isReport, isRev
 	return broadcastTransaction(msg, privKeyHex)
 }
 
+func View(username, author, postID, privKeyHex string) error {
+	msg := model.ViewMsg{
+		Username: username,
+		Author:   author,
+		PostID:   postID,
+	}
+	return broadcastTransaction(msg, privKeyHex)
+}
+
+func DeletePost(title, author, postID, privKeyHex string) error {
+	msg := model.DeletePostMsg{
+		Titile: title,
+		Author: author,
+		PostID: postID,
+	}
+	return broadcastTransaction(msg, privKeyHex)
+}
+
+func UpdatePost(author, postID, title, content, redistributionSplitRate, privKeyHex string, links map[string]string) error {
+	var mLinks []model.IDToURLMapping
+	if links == nil || len(links) == 0 {
+		mLinks = nil
+	} else {
+		for k, v := range links {
+			mLinks = append(mLinks, model.IDToURLMapping{k, v})
+		}
+	}
+
+	msg := model.UpdatePostMsg{
+		Author:  author,
+		PostID:  postID,
+		Title:   title,
+		Content: content,
+		Links:   mLinks,
+		RedistributionSplitRate: redistributionSplitRate,
+	}
+	return broadcastTransaction(msg, privKeyHex)
+}
+
 // Validator related tx
 func ValidatorDeposit(username, deposit, privKeyHex string) error {
 	privKey, err := transport.GetPrivKeyFromHex(privKeyHex)
@@ -269,6 +308,8 @@ func ProviderReport(username, privKeyHex string, usage int64) error {
 	}
 	return broadcastTransaction(msg, privKeyHex)
 }
+
+// proposal related tx
 
 // internal helper functions
 func broadcastTransaction(transaction interface{}, privKeyHex string) error {

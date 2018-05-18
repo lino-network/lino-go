@@ -1,30 +1,46 @@
 package main
 
 import (
-	"encoding/hex"
+	//"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"strings"
+	//"strings"
 
-	"github.com/lino-network/lino-go/broadcast"
+	//"github.com/lino-network/lino-go/broadcast"
 	"github.com/lino-network/lino-go/query"
-	crypto "github.com/tendermint/go-crypto"
+	//crypto "github.com/tendermint/go-crypto"
 )
 
 func main() {
 	// // query example
-	res, _ := query.GetAllValidators()
-	output, _ := json.Marshal(res)
-	fmt.Println(string(output))
 
-	// res1, _ := query.GetValidator("Lino")
-	// output, _ = json.Marshal(res1)
-	// fmt.Println(string(output))
+	for {
+		res, _ := query.GetAllValidators()
+		output, _ := json.Marshal(res)
+		fmt.Println(string(output))
 
-	// res2, _ := query.GetDeveloper("Lino")
+		res1, _ := query.GetValidator("Lino1")
+		output, _ = json.Marshal(res1)
+		fmt.Println(string(output))
+
+		res11, _ := query.GetValidator("Lino2")
+		output, _ = json.Marshal(res11)
+		fmt.Println(string(output))
+
+		res111, _ := query.GetValidator("Lino3")
+		output, _ = json.Marshal(res111)
+		fmt.Println(string(output))
+
+		res1111, _ := query.GetValidator("Lino4")
+		output, _ = json.Marshal(res1111)
+		fmt.Println(string(output))
+
+		fmt.Println("--------------------------------------------------------------------")
+	}
+	// res2, _ := query.GetDeveloper("Lino1")
 	// output, _ = json.Marshal(res2)
 	// fmt.Println(string(output))
-	//
+
 	// res3, _ := query.GetDevelopers()
 	// output, _ = json.Marshal(res3)
 	// fmt.Println(string(output))
@@ -49,13 +65,13 @@ func main() {
 	// output, _ = json.Marshal(res8)
 	// fmt.Println(string(output))
 	//
-	// res9, _ := query.GetVoter("Lino")
+	// res9, _ := query.GetVoter("Lino1")
 	// output, _ = json.Marshal(res9)
 	// fmt.Println(string(output))
-	//
-	res10, _ := query.GetAccountInfo("Lino")
-	output, _ = json.Marshal(res10)
-	fmt.Println(string(output))
+	// //
+	// res10, _ := query.GetAccountInfo("Lino1")
+	// output, _ = json.Marshal(res10)
+	// fmt.Println(string(output))
 	//
 	// res11, _ := query.GetGrantList("Lino")
 	// output, _ = json.Marshal(res11)
@@ -70,38 +86,38 @@ func main() {
 	// fmt.Println(string(output))
 
 	//broadcast ransaction example
-	user := "yukai-tu"
-	masterPriv := crypto.GenPrivKeyEd25519()
-	txPriv := crypto.GenPrivKeyEd25519()
-	postPriv := crypto.GenPrivKeyEd25519()
+	// user := "yukai-tu"
+	// masterPriv := crypto.GenPrivKeyEd25519()
+	// txPriv := crypto.GenPrivKeyEd25519()
+	// postPriv := crypto.GenPrivKeyEd25519()
 
-	masterPub := masterPriv.PubKey()
-	txPub := txPriv.PubKey()
-	postPub := postPriv.PubKey()
+	// masterPub := masterPriv.PubKey()
+	// txPub := txPriv.PubKey()
+	// postPub := postPriv.PubKey()
 
-	addr := masterPub.Address()
+	// addr := masterPub.Address()
 
-	addrHex := strings.ToUpper(hex.EncodeToString(addr))
-	masterPrivHex := hex.EncodeToString(masterPriv.Bytes())
-	masterPubHex := hex.EncodeToString(masterPub.Bytes())
-	txPubHex := hex.EncodeToString(txPub.Bytes())
-	postPubHex := hex.EncodeToString(postPub.Bytes())
+	// addrHex := strings.ToUpper(hex.EncodeToString(addr))
+	// masterPrivHex := hex.EncodeToString(masterPriv.Bytes())
+	// masterPubHex := hex.EncodeToString(masterPub.Bytes())
+	// txPubHex := hex.EncodeToString(txPub.Bytes())
+	// postPubHex := hex.EncodeToString(postPub.Bytes())
 
-	linoTxPriv := "A32889124067E8FDA45CB7FC07C4DE02E6E78F46A82A9D40FB41024C219EE5A21852E84F20638D16DEA1030F8DD58270638048080C699DA02342420155693330E1FF4272BD"
+	// linoTxPriv := "A32889124067E8FDA45CB7FC07C4DE02E6E78F46A82A9D40FB41024C219EE5A21852E84F20638D16DEA1030F8DD58270638048080C699DA02342420155693330E1FF4272BD"
 
-	links := map[string]string{}
-	err := broadcast.CreatePost("test12", "a test", "dummy", "Lino", "", "", "", "", "0", linoTxPriv, links)
-	if err != nil {
-		panic(err)
-	}
+	// links := map[string]string{}
+	// err := broadcast.CreatePost("test12", "a test", "dummy", "Lino", "", "", "", "", "0", linoTxPriv, links)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	err = broadcast.Transfer("Lino", "", addrHex, "10000", "", linoTxPriv)
-	if err != nil {
-		panic(err)
-	}
-	err = broadcast.Register(user, masterPubHex, postPubHex, txPubHex, masterPrivHex)
-	if err != nil {
-		panic(err)
-	}
+	// err = broadcast.Transfer("Lino", "", addrHex, "10000", "", linoTxPriv)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// err = broadcast.Register(user, masterPubHex, postPubHex, txPubHex, masterPrivHex)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 }

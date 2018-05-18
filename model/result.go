@@ -13,6 +13,11 @@ type Rat struct {
 	Denom int64 `json:"denom"`
 }
 
+type ABCIValidator struct {
+	PubKey []byte `protobuf:"bytes,1,opt,name=pub_key,json=pubKey,proto3" json:"pub_key,omitempty"`
+	Power  int64  `protobuf:"varint,2,opt,name=power,proto3" json:"power,omitempty"`
+}
+
 // validator related struct
 type ValidatorList struct {
 	OncallValidators   []string `json:"oncall_validators"`
@@ -23,9 +28,12 @@ type ValidatorList struct {
 }
 
 type Validator struct {
-	Username     string `json:"username"`
-	Deposit      Coin   `json:"deposit"`
-	AbsentCommit int    `json:"absent_commit"`
+	ABCIValidator
+	Username       string `json:"username"`
+	Deposit        Coin   `json:"deposit"`
+	AbsentCommit   int    `json:"absent_commit"`
+	ProducedBlocks int64  `json:"produced_blocks"`
+	Link           string `json:"link"`
 }
 
 // vote related struct

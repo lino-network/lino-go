@@ -247,7 +247,6 @@
     "p2p",
     "p2p/conn",
     "p2p/pex",
-    "p2p/trust",
     "p2p/upnp",
     "proxy",
     "rpc/client",
@@ -266,8 +265,8 @@
     "types/priv_validator",
     "version"
   ]
-  revision = "26f633ed48441f72895b710f0e87b7b6c6791066"
-  version = "v0.19.1"
+  revision = "64408a40419a5fa6f156dd96a2ab2fffa3c8ab96"
+  version = "v0.19.2"
 
 [[projects]]
   name = "github.com/tendermint/tmlibs"
@@ -381,6 +380,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "20e69ddf15b34ebfd2e8c4d46de9ebb18dd36d8fc5c72a00c23a43cae2ace2e0"
+  inputs-digest = "6c80d72036432134b098b948055f10fa19cc63d6887e4f53ffba63f57e093c9c"
   solver-name = "gps-cdcl"
   solver-version = 1

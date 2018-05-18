@@ -18,31 +18,33 @@ const (
 )
 
 var (
-	DelegatorSubstore     = []byte{0x00}
-	VoterSubstore         = []byte{0x01}
-	VoteSubstore          = []byte{0x02}
-	ReferenceListSubStore = []byte{0x03}
+	delegatorSubstore     = []byte{0x00}
+	voterSubstore         = []byte{0x01}
+	voteSubstore          = []byte{0x02}
+	referenceListSubStore = []byte{0x03}
 
-	ProposalSubstore     = []byte{0x00}
-	ProposalListSubStore = []byte{0x01}
+	proposalSubstore     = []byte{0x00}
+	proposalListSubStore = []byte{0x01}
 
-	KeySeparator              = "/"
-	ValidatorSubstore         = []byte("Validator/")
-	ValidatorListSubstore     = []byte("ValidatorList/ValidatorListKey")
-	DeveloperSubstore         = []byte("Developer/")
-	DeveloperListSubstore     = []byte("Developer/DeveloperListKey")
-	InfraProviderSubstore     = []byte("InfraProvider/")
-	InfraProviderListSubstore = []byte("InfraProvider/InfraProviderListKey")
+	KeySeparator          = "/"
+	validatorSubstore     = []byte{0x00}
+	validatorListSubstore = []byte{0x01}
 
-	AccountInfoSubstore              = []byte{0x00}
-	AccountBankSubstore              = []byte{0x01}
-	AccountMetaSubstore              = []byte{0x02}
-	AccountFollowerSubstore          = []byte{0x03}
-	AccountFollowingSubstore         = []byte{0x04}
-	AccountRewardSubstore            = []byte{0x05}
-	AccountPendingStakeQueueSubstore = []byte{0x06}
-	AccountRelationshipSubstore      = []byte{0x07}
-	AccountGrantListSubstore         = []byte{0x08}
+	developerSubstore     = []byte{0x00}
+	developerListSubstore = []byte{0x01}
+
+	infraProviderSubstore     = []byte{0x00}
+	infraProviderListSubstore = []byte{0x01}
+
+	accountInfoSubstore              = []byte{0x00}
+	accountBankSubstore              = []byte{0x01}
+	accountMetaSubstore              = []byte{0x02}
+	accountFollowerSubstore          = []byte{0x03}
+	accountFollowingSubstore         = []byte{0x04}
+	accountRewardSubstore            = []byte{0x05}
+	accountPendingStakeQueueSubstore = []byte{0x06}
+	accountRelationshipSubstore      = []byte{0x07}
+	accountGrantListSubstore         = []byte{0x08}
 
 	postInfoSubStore           = []byte{0x00} // SubStore for all post info
 	postMetaSubStore           = []byte{0x01} // SubStore for all post mata info
@@ -66,16 +68,16 @@ var (
 
 //  validator related
 func getValidatorKey(accKey string) []byte {
-	return append(ValidatorSubstore, accKey...)
+	return append(validatorSubstore, accKey...)
 }
 
 func getValidatorListKey() []byte {
-	return ValidatorListSubstore
+	return validatorListSubstore
 }
 
 // vote related
 func getVotePrefix(id string) []byte {
-	return append(append(VoteSubstore, id...), KeySeparator...)
+	return append(append(voteSubstore, id...), KeySeparator...)
 }
 
 func getVoteKey(proposalID string, voter string) []byte {
@@ -83,7 +85,7 @@ func getVoteKey(proposalID string, voter string) []byte {
 }
 
 func getDelegatorPrefix(me string) []byte {
-	return append(append(DelegatorSubstore, me...), KeySeparator...)
+	return append(append(delegatorSubstore, me...), KeySeparator...)
 }
 
 func getDelegationKey(me string, myDelegator string) []byte {
@@ -91,50 +93,50 @@ func getDelegationKey(me string, myDelegator string) []byte {
 }
 
 func getVoterKey(me string) []byte {
-	return append(VoterSubstore, me...)
+	return append(voterSubstore, me...)
 }
 
 // developer related
 func getDeveloperKey(accKey string) []byte {
-	return append(DeveloperSubstore, accKey...)
+	return append(developerSubstore, accKey...)
 }
 
 func getDeveloperListKey() []byte {
-	return DeveloperListSubstore
+	return developerListSubstore
 }
 
 // infra related
 func getInfraProviderKey(accKey string) []byte {
-	return append(InfraProviderSubstore, accKey...)
+	return append(infraProviderSubstore, accKey...)
 }
 
 func getInfraProviderListKey() []byte {
-	return InfraProviderListSubstore
+	return infraProviderListSubstore
 }
 
 // account related
 func getAccountInfoKey(accKey string) []byte {
-	return append(AccountInfoSubstore, accKey...)
+	return append(accountInfoSubstore, accKey...)
 }
 
 func getAccountBankKey(address string) []byte {
 	bz, _ := hex.DecodeString(address)
-	return append(AccountBankSubstore, []byte(bz)...)
+	return append(accountBankSubstore, []byte(bz)...)
 }
 
 func getAccountMetaKey(accKey string) []byte {
-	return append(AccountMetaSubstore, accKey...)
+	return append(accountMetaSubstore, accKey...)
 }
 func getGrantKeyListKey(accKey string) []byte {
-	return append(AccountGrantListSubstore, accKey...)
+	return append(accountGrantListSubstore, accKey...)
 }
 
 func getRewardKey(accKey string) []byte {
-	return append(AccountRewardSubstore, accKey...)
+	return append(accountRewardSubstore, accKey...)
 }
 
 func getRelationshipPrefix(me string) []byte {
-	return append(append(AccountRelationshipSubstore, me...), KeySeparator...)
+	return append(append(accountRelationshipSubstore, me...), KeySeparator...)
 }
 
 func getRelationshipKey(me string, other string) []byte {
@@ -142,11 +144,11 @@ func getRelationshipKey(me string, other string) []byte {
 }
 
 func getFollowerPrefix(me string) []byte {
-	return append(append(AccountFollowerSubstore, me...), KeySeparator...)
+	return append(append(accountFollowerSubstore, me...), KeySeparator...)
 }
 
 func getFollowingPrefix(me string) []byte {
-	return append(append(AccountFollowingSubstore, me...), KeySeparator...)
+	return append(append(accountFollowingSubstore, me...), KeySeparator...)
 }
 
 func getFollowerKey(me string, myFollower string) []byte {
@@ -212,11 +214,11 @@ func getPostDonationKey(postKey string, donateUser string) []byte {
 
 // proposal related
 func getProposalKey(proposalID string) []byte {
-	return append(ProposalSubstore, proposalID...)
+	return append(proposalSubstore, proposalID...)
 }
 
 func getProposalListKey() []byte {
-	return ProposalListSubStore
+	return proposalListSubStore
 }
 
 // param related

@@ -98,6 +98,27 @@ type ReportOrUpvoteMsg struct {
 	IsRevoke bool
 }
 
+type DeletePostMsg struct {
+	Author string `json:"author"`
+	PostID string `json:"post_id"`
+	Titile string `json:"title"`
+}
+
+type ViewMsg struct {
+	Username string `json:"username"`
+	Author   string `json:"author"`
+	PostID   string `json:"post_id"`
+}
+
+type UpdatePostMsg struct {
+	Author                  string           `json:"author"`
+	PostID                  string           `json:"post_id"`
+	Title                   string           `json:"title"`
+	Content                 string           `json:"content"`
+	Links                   []IDToURLMapping `json:"links"`
+	RedistributionSplitRate string           `json:"redistribution_split_rate"`
+}
+
 // Validator related messages
 type ValidatorDepositMsg struct {
 	Username  string        `json:"username"`

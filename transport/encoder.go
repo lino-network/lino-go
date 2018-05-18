@@ -25,6 +25,7 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.TransferMsg{}, "transfer", nil)
 	cdc.RegisterConcrete(model.ClaimMsg{}, "claim", nil)
 	cdc.RegisterConcrete(model.CreatePostMsg{}, "post", nil)
+	cdc.RegisterConcrete(model.UpdatePostMsg{}, "update/post", nil)
 	cdc.RegisterConcrete(model.LikeMsg{}, "like", nil)
 	cdc.RegisterConcrete(model.DonateMsg{}, "donate", nil)
 	cdc.RegisterConcrete(model.ReportOrUpvoteMsg{}, "reportOrUpvote", nil)
