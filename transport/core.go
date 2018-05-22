@@ -51,7 +51,6 @@ func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err er
 		return res, err
 	}
 
-	fmt.Println(result.Response.Key)
 	resp := result.Response
 	if resp.Code != uint32(0) {
 		return res, errors.Errorf("Query failed: (%d) %s", resp.Code, resp.Log)
@@ -95,7 +94,6 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(txBytes))
 	// broadcast
 	return t.BroadcastTx(txBytes)
 }
