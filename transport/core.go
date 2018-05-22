@@ -50,6 +50,8 @@ func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err er
 	if err != nil {
 		return res, err
 	}
+
+	fmt.Println(result.Response.Key)
 	resp := result.Response
 	if resp.Code != uint32(0) {
 		return res, errors.Errorf("Query failed: (%d) %s", resp.Code, resp.Log)

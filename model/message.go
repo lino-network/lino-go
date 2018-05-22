@@ -76,32 +76,32 @@ type IDToURLMapping struct {
 }
 
 type LikeMsg struct {
-	Username string
-	Weight   int64
-	Author   string
-	PostID   string
+	Username string `json:"username"`
+	Weight   int64  `json:"weight"`
+	Author   string `json:"author"`
+	PostID   string `json:"post_id"`
 }
 
 type DonateMsg struct {
-	Username string
-	Amount   string
-	Author   string
-	PostID   string
-	FromApp  string
+	Username     string `json:"username"`
+	Amount       string `json:"amount"`
+	Author       string `json:"author"`
+	PostID       string `json:"post_id"`
+	FromApp      string `json:"from_app"`
+	FromChecking bool   `json:"from_checking"`
+	Memo         string `json:"memo"`
 }
 
 type ReportOrUpvoteMsg struct {
-	Username string
-	Author   string
-	PostID   string
-	IsReport bool
-	IsRevoke bool
+	Username string `json:"username"`
+	Author   string `json:"author"`
+	PostID   string `json:"post_id"`
+	IsReport bool   `json:"is_report"`
 }
 
 type DeletePostMsg struct {
 	Author string `json:"author"`
 	PostID string `json:"post_id"`
-	Titile string `json:"title"`
 }
 
 type ViewMsg struct {
