@@ -68,6 +68,22 @@ func Claim(username, privKeyHex string) error {
 	return broadcastTransaction(msg, privKeyHex)
 }
 
+func SavingToChecking(username, amount, privKeyHex string) error {
+	msg := model.SavingToCheckingMsg{
+		Username: username,
+		Amount:   amount,
+	}
+	return broadcastTransaction(msg, privKeyHex)
+}
+
+func CheckingToSaving(username, amount, privKeyHex string) error {
+	msg := model.CheckingToSavingMsg{
+		Username: username,
+		Amount:   amount,
+	}
+	return broadcastTransaction(msg, privKeyHex)
+}
+
 // Post related tx
 func CreatePost(postID, title, content, author, parentAuthor, parentPostID,
 	sourceAuthor, sourcePostID, redistributionSplitRate, privKeyHex string, links map[string]string) error {
@@ -126,6 +142,44 @@ func ReportOrUpvote(username, author, postID, privKeyHex string, isReport, isRev
 		PostID:   postID,
 		IsReport: isReport,
 		IsRevoke: isRevoke,
+	}
+	return broadcastTransaction(msg, privKeyHex)
+}
+
+func View(username, author, postID, privKeyHex string) error {
+	msg := model.ViewMsg{
+		Username: username,
+		Author:   author,
+		PostID:   postID,
+	}
+	return broadcastTransaction(msg, privKeyHex)
+}
+
+func DeletePost(title, author, postID, privKeyHex string) error {
+	msg := model.DeletePostMsg{
+		Author: author,
+		PostID: postID,
+	}
+	return broadcastTransaction(msg, privKeyHex)
+}
+
+func UpdatePost(author, postID, title, content, redistributionSplitRate, privKeyHex string, links map[string]string) error {
+	var mLinks []model.IDToURLMapping
+	if links == nil || len(links) == 0 {
+		mLinks = nil
+	} else {
+		for k, v := range links {
+			mLinks = append(mLinks, model.IDToURLMapping{k, v})
+		}
+	}
+
+	msg := model.UpdatePostMsg{
+		Author:  author,
+		PostID:  postID,
+		Title:   title,
+		Content: content,
+		Links:   mLinks,
+		RedistributionSplitRate: redistributionSplitRate,
 	}
 	return broadcastTransaction(msg, privKeyHex)
 }
@@ -253,6 +307,8 @@ func ProviderReport(username, privKeyHex string, usage int64) error {
 	}
 	return broadcastTransaction(msg, privKeyHex)
 }
+
+// proposal related tx
 
 // internal helper functions
 func broadcastTransaction(transaction interface{}, privKeyHex string) error {

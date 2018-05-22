@@ -27,7 +27,7 @@
 
 [[constraint]]
   name = "github.com/tendermint/tendermint"
-  version = "0.19.1"
+  version = "0.19.2"
 
 
 [prune]

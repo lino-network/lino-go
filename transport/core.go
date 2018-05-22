@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	cmn "github.com/tendermint/tmlibs/common"
@@ -50,6 +51,7 @@ func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err er
 	if err != nil {
 		return res, err
 	}
+
 	resp := result.Response
 	if resp.Code != uint32(0) {
 		return res, errors.Errorf("Query failed: (%d) %s", resp.Code, resp.Log)

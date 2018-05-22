@@ -8,6 +8,16 @@ type Coin struct {
 	Amount int64 `json:"amount"`
 }
 
+type Rat struct {
+	Num   int64 `json:"num"`
+	Denom int64 `json:"denom"`
+}
+
+type ABCIValidator struct {
+	PubKey []byte `protobuf:"bytes,1,opt,name=pub_key,json=pubKey,proto3" json:"pub_key,omitempty"`
+	Power  int64  `protobuf:"varint,2,opt,name=power,proto3" json:"power,omitempty"`
+}
+
 // validator related struct
 type ValidatorList struct {
 	OncallValidators   []string `json:"oncall_validators"`
@@ -18,9 +28,12 @@ type ValidatorList struct {
 }
 
 type Validator struct {
-	Username     string `json:"username"`
-	Deposit      Coin   `json:"deposit"`
-	AbsentCommit int    `json:"absent_commit"`
+	ABCIValidator
+	Username       string `json:"username"`
+	Deposit        Coin   `json:"deposit"`
+	AbsentCommit   int    `json:"absent_commit"`
+	ProducedBlocks int64  `json:"produced_blocks"`
+	Link           string `json:"link"`
 }
 
 // vote related struct
@@ -84,19 +97,19 @@ type PostInfo struct {
 }
 
 type PostMeta struct {
-	Created            int64 `json:"created"`
-	LastUpdate         int64 `json:"last_update"`
-	LastActivity       int64 `json:"last_activity"`
-	AllowReplies       bool  `json:"allow_replies"`
-	TotalLikeCount     int64 `json:"total_like_count"`
-	TotalDonateCount   int64 `json:"total_donate_count"`
-	TotalLikeWeight    int64 `json:"total_like_weight"`
-	TotalDislikeWeight int64 `json:"total_dislike_weight"`
-	TotalReportStake   Coin  `json:"total_report_stake"`
-	TotalUpvoteStake   Coin  `json:"total_upvote_stake"`
-	TotalReward        Coin  `json:"reward"`
-	// PenaltyScore            big.Rat `json:"penalty_score"`
-	// RedistributionSplitRate big.Rat `json:"redistribution_split_rate"`
+	Created                 int64 `json:"created"`
+	LastUpdate              int64 `json:"last_update"`
+	LastActivity            int64 `json:"last_activity"`
+	AllowReplies            bool  `json:"allow_replies"`
+	TotalLikeCount          int64 `json:"total_like_count"`
+	TotalDonateCount        int64 `json:"total_donate_count"`
+	TotalLikeWeight         int64 `json:"total_like_weight"`
+	TotalDislikeWeight      int64 `json:"total_dislike_weight"`
+	TotalReportStake        Coin  `json:"total_report_stake"`
+	TotalUpvoteStake        Coin  `json:"total_upvote_stake"`
+	TotalReward             Coin  `json:"reward"`
+	PenaltyScore            Rat   `json:"penalty_score"`
+	RedistributionSplitRate Rat   `json:"redistribution_split_rate"`
 }
 
 // developer related
@@ -138,10 +151,19 @@ type AccountInfo struct {
 }
 
 type AccountBank struct {
-	Address  string `json:"address"`
-	Balance  Coin   `json:"balance"`
-	Username string `json:"username"`
-	Stake    Coin   `json:"stake"`
+	Address         string        `json:"address"`
+	Saving          Coin          `json:"saving"`
+	Checking        Coin          `json:"checking"`
+	Username        string        `json:"username"`
+	Stake           Coin          `json:"stake"`
+	FrozenMoneyList []FrozenMoney `json:"frozen_money_list"`
+}
+
+type FrozenMoney struct {
+	Amount   Coin  `json:"amount"`
+	StartAt  int64 `json:"start_at"`
+	Times    int64 `json:"times"`
+	Interval int64 `json:"interval"`
 }
 
 type GrantKeyList struct {
@@ -175,14 +197,33 @@ type FollowingMeta struct {
 	FollowingName string `json:"following_name"`
 }
 
-// unmarshalJSON
-// func (v *PostMeta) UnmarshalJSON(b []byte) error {
-// 	var stuff map[string]interface{}
-// 	err := json.Unmarshal(b, &stuff)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	v.Username = stuff["username"].(string)
-//
-// 	return nil
-// }
+// proposal related
+type ProposalList struct {
+	OngoingProposal []string `json:"ongoing_proposal"`
+	PastProposal    []string `json:"past_proposal"`
+}
+
+type Proposal interface{}
+
+type ProposalInfo struct {
+	Creator       string `json:"creator"`
+	ProposalID    string `json:"proposal_id"`
+	AgreeVotes    Coin   `json:"agree_vote"`
+	DisagreeVotes Coin   `json:"disagree_vote"`
+	Result        int    `json:"result"`
+}
+
+type ChangeParamProposal struct {
+	ProposalInfo
+	Param Parameter `json:"param"`
+}
+
+type ContentCensorshipProposal struct {
+	ProposalInfo
+	PermLink string `json:"perm_link"`
+}
+
+type ProtocolUpgradeProposal struct {
+	ProposalInfo
+	Link string `json:"link"`
+}
