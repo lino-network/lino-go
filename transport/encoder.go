@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/lino-network/lino-go/model"
 	"github.com/pkg/errors"
+
 	crypto "github.com/tendermint/go-crypto"
 )
 
@@ -26,6 +27,7 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.ClaimMsg{}, "claim", nil)
 	cdc.RegisterConcrete(model.CreatePostMsg{}, "post", nil)
 	cdc.RegisterConcrete(model.UpdatePostMsg{}, "update/post", nil)
+	cdc.RegisterConcrete(model.DeletePostMsg{}, "delete/post", nil)
 	cdc.RegisterConcrete(model.LikeMsg{}, "like", nil)
 	cdc.RegisterConcrete(model.DonateMsg{}, "donate", nil)
 	cdc.RegisterConcrete(model.ReportOrUpvoteMsg{}, "reportOrUpvote", nil)

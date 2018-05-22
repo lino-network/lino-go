@@ -157,7 +157,6 @@ func View(username, author, postID, privKeyHex string) error {
 
 func DeletePost(title, author, postID, privKeyHex string) error {
 	msg := model.DeletePostMsg{
-		Titile: title,
 		Author: author,
 		PostID: postID,
 	}

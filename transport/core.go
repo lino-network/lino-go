@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	cmn "github.com/tendermint/tmlibs/common"
