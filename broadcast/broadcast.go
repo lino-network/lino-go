@@ -135,13 +135,12 @@ func Donate(username, author, postID, amount, fromApp, privKeyHex string) error 
 	return broadcastTransaction(msg, privKeyHex)
 }
 
-func ReportOrUpvote(username, author, postID, privKeyHex string, isReport, isRevoke bool) error {
+func ReportOrUpvote(username, author, postID, privKeyHex string, isReport bool) error {
 	msg := model.ReportOrUpvoteMsg{
 		Username: username,
 		Author:   author,
 		PostID:   postID,
 		IsReport: isReport,
-		IsRevoke: isRevoke,
 	}
 	return broadcastTransaction(msg, privKeyHex)
 }
