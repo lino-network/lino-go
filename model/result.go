@@ -1,11 +1,12 @@
 package model
 
 import (
+	"github.com/cznic/mathutil"
 	"github.com/tendermint/go-crypto"
 )
 
 type Coin struct {
-	Amount int64 `json:"amount"`
+	Amount mathutil.Int128 `json:"amount"`
 }
 
 type Rat struct {
@@ -108,7 +109,6 @@ type PostMeta struct {
 	TotalReportStake        Coin  `json:"total_report_stake"`
 	TotalUpvoteStake        Coin  `json:"total_upvote_stake"`
 	TotalReward             Coin  `json:"reward"`
-	PenaltyScore            Rat   `json:"penalty_score"`
 	RedistributionSplitRate Rat   `json:"redistribution_split_rate"`
 }
 
