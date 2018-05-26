@@ -63,6 +63,15 @@ func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err er
 	return resp.Value, nil
 }
 
+func (t Transport) QueryBlock(height int64) (res *ctypes.ResultBlock, err error) {
+	node, err := t.GetNode()
+	if err != nil {
+		return res, err
+	}
+
+	return node.Block(&height)
+}
+
 func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, error) {
 	node, err := t.GetNode()
 	if err != nil {
