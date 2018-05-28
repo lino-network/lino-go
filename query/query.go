@@ -476,6 +476,7 @@ func (query *Query) GetBlock(height int64) (*model.Block, error) {
 	block.Header = resp.Block.Header
 	block.Evidence = resp.Block.Evidence
 	block.LastCommit = resp.Block.LastCommit
+	block.Data = new(model.Data)
 	block.Data.Txs = []model.Transaction{}
 	for _, txBytes := range resp.Block.Data.Txs {
 		var tx model.Transaction
