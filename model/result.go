@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/cznic/mathutil"
 	"github.com/tendermint/go-crypto"
+	ttypes "github.com/tendermint/tendermint/types"
 )
 
 type Coin struct {
@@ -227,3 +228,16 @@ type ProtocolUpgradeProposal struct {
 	ProposalInfo
 	Link string `json:"link"`
 }
+
+type Block struct {
+	Header     *ttypes.Header      `json:"header"`
+	Evidence   ttypes.EvidenceData `json:"evidence"`
+	LastCommit *ttypes.Commit      `json:"last_commit"`
+	Data       *Data               `json:"data"`
+}
+
+type Data struct {
+	Txs Txs `json:"txs"`
+}
+
+type Txs []Transaction

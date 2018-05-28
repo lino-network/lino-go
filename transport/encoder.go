@@ -11,7 +11,7 @@ import (
 	crypto "github.com/tendermint/go-crypto"
 )
 
-var ZeroFee = Fee{
+var ZeroFee = model.Fee{
 	Amount: []int64{},
 	Gas:    0,
 }
@@ -69,15 +69,15 @@ func MakeCodec() *wire.Codec {
 
 func EncodeTx(cdc *wire.Codec, msg interface{}, pubKey crypto.PubKey,
 	sig crypto.Signature, seq int64) ([]byte, error) {
-	stdSig := Signature{
+	stdSig := model.Signature{
 		PubKey:   pubKey,
 		Sig:      sig,
 		Sequence: seq,
 	}
 
-	stdTx := Transaction{
+	stdTx := model.Transaction{
 		Msg:  msg,
-		Sigs: []Signature{stdSig},
+		Sigs: []model.Signature{stdSig},
 		Fee:  ZeroFee,
 	}
 	return cdc.MarshalJSON(stdTx)
@@ -92,7 +92,7 @@ func EncodeSignMsg(cdc *wire.Codec, msg interface{}, chainId string, seq int64) 
 	if err != nil {
 		return nil, err
 	}
-	stdSignMsg := SignMsg{
+	stdSignMsg := model.SignMsg{
 		ChainID:   chainId,
 		MsgBytes:  msgBytes,
 		Sequences: []int64{seq},
