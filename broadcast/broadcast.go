@@ -10,8 +10,18 @@ import (
 	"github.com/lino-network/lino-go/types"
 )
 
+type Broadcast struct {
+	transport *transport.Transport
+}
+
+func NewBroadcast(transport *transport.Transport) *Broadcast {
+	return &Broadcast{
+		transport: transport,
+	}
+}
+
 // Account related tx
-func Register(username, masterPubKeyHex, postPubKeyHex, transactionPubKeyHex, masterPrivKeyHex string) error {
+func (broadcast *Broadcast) Register(username, masterPubKeyHex, postPubKeyHex, transactionPubKeyHex, masterPrivKeyHex string) error {
 	masterPubKey, err := transport.GetPubKeyFromHex(masterPubKeyHex)
 	if err != nil {
 		return nil
@@ -31,10 +41,10 @@ func Register(username, masterPubKeyHex, postPubKeyHex, transactionPubKeyHex, ma
 		NewPostPubKey:        postPubKey,
 		NewTransactionPubKey: txPubKey,
 	}
-	return broadcastTransaction(msg, masterPrivKeyHex)
+	return broadcast.broadcastTransaction(msg, masterPrivKeyHex)
 }
 
-func Transfer(sender, receiverName, receiverAddr, amount, memo, privKeyHex string) error {
+func (broadcast *Broadcast) Transfer(sender, receiverName, receiverAddr, amount, memo, privKeyHex string) error {
 	msg := model.TransferMsg{
 		Sender:       sender,
 		ReceiverName: receiverName,
@@ -42,50 +52,50 @@ func Transfer(sender, receiverName, receiverAddr, amount, memo, privKeyHex strin
 		Amount:       amount,
 		Memo:         memo,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func Follow(follower, followee, privKeyHex string) error {
+func (broadcast *Broadcast) Follow(follower, followee, privKeyHex string) error {
 	msg := model.FollowMsg{
 		Followee: followee,
 		Follower: follower,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func Unfollow(follower, followee, privKeyHex string) error {
+func (broadcast *Broadcast) Unfollow(follower, followee, privKeyHex string) error {
 	msg := model.UnfollowMsg{
 		Followee: followee,
 		Follower: follower,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func Claim(username, privKeyHex string) error {
+func (broadcast *Broadcast) Claim(username, privKeyHex string) error {
 	msg := model.ClaimMsg{
 		Username: username,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func SavingToChecking(username, amount, privKeyHex string) error {
+func (broadcast *Broadcast) SavingToChecking(username, amount, privKeyHex string) error {
 	msg := model.SavingToCheckingMsg{
 		Username: username,
 		Amount:   amount,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func CheckingToSaving(username, amount, privKeyHex string) error {
+func (broadcast *Broadcast) CheckingToSaving(username, amount, privKeyHex string) error {
 	msg := model.CheckingToSavingMsg{
 		Username: username,
 		Amount:   amount,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
 // Post related tx
-func CreatePost(postID, title, content, author, parentAuthor, parentPostID,
+func (broadcast *Broadcast) CreatePost(postID, title, content, author, parentAuthor, parentPostID,
 	sourceAuthor, sourcePostID, redistributionSplitRate, privKeyHex string, links map[string]string) error {
 	var mLinks []model.IDToURLMapping
 	if links == nil || len(links) == 0 {
@@ -111,20 +121,20 @@ func CreatePost(postID, title, content, author, parentAuthor, parentPostID,
 	msg := model.CreatePostMsg{
 		para,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func Like(username, author, postID, privKeyHex string, weight int64) error {
+func (broadcast *Broadcast) Like(username, author, postID, privKeyHex string, weight int64) error {
 	msg := model.LikeMsg{
 		Username: username,
 		Weight:   weight,
 		Author:   author,
 		PostID:   postID,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func Donate(username, author, postID, amount, fromApp, privKeyHex string) error {
+func (broadcast *Broadcast) Donate(username, author, postID, amount, fromApp, privKeyHex string) error {
 	msg := model.DonateMsg{
 		Username: username,
 		Author:   author,
@@ -132,37 +142,37 @@ func Donate(username, author, postID, amount, fromApp, privKeyHex string) error 
 		FromApp:  fromApp,
 		Amount:   amount,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func ReportOrUpvote(username, author, postID, privKeyHex string, isReport bool) error {
+func (broadcast *Broadcast) ReportOrUpvote(username, author, postID, privKeyHex string, isReport bool) error {
 	msg := model.ReportOrUpvoteMsg{
 		Username: username,
 		Author:   author,
 		PostID:   postID,
 		IsReport: isReport,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func View(username, author, postID, privKeyHex string) error {
+func (broadcast *Broadcast) View(username, author, postID, privKeyHex string) error {
 	msg := model.ViewMsg{
 		Username: username,
 		Author:   author,
 		PostID:   postID,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func DeletePost(title, author, postID, privKeyHex string) error {
+func (broadcast *Broadcast) DeletePost(title, author, postID, privKeyHex string) error {
 	msg := model.DeletePostMsg{
 		Author: author,
 		PostID: postID,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func UpdatePost(author, postID, title, content, redistributionSplitRate, privKeyHex string, links map[string]string) error {
+func (broadcast *Broadcast) UpdatePost(author, postID, title, content, redistributionSplitRate, privKeyHex string, links map[string]string) error {
 	var mLinks []model.IDToURLMapping
 	if links == nil || len(links) == 0 {
 		mLinks = nil
@@ -180,11 +190,11 @@ func UpdatePost(author, postID, title, content, redistributionSplitRate, privKey
 		Links:   mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
 // Validator related tx
-func ValidatorDeposit(username, deposit, privKeyHex string) error {
+func (broadcast *Broadcast) ValidatorDeposit(username, deposit, privKeyHex string) error {
 	privKey, err := transport.GetPrivKeyFromHex(privKeyHex)
 	if err != nil {
 		return err
@@ -195,124 +205,123 @@ func ValidatorDeposit(username, deposit, privKeyHex string) error {
 		Deposit:   deposit,
 		ValPubKey: privKey.PubKey(),
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func ValidatorWithdraw(username, amount, privKeyHex string) error {
+func (broadcast *Broadcast) ValidatorWithdraw(username, amount, privKeyHex string) error {
 	msg := model.ValidatorWithdrawMsg{
 		Username: username,
 		Amount:   amount,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func ValidatorRevoke(username, privKeyHex string) error {
+func (broadcast *Broadcast) ValidatorRevoke(username, privKeyHex string) error {
 	msg := model.ValidatorRevokeMsg{
 		Username: username,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
 // Vote related tx
-func Vote(voter, proposalID, privKeyHex string, result bool) error {
+func (broadcast *Broadcast) Vote(voter, proposalID, privKeyHex string, result bool) error {
 	msg := model.VoteMsg{
 		Voter:      voter,
 		ProposalID: proposalID,
 		Result:     result,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func VoterDeposit(username, deposit, privKeyHex string) error {
+func (broadcast *Broadcast) VoterDeposit(username, deposit, privKeyHex string) error {
 	msg := model.VoterDepositMsg{
 		Username: username,
 		Deposit:  deposit,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func VoterWithdraw(username, amount, privKeyHex string) error {
+func (broadcast *Broadcast) VoterWithdraw(username, amount, privKeyHex string) error {
 	msg := model.VoterWithdrawMsg{
 		Username: username,
 		Amount:   amount,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func VoterRevoke(username, privKeyHex string) error {
+func (broadcast *Broadcast) VoterRevoke(username, privKeyHex string) error {
 	msg := model.VoterRevokeMsg{
 		Username: username,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func Delegate(delegator, voter, amount, privKeyHex string) error {
+func (broadcast *Broadcast) Delegate(delegator, voter, amount, privKeyHex string) error {
 	msg := model.DelegateMsg{
 		Delegator: delegator,
 		Voter:     voter,
 		Amount:    amount,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func DelegatorWithdraw(delegator, voter, amount, privKeyHex string) error {
+func (broadcast *Broadcast) DelegatorWithdraw(delegator, voter, amount, privKeyHex string) error {
 	msg := model.DelegatorWithdrawMsg{
 		Delegator: delegator,
 		Voter:     voter,
 		Amount:    amount,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func RevokeDelegation(delegator, voter, privKeyHex string) error {
+func (broadcast *Broadcast) RevokeDelegation(delegator, voter, privKeyHex string) error {
 	msg := model.RevokeDelegationMsg{
 		Delegator: delegator,
 		Voter:     voter,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
 // Developer related tx
-func DeveloperRegister(username, deposit, privKeyHex string) error {
+func (broadcast *Broadcast) DeveloperRegister(username, deposit, privKeyHex string) error {
 	msg := model.DeveloperRegisterMsg{
 		Username: username,
 		Deposit:  deposit,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func DeveloperRevoke(username, privKeyHex string) error {
+func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string) error {
 	msg := model.DeveloperRegisterMsg{
 		Username: username,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func GrantDeveloper(username, authenticateApp, privKeyHex string, validityPeriod, grantLevel int64) error {
+func (broadcast *Broadcast) GrantDeveloper(username, authenticateApp, privKeyHex string, validityPeriod, grantLevel int64) error {
 	msg := model.GrantDeveloperMsg{
 		Username:        username,
 		AuthenticateApp: authenticateApp,
 		ValidityPeriod:  validityPeriod,
 		GrantLevel:      grantLevel,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
 // infra related tx
-func ProviderReport(username, privKeyHex string, usage int64) error {
+func (broadcast *Broadcast) ProviderReport(username, privKeyHex string, usage int64) error {
 	msg := model.ProviderReportMsg{
 		Username: username,
 		Usage:    usage,
 	}
-	return broadcastTransaction(msg, privKeyHex)
+	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
 // proposal related tx
 
 // internal helper functions
-func broadcastTransaction(transaction interface{}, privKeyHex string) error {
-	transport := transport.NewTransportFromViper()
-	res, err := transport.SignBuildBroadcast(transaction, privKeyHex, 0)
+func (broadcast *Broadcast) broadcastTransaction(transaction interface{}, privKeyHex string) error {
+	res, err := broadcast.transport.SignBuildBroadcast(transaction, privKeyHex, 0)
 
 	var reg = regexp.MustCompile(`expected (\d+)`)
 	var tries = 1
@@ -324,7 +333,7 @@ func broadcastTransaction(transaction interface{}, privKeyHex string) error {
 		if err != nil || tries == types.BroadcastMaxTries {
 			return err
 		}
-		res, err = transport.SignBuildBroadcast(transaction, privKeyHex, seq)
+		res, err = broadcast.transport.SignBuildBroadcast(transaction, privKeyHex, seq)
 		tries += 1
 	}
 

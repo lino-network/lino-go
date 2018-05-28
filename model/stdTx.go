@@ -1,12 +1,11 @@
-package transport
+package model
 
 import (
-	"github.com/lino-network/lino-go/model"
 	"github.com/tendermint/go-crypto"
 )
 
 type Transaction struct {
-	Msg  model.Msg   `json:"msg"`
+	Msg  Msg         `json:"msg"`
 	Fee  Fee         `json:"fee"`
 	Sigs []Signature `json:"signatures"`
 }

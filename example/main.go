@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/lino-network/lino-go/query"
+	"github.com/lino-network/lino-go/api"
 )
 
 //"encoding/hex"
@@ -16,6 +16,7 @@ import (
 func main() {
 	// // query example
 
+	api := api.DefaultLinoAPI()
 	// for {
 	// 	res, _ := query.GetAllValidators()
 	// 	output, _ := json.Marshal(res)
@@ -59,9 +60,9 @@ func main() {
 	// output, _ = json.Marshal(res6)
 	// fmt.Println(string(output))
 	//
-	// res7, _ := query.GetAccountMeta("Lino")
-	// output, _ := json.Marshal(res7)
-	// fmt.Println(string(output))
+	res7, _ := api.Query.GetAccountMeta("Lino")
+	output, _ := json.Marshal(res7)
+	fmt.Println(string(output))
 	//
 	// res8 := query.GetAccountSequence("Lino")
 	// output, _ = json.Marshal(res8)
@@ -71,8 +72,8 @@ func main() {
 	// output, _ = json.Marshal(res9)
 	// fmt.Println(string(output))
 	// //
-	res10, _ := query.GetAccountBank("6AD350F6B7F333C99D4FDD9BB633B9ABFE20F987")
-	output, _ := json.Marshal(res10)
+	res10, _ := api.Query.GetAccountBank("6AD350F6B7F333C99D4FDD9BB633B9ABFE20F987")
+	output, _ = json.Marshal(res10)
 	fmt.Println(string(output))
 	//
 	// res11, _ := query.GetGrantList("Lino")

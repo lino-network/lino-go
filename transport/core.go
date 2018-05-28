@@ -19,7 +19,7 @@ type Transport struct {
 	Cdc     *wire.Codec
 }
 
-func NewTransportFromViper() Transport {
+func NewTransportFromViper() *Transport {
 	v := viper.New()
 	viper.SetConfigType("json")
 	v.SetConfigName("config")
@@ -32,8 +32,21 @@ func NewTransportFromViper() Transport {
 		nodeUrl = "localhost:46657"
 	}
 	rpc := rpcclient.NewHTTP(nodeUrl, "/websocket")
-	return Transport{
+	return &Transport{
 		chainId: v.GetString("chain_id"),
+		nodeUrl: nodeUrl,
+		client:  rpc,
+		Cdc:     MakeCodec(),
+	}
+}
+
+func NewTransportFromArgs(chainID, nodeUrl string) *Transport {
+	if nodeUrl == "" {
+		nodeUrl = "localhost:46657"
+	}
+	rpc := rpcclient.NewHTTP(nodeUrl, "/websocket")
+	return &Transport{
+		chainId: chainID,
 		nodeUrl: nodeUrl,
 		client:  rpc,
 		Cdc:     MakeCodec(),

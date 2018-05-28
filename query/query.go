@@ -5,487 +5,484 @@ import (
 	"github.com/lino-network/lino-go/transport"
 )
 
+type Query struct {
+	transport *transport.Transport
+}
+
+func NewQuery(transport *transport.Transport) *Query {
+	return &Query{
+		transport: transport,
+	}
+}
+
 // Account related query
-func GetAccountSequence(username string) int64 {
-	meta, err := GetAccountMeta(username)
+func (query *Query) GetAccountSequence(username string) int64 {
+	meta, err := query.GetAccountMeta(username)
 	if err != nil {
 		return 0
 	}
 	return meta.Sequence
 }
 
-func GetAccountMeta(username string) (*model.AccountMeta, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getAccountMetaKey(username), AccountKVStoreKey)
+func (query *Query) GetAccountMeta(username string) (*model.AccountMeta, error) {
+	resp, err := query.transport.Query(getAccountMetaKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	meta := new(model.AccountMeta)
-	if err := transport.Cdc.UnmarshalJSON(resp, meta); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, meta); err != nil {
 		return nil, err
 	}
 	return meta, nil
 }
 
-func GetAccountBank(address string) (*model.AccountBank, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getAccountBankKey(address), AccountKVStoreKey)
+func (query *Query) GetAccountBank(address string) (*model.AccountBank, error) {
+	resp, err := query.transport.Query(getAccountBankKey(address), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	bank := new(model.AccountBank)
-	if err := transport.Cdc.UnmarshalJSON(resp, bank); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, bank); err != nil {
 		return nil, err
 	}
 	return bank, nil
 }
 
-func GetAccountInfo(username string) (*model.AccountInfo, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+func (query *Query) GetAccountInfo(username string) (*model.AccountInfo, error) {
+	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	info := new(model.AccountInfo)
-	if err := transport.Cdc.UnmarshalJSON(resp, info); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
 		return nil, err
 	}
 	return info, nil
 }
 
-func GetGrantList(username string) (*model.GrantKeyList, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getGrantKeyListKey(username), AccountKVStoreKey)
+func (query *Query) GetGrantList(username string) (*model.GrantKeyList, error) {
+	resp, err := query.transport.Query(getGrantKeyListKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	grantKeyList := new(model.GrantKeyList)
-	if err := transport.Cdc.UnmarshalJSON(resp, grantKeyList); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, grantKeyList); err != nil {
 		return grantKeyList, err
 	}
 	return grantKeyList, nil
 }
 
-func GetReward(username string) (*model.Reward, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getRewardKey(username), AccountKVStoreKey)
+func (query *Query) GetReward(username string) (*model.Reward, error) {
+	resp, err := query.transport.Query(getRewardKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	reward := new(model.Reward)
-	if err := transport.Cdc.UnmarshalJSON(resp, reward); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, reward); err != nil {
 		return reward, err
 	}
 	return reward, nil
 }
 
-func GetRelationship(me, other string) (*model.Relationship, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getRelationshipKey(me, other), AccountKVStoreKey)
+func (query *Query) GetRelationship(me, other string) (*model.Relationship, error) {
+	resp, err := query.transport.Query(getRelationshipKey(me, other), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	relationship := new(model.Relationship)
-	if err := transport.Cdc.UnmarshalJSON(resp, relationship); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, relationship); err != nil {
 		return relationship, err
 	}
 	return relationship, nil
 }
 
-func GetFollowerMeta(me, myFollower string) (*model.FollowerMeta, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getFollowerKey(me, myFollower), AccountKVStoreKey)
+func (query *Query) GetFollowerMeta(me, myFollower string) (*model.FollowerMeta, error) {
+	resp, err := query.transport.Query(getFollowerKey(me, myFollower), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	followerMeta := new(model.FollowerMeta)
-	if err := transport.Cdc.UnmarshalJSON(resp, followerMeta); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, followerMeta); err != nil {
 		return followerMeta, err
 	}
 	return followerMeta, nil
 }
 
-func GetFollowingMeta(me, myFollowing string) (*model.FollowingMeta, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getFollowerKey(me, myFollowing), AccountKVStoreKey)
+func (query *Query) GetFollowingMeta(me, myFollowing string) (*model.FollowingMeta, error) {
+	resp, err := query.transport.Query(getFollowerKey(me, myFollowing), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	followingMeta := new(model.FollowingMeta)
-	if err := transport.Cdc.UnmarshalJSON(resp, followingMeta); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, followingMeta); err != nil {
 		return followingMeta, err
 	}
 	return followingMeta, nil
 }
 
 // Post related query
-func GetPostComment(author, postID, commentPostKey string) (*model.Comment, error) {
+func (query *Query) GetPostComment(author, postID, commentPostKey string) (*model.Comment, error) {
 	postKey := getPostKey(author, postID)
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getPostCommentKey(postKey, commentPostKey), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostCommentKey(postKey, commentPostKey), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	comment := new(model.Comment)
-	if err := transport.Cdc.UnmarshalJSON(resp, comment); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, comment); err != nil {
 		return nil, err
 	}
 	return comment, nil
 }
 
-func GetPostView(author, postID, viewUser string) (*model.View, error) {
+func (query *Query) GetPostView(author, postID, viewUser string) (*model.View, error) {
 	postKey := getPostKey(author, postID)
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getPostViewKey(postKey, viewUser), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostViewKey(postKey, viewUser), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	view := new(model.View)
-	if err := transport.Cdc.UnmarshalJSON(resp, view); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, view); err != nil {
 		return nil, err
 	}
 	return view, nil
 }
 
-func GetPostDonation(author, postID, donateUser string) (*model.Donation, error) {
+func (query *Query) GetPostDonation(author, postID, donateUser string) (*model.Donation, error) {
 	postKey := getPostKey(author, postID)
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getPostDonationKey(postKey, donateUser), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostDonationKey(postKey, donateUser), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	donation := new(model.Donation)
-	if err := transport.Cdc.UnmarshalJSON(resp, donation); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, donation); err != nil {
 		return nil, err
 	}
 	return donation, nil
 }
 
-func GetPostReportOrUpvote(author, postID string, user string) (*model.ReportOrUpvote, error) {
+func (query *Query) GetPostReportOrUpvote(author, postID string, user string) (*model.ReportOrUpvote, error) {
 	postKey := getPostKey(author, postID)
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getPostReportOrUpvoteKey(postKey, user), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostReportOrUpvoteKey(postKey, user), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	reportOrUpvote := new(model.ReportOrUpvote)
-	if err := transport.Cdc.UnmarshalJSON(resp, reportOrUpvote); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, reportOrUpvote); err != nil {
 		return nil, err
 	}
 	return reportOrUpvote, nil
 }
 
-func GetPostInfo(author, postID string) (*model.PostInfo, error) {
+func (query *Query) GetPostInfo(author, postID string) (*model.PostInfo, error) {
 	postKey := getPostKey(author, postID)
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getPostInfoKey(postKey), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostInfoKey(postKey), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	postInfo := new(model.PostInfo)
-	if err := transport.Cdc.UnmarshalJSON(resp, postInfo); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, postInfo); err != nil {
 		return nil, err
 	}
 	return postInfo, nil
 }
 
-func GetPostMeta(author, postID string) (*model.PostMeta, error) {
+func (query *Query) GetPostMeta(author, postID string) (*model.PostMeta, error) {
 	postKey := getPostKey(author, postID)
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getPostMetaKey(postKey), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostMetaKey(postKey), PostKVStoreKey)
 
 	if err != nil {
 		return nil, err
 	}
 	postMeta := new(model.PostMeta)
-	if err := transport.Cdc.UnmarshalJSON(resp, postMeta); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, postMeta); err != nil {
 		return nil, err
 	}
 	return postMeta, nil
 }
 
 // Validator related query
-func GetValidator(username string) (*model.Validator, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getValidatorKey(username), ValidatorKVStoreKey)
+func (query *Query) GetValidator(username string) (*model.Validator, error) {
+	resp, err := query.transport.Query(getValidatorKey(username), ValidatorKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	validator := new(model.Validator)
-	if err := transport.Cdc.UnmarshalJSON(resp, validator); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, validator); err != nil {
 		return nil, err
 	}
 	return validator, nil
 }
 
-func GetAllValidators() (*model.ValidatorList, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getValidatorListKey(), ValidatorKVStoreKey)
+func (query *Query) GetAllValidators() (*model.ValidatorList, error) {
+	resp, err := query.transport.Query(getValidatorListKey(), ValidatorKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	validatorList := new(model.ValidatorList)
-	if err := transport.Cdc.UnmarshalJSON(resp, validatorList); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, validatorList); err != nil {
 		return validatorList, err
 	}
 	return validatorList, nil
 }
 
 // Vote related query
-func GetDelegation(voter string, delegator string) (*model.Delegation, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getDelegationKey(voter, delegator), VoteKVStoreKey)
+func (query *Query) GetDelegation(voter string, delegator string) (*model.Delegation, error) {
+	resp, err := query.transport.Query(getDelegationKey(voter, delegator), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	delegation := new(model.Delegation)
-	if err := transport.Cdc.UnmarshalJSON(resp, delegation); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, delegation); err != nil {
 		return nil, err
 	}
 	return delegation, nil
 }
 
-func GetVoter(voterName string) (*model.Voter, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getVoterKey(voterName), VoteKVStoreKey)
+func (query *Query) GetVoter(voterName string) (*model.Voter, error) {
+	resp, err := query.transport.Query(getVoterKey(voterName), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	voter := new(model.Voter)
-	if err := transport.Cdc.UnmarshalJSON(resp, voter); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, voter); err != nil {
 		return nil, err
 	}
 	return voter, nil
 }
 
 // Developer related query
-func GetDeveloper(developerName string) (*model.Developer, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getDeveloperKey(developerName), DeveloperKVStoreKey)
+func (query *Query) GetDeveloper(developerName string) (*model.Developer, error) {
+	resp, err := query.transport.Query(getDeveloperKey(developerName), DeveloperKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	developer := new(model.Developer)
-	if err := transport.Cdc.UnmarshalJSON(resp, developer); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, developer); err != nil {
 		return nil, err
 	}
 	return developer, nil
 }
 
-func GetDevelopers() (*model.DeveloperList, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getDeveloperListKey(), DeveloperKVStoreKey)
+func (query *Query) GetDevelopers() (*model.DeveloperList, error) {
+	resp, err := query.transport.Query(getDeveloperListKey(), DeveloperKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	developerList := new(model.DeveloperList)
-	if err := transport.Cdc.UnmarshalJSON(resp, developerList); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, developerList); err != nil {
 		return nil, err
 	}
 	return developerList, nil
 }
 
 // Infra related query
-func GetInfraProvider(providerName string) (*model.InfraProvider, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getInfraProviderKey(providerName), InfraKVStoreKey)
+func (query *Query) GetInfraProvider(providerName string) (*model.InfraProvider, error) {
+	resp, err := query.transport.Query(getInfraProviderKey(providerName), InfraKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 	provider := new(model.InfraProvider)
-	if err := transport.Cdc.UnmarshalJSON(resp, provider); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, provider); err != nil {
 		return nil, err
 	}
 	return provider, nil
 }
 
-func GetInfraProviders() (*model.InfraProviderList, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getInfraProviderListKey(), InfraKVStoreKey)
+func (query *Query) GetInfraProviders() (*model.InfraProviderList, error) {
+	resp, err := query.transport.Query(getInfraProviderListKey(), InfraKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	providerList := new(model.InfraProviderList)
-	if err := transport.Cdc.UnmarshalJSON(resp, providerList); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, providerList); err != nil {
 		return nil, err
 	}
 	return providerList, nil
 }
 
 // param related query
-func GetEvaluateOfContentValueParam() (*model.EvaluateOfContentValueParam, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getEvaluateOfContentValueParamKey(), ParamKVStoreKey)
+func (query *Query) GetEvaluateOfContentValueParam() (*model.EvaluateOfContentValueParam, error) {
+	resp, err := query.transport.Query(getEvaluateOfContentValueParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	param := new(model.EvaluateOfContentValueParam)
-	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
 	return param, nil
 }
 
-func GetGlobalAllocationParam() (*model.GlobalAllocationParam, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getGlobalAllocationParamKey(), ParamKVStoreKey)
+func (query *Query) GetGlobalAllocationParam() (*model.GlobalAllocationParam, error) {
+	resp, err := query.transport.Query(getGlobalAllocationParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	param := new(model.GlobalAllocationParam)
-	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
 	return param, nil
 }
 
-func GetInfraInternalAllocationParam() (*model.InfraInternalAllocationParam, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getInfraInternalAllocationParamKey(), ParamKVStoreKey)
+func (query *Query) GetInfraInternalAllocationParam() (*model.InfraInternalAllocationParam, error) {
+	resp, err := query.transport.Query(getInfraInternalAllocationParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	param := new(model.InfraInternalAllocationParam)
-	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
 	return param, nil
 }
 
-func GetDeveloperParam() (*model.DeveloperParam, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getDeveloperParamKey(), ParamKVStoreKey)
+func (query *Query) GetDeveloperParam() (*model.DeveloperParam, error) {
+	resp, err := query.transport.Query(getDeveloperParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	param := new(model.DeveloperParam)
-	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
 	return param, nil
 }
 
-func GetVoteParam() (*model.VoteParam, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getVoteParamKey(), ParamKVStoreKey)
+func (query *Query) GetVoteParam() (*model.VoteParam, error) {
+	resp, err := query.transport.Query(getVoteParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	param := new(model.VoteParam)
-	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
 	return param, nil
 }
 
-func GetProposalParam() (*model.ProposalParam, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getProposalParamKey(), ParamKVStoreKey)
+func (query *Query) GetProposalParam() (*model.ProposalParam, error) {
+	resp, err := query.transport.Query(getProposalParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	param := new(model.ProposalParam)
-	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
 	return param, nil
 }
 
-func GetValidatorParam() (*model.ValidatorParam, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getValidatorParamKey(), ParamKVStoreKey)
+func (query *Query) GetValidatorParam() (*model.ValidatorParam, error) {
+	resp, err := query.transport.Query(getValidatorParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	param := new(model.ValidatorParam)
-	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
 	return param, nil
 }
 
-func GetCoinDayParam() (*model.CoinDayParam, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getCoinDayParamKey(), ParamKVStoreKey)
+func (query *Query) GetCoinDayParam() (*model.CoinDayParam, error) {
+	resp, err := query.transport.Query(getCoinDayParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	param := new(model.CoinDayParam)
-	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
 	return param, nil
 }
 
-func GetBandwidthParam() (*model.BandwidthParam, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getBandwidthParamKey(), ParamKVStoreKey)
+func (query *Query) GetBandwidthParam() (*model.BandwidthParam, error) {
+	resp, err := query.transport.Query(getBandwidthParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	param := new(model.BandwidthParam)
-	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
 	return param, nil
 }
 
-func GetAccountParam() (*model.AccountParam, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getAccountParamKey(), ParamKVStoreKey)
+func (query *Query) GetAccountParam() (*model.AccountParam, error) {
+	resp, err := query.transport.Query(getAccountParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	param := new(model.AccountParam)
-	if err := transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
 	return param, nil
 }
 
 // proposal related query
-func GetProposalList() (*model.ProposalList, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getProposalListKey(), ProposalKVStoreKey)
+func (query *Query) GetProposalList() (*model.ProposalList, error) {
+	resp, err := query.transport.Query(getProposalListKey(), ProposalKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	proposalList := new(model.ProposalList)
-	if err := transport.Cdc.UnmarshalJSON(resp, proposalList); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, proposalList); err != nil {
 		return nil, err
 	}
 	return proposalList, nil
 }
 
-func GetProposal(proposalID string) (model.Proposal, error) {
-	transport := transport.NewTransportFromViper()
-	resp, err := transport.Query(getProposalKey(proposalID), ProposalKVStoreKey)
+func (query *Query) GetProposal(proposalID string) (*model.Proposal, error) {
+	resp, err := query.transport.Query(getProposalKey(proposalID), ProposalKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	proposal := new(model.Proposal)
-	if err := transport.Cdc.UnmarshalJSON(resp, proposal); err != nil {
+	if err := query.transport.Cdc.UnmarshalJSON(resp, proposal); err != nil {
 		return nil, err
 	}
-	return *proposal, nil
+	return proposal, nil
+}
+
+func (query *Query) GetBlock(height int64) (*model.Block, error) {
+	resp, err := query.transport.QueryBlock(height)
+	if err != nil {
+		return nil, err
+	}
+
+	block := new(model.Block)
+	block.Header = resp.Block.Header
+	block.Evidence = resp.Block.Evidence
+	block.LastCommit = resp.Block.LastCommit
+	block.Data.Txs = []model.Transaction{}
+	for _, txBytes := range resp.Block.Data.Txs {
+		var tx model.Transaction
+		if err := query.transport.Cdc.UnmarshalJSON(txBytes, &tx); err != nil {
+			return nil, err
+		}
+		block.Data.Txs = append(block.Data.Txs, tx)
+	}
+	return block, nil
 }
