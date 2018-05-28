@@ -11,15 +11,15 @@ type API struct {
 	*broadcast.Broadcast
 }
 
-func DefaultLinoAPI() *API {
-	transport := transport.NewTransportFromViper()
+func NewLinoAPIFromConfig() *API {
+	transport := transport.NewTransportFromConfig()
 	return &API{
 		Query:     query.NewQuery(transport),
 		Broadcast: broadcast.NewBroadcast(transport),
 	}
 }
 
-func NewLionAPI(chainID, nodeUrl string) *API {
+func NewLinoAPIFromArgs(chainID, nodeUrl string) *API {
 	transport := transport.NewTransportFromArgs(chainID, nodeUrl)
 	return &API{
 		Query:     query.NewQuery(transport),

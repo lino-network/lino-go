@@ -19,7 +19,7 @@ type Transport struct {
 	Cdc     *wire.Codec
 }
 
-func NewTransportFromViper() *Transport {
+func NewTransportFromConfig() *Transport {
 	v := viper.New()
 	viper.SetConfigType("json")
 	v.SetConfigName("config")

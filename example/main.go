@@ -16,7 +16,7 @@ import (
 func main() {
 	// // query example
 
-	api := api.DefaultLinoAPI()
+	api := api.NewLinoAPIFromConfig()
 	// for {
 	// 	res, _ := query.GetAllValidators()
 	// 	output, _ := json.Marshal(res)
