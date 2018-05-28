@@ -75,6 +75,10 @@ func main() {
 	res10, _ := api.Query.GetAccountBank("6AD350F6B7F333C99D4FDD9BB633B9ABFE20F987")
 	output, _ = json.Marshal(res10)
 	fmt.Println(string(output))
+
+	block, err := api.Query.GetBlock(121)
+	fmt.Println(err)
+	fmt.Println(block)
 	//
 	// res11, _ := query.GetGrantList("Lino")
 	// output, _ = json.Marshal(res11)
