@@ -318,6 +318,93 @@ func (broadcast *Broadcast) ProviderReport(username, privKeyHex string, usage in
 }
 
 // proposal related tx
+func (broadcast *Broadcast) ChangeGlobalAllocationParam(creator, privKeyHex string, parameter model.GlobalAllocationParam) error {
+	msg := model.ChangeGlobalAllocationParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(creator, privKeyHex string, parameter model.EvaluateOfContentValueParam) error {
+	msg := model.ChangeEvaluateOfContentValueParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ChangeInfraInternalAllocationParam(creator, privKeyHex string, parameter model.InfraInternalAllocationParam) error {
+	msg := model.ChangeInfraInternalAllocationParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ChangeVoteParam(creator, privKeyHex string, parameter model.VoteParam) error {
+	msg := model.ChangeVoteParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ChangeProposalParam(creator, privKeyHex string, parameter model.ProposalParam) error {
+	msg := model.ChangeProposalParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ChangeDeveloperParam(creator, privKeyHex string, parameter model.DeveloperParam) error {
+	msg := model.ChangeDeveloperParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ChangeValidatorParam(creator, privKeyHex string, parameter model.ValidatorParam) error {
+	msg := model.ChangeValidatorParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ChangeCoinDayParam(creator, privKeyHex string, parameter model.CoinDayParam) error {
+	msg := model.ChangeCoinDayParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ChangeBandwidthParam(creator, privKeyHex string, parameter model.BandwidthParam) error {
+	msg := model.ChangeBandwidthParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ChangeAccountParam(creator, privKeyHex string, parameter model.AccountParam) error {
+	msg := model.ChangeAccountParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) DeletePostContent(creator, permLink, privKeyHex string) error {
+	msg := model.DeletePostContentMsg{
+		Creator:  creator,
+		PermLink: permLink,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
 
 // internal helper functions
 func (broadcast *Broadcast) broadcastTransaction(transaction interface{}, privKeyHex string) error {
