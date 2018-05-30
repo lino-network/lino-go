@@ -1,11 +1,13 @@
 package model
 
 import (
+	"github.com/cznic/mathutil"
 	"github.com/tendermint/go-crypto"
+	ttypes "github.com/tendermint/tendermint/types"
 )
 
 type Coin struct {
-	Amount int64 `json:"amount"`
+	Amount mathutil.Int128 `json:"amount"`
 }
 
 type Rat struct {
@@ -108,7 +110,6 @@ type PostMeta struct {
 	TotalReportStake        Coin  `json:"total_report_stake"`
 	TotalUpvoteStake        Coin  `json:"total_upvote_stake"`
 	TotalReward             Coin  `json:"reward"`
-	PenaltyScore            Rat   `json:"penalty_score"`
 	RedistributionSplitRate Rat   `json:"redistribution_split_rate"`
 }
 
@@ -227,3 +228,16 @@ type ProtocolUpgradeProposal struct {
 	ProposalInfo
 	Link string `json:"link"`
 }
+
+type Block struct {
+	Header     *ttypes.Header      `json:"header"`
+	Evidence   ttypes.EvidenceData `json:"evidence"`
+	LastCommit *ttypes.Commit      `json:"last_commit"`
+	Data       *Data               `json:"data"`
+}
+
+type Data struct {
+	Txs Txs `json:"txs"`
+}
+
+type Txs []Transaction

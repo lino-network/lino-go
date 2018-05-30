@@ -1,42 +1,45 @@
 package main
 
 import (
-	//"encoding/hex"
 	"encoding/json"
 	"fmt"
-	//"strings"
 
-	//"github.com/lino-network/lino-go/broadcast"
-	"github.com/lino-network/lino-go/query"
-	//crypto "github.com/tendermint/go-crypto"
+	"github.com/lino-network/lino-go/api"
 )
+
+//"encoding/hex"
+
+//"strings"
+
+//crypto "github.com/tendermint/go-crypto"
 
 func main() {
 	// // query example
 
-	for {
-		res, _ := query.GetAllValidators()
-		output, _ := json.Marshal(res)
-		fmt.Println(string(output))
+	api := api.NewLinoAPIFromConfig()
+	// for {
+	// 	res, _ := query.GetAllValidators()
+	// 	output, _ := json.Marshal(res)
+	// 	fmt.Println(string(output))
 
-		res1, _ := query.GetValidator("Lino1")
-		output, _ = json.Marshal(res1)
-		fmt.Println(string(output))
+	// 	res1, _ := query.GetValidator("Lino1")
+	// 	output, _ = json.Marshal(res1)
+	// 	fmt.Println(string(output))
 
-		res11, _ := query.GetValidator("Lino2")
-		output, _ = json.Marshal(res11)
-		fmt.Println(string(output))
+	// 	res11, _ := query.GetValidator("Lino2")
+	// 	output, _ = json.Marshal(res11)
+	// 	fmt.Println(string(output))
 
-		res111, _ := query.GetValidator("Lino3")
-		output, _ = json.Marshal(res111)
-		fmt.Println(string(output))
+	// 	res111, _ := query.GetValidator("Lino3")
+	// 	output, _ = json.Marshal(res111)
+	// 	fmt.Println(string(output))
 
-		res1111, _ := query.GetValidator("Lino4")
-		output, _ = json.Marshal(res1111)
-		fmt.Println(string(output))
+	// 	res1111, _ := query.GetValidator("Lino4")
+	// 	output, _ = json.Marshal(res1111)
+	// 	fmt.Println(string(output))
 
-		fmt.Println("--------------------------------------------------------------------")
-	}
+	// 	fmt.Println("--------------------------------------------------------------------")
+	// }
 	// res2, _ := query.GetDeveloper("Lino1")
 	// output, _ = json.Marshal(res2)
 	// fmt.Println(string(output))
@@ -57,9 +60,9 @@ func main() {
 	// output, _ = json.Marshal(res6)
 	// fmt.Println(string(output))
 	//
-	// res7, _ := query.GetAccountMeta("Lino")
-	// output, _ = json.Marshal(res7)
-	// fmt.Println(string(output))
+	res7, _ := api.Query.GetAccountMeta("Lino")
+	output, _ := json.Marshal(res7)
+	fmt.Println(string(output))
 	//
 	// res8 := query.GetAccountSequence("Lino")
 	// output, _ = json.Marshal(res8)
@@ -69,9 +72,13 @@ func main() {
 	// output, _ = json.Marshal(res9)
 	// fmt.Println(string(output))
 	// //
-	// res10, _ := query.GetAccountInfo("Lino1")
-	// output, _ = json.Marshal(res10)
-	// fmt.Println(string(output))
+	res10, _ := api.Query.GetAccountBank("6AD350F6B7F333C99D4FDD9BB633B9ABFE20F987")
+	output, _ = json.Marshal(res10)
+	fmt.Println(string(output))
+
+	block, err := api.Query.GetBlock(121)
+	fmt.Println(err)
+	fmt.Println(block)
 	//
 	// res11, _ := query.GetGrantList("Lino")
 	// output, _ = json.Marshal(res11)

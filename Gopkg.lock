@@ -14,6 +14,12 @@
   version = "v0.15.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/cznic/mathutil"
+  packages = ["."]
+  revision = "ca4c9f2c136954238c3158b92de72078c7672ecc"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -380,6 +386,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6c80d72036432134b098b948055f10fa19cc63d6887e4f53ffba63f57e093c9c"
+  inputs-digest = "cfd50599549b877e4a813d9e8fc0b3f58a58a8870d0771fa06a083760d43f7b4"
   solver-name = "gps-cdcl"
   solver-version = 1
