@@ -36,8 +36,8 @@ func (query *Query) GetAccountMeta(username string) (*model.AccountMeta, error) 
 	return meta, nil
 }
 
-func (query *Query) GetAccountBank(address string) (*model.AccountBank, error) {
-	resp, err := query.transport.Query(getAccountBankKey(address), AccountKVStoreKey)
+func (query *Query) GetAccountBank(username string) (*model.AccountBank, error) {
+	resp, err := query.transport.Query(getAccountBankKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
