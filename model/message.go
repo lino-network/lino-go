@@ -8,18 +8,19 @@ type Msg interface{}
 
 // Account related messages
 type RegisterMsg struct {
-	NewUser              string        `json:"new_user"`
+	Referrer             string        `json:"referrer"`
+	RegisterFee          string        `json:"register_fee"`
+	NewUser              string        `json:"new_username"`
 	NewMasterPubKey      crypto.PubKey `json:"new_master_public_key"`
 	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
 	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
 }
 
 type TransferMsg struct {
-	Sender       string `json:"sender"`
-	ReceiverName string `json:"receiver_name"`
-	ReceiverAddr string `json:"receiver_addr"`
-	Amount       string `json:"amount"`
-	Memo         string `json:"memo"`
+	Sender   string `json:"sender"`
+	Receiver string `json:"receiver"`
+	Amount   string `json:"amount"`
+	Memo     string `json:"memo"`
 }
 
 type FollowMsg struct {
@@ -38,6 +39,7 @@ type ClaimMsg struct {
 
 type RecoverMsg struct {
 	Username             string        `json:"username"`
+	NewMasterPubKey      crypto.PubKey `json:"new_master_public_key"`
 	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
 	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
 }

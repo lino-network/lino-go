@@ -144,18 +144,14 @@ type AccountMeta struct {
 
 type AccountInfo struct {
 	Username       string        `json:"username"`
-	Created        int64         `json:"created"`
+	CreatedAt      int64         `json:"created_at"`
 	MasterKey      crypto.PubKey `json:"master_key"`
 	TransactionKey crypto.PubKey `json:"transaction_key"`
 	PostKey        crypto.PubKey `json:"post_key"`
-	Address        string        `json:"address"`
 }
 
 type AccountBank struct {
-	Address         string        `json:"address"`
 	Saving          Coin          `json:"saving"`
-	Checking        Coin          `json:"checking"`
-	Username        string        `json:"username"`
 	Stake           Coin          `json:"stake"`
 	FrozenMoneyList []FrozenMoney `json:"frozen_money_list"`
 }

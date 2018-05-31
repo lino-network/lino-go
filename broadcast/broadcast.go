@@ -21,7 +21,7 @@ func NewBroadcast(transport *transport.Transport) *Broadcast {
 }
 
 // Account related tx
-func (broadcast *Broadcast) Register(username, masterPubKeyHex, postPubKeyHex, transactionPubKeyHex, masterPrivKeyHex string) error {
+func (broadcast *Broadcast) Register(username, masterPubKeyHex, postPubKeyHex, transactionPubKeyHex, masterPrivKeyHex, referrer, registerFee string) error {
 	masterPubKey, err := transport.GetPubKeyFromHex(masterPubKeyHex)
 	if err != nil {
 		return nil
@@ -36,6 +36,8 @@ func (broadcast *Broadcast) Register(username, masterPubKeyHex, postPubKeyHex, t
 	}
 
 	msg := model.RegisterMsg{
+		Referrer:             referrer,
+		RegisterFee:          registerFee,
 		NewUser:              username,
 		NewMasterPubKey:      masterPubKey,
 		NewPostPubKey:        postPubKey,
@@ -44,13 +46,12 @@ func (broadcast *Broadcast) Register(username, masterPubKeyHex, postPubKeyHex, t
 	return broadcast.broadcastTransaction(msg, masterPrivKeyHex)
 }
 
-func (broadcast *Broadcast) Transfer(sender, receiverName, receiverAddr, amount, memo, privKeyHex string) error {
+func (broadcast *Broadcast) Transfer(sender, receiver, amount, memo, privKeyHex string) error {
 	msg := model.TransferMsg{
-		Sender:       sender,
-		ReceiverName: receiverName,
-		ReceiverAddr: receiverAddr,
-		Amount:       amount,
-		Memo:         memo,
+		Sender:   sender,
+		Receiver: receiver,
+		Amount:   amount,
+		Memo:     memo,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
@@ -74,6 +75,29 @@ func (broadcast *Broadcast) Unfollow(follower, followee, privKeyHex string) erro
 func (broadcast *Broadcast) Claim(username, privKeyHex string) error {
 	msg := model.ClaimMsg{
 		Username: username,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newPostPubKeyHex, newTransactionPubKeyHex, privKeyHex string) error {
+	masterPubKey, err := transport.GetPubKeyFromHex(newMasterPubKeyHex)
+	if err != nil {
+		return nil
+	}
+	postPubKey, err := transport.GetPubKeyFromHex(newPostPubKeyHex)
+	if err != nil {
+		return nil
+	}
+	txPubKey, err := transport.GetPubKeyFromHex(newTransactionPubKeyHex)
+	if err != nil {
+		return err
+	}
+
+	msg := model.RecoverMsg{
+		Username:             username,
+		NewMasterPubKey:      masterPubKey,
+		NewPostPubKey:        postPubKey,
+		NewTransactionPubKey: txPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
