@@ -126,6 +126,7 @@ type ValidatorDepositMsg struct {
 	Username  string        `json:"username"`
 	Deposit   string        `json:"deposit"`
 	ValPubKey crypto.PubKey `json:"validator_public_key"`
+	Link      string        `json:"link"`
 }
 
 type ValidatorWithdrawMsg struct {

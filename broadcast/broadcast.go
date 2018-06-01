@@ -24,11 +24,11 @@ func NewBroadcast(transport *transport.Transport) *Broadcast {
 func (broadcast *Broadcast) Register(username, masterPubKeyHex, postPubKeyHex, transactionPubKeyHex, masterPrivKeyHex, referrer, registerFee string) error {
 	masterPubKey, err := transport.GetPubKeyFromHex(masterPubKeyHex)
 	if err != nil {
-		return nil
+		return err
 	}
 	postPubKey, err := transport.GetPubKeyFromHex(postPubKeyHex)
 	if err != nil {
-		return nil
+		return err
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(transactionPubKeyHex)
 	if err != nil {
@@ -218,16 +218,16 @@ func (broadcast *Broadcast) UpdatePost(author, postID, title, content, redistrib
 }
 
 // Validator related tx
-func (broadcast *Broadcast) ValidatorDeposit(username, deposit, privKeyHex string) error {
-	privKey, err := transport.GetPrivKeyFromHex(privKeyHex)
+func (broadcast *Broadcast) ValidatorDeposit(username, deposit, validatorPubKey, link, privKeyHex string) error {
+	valPubKey, err := transport.GetPubKeyFromHex(validatorPubKey)
 	if err != nil {
 		return err
 	}
-
 	msg := model.ValidatorDepositMsg{
 		Username:  username,
 		Deposit:   deposit,
-		ValPubKey: privKey.PubKey(),
+		ValPubKey: valPubKey,
+		Link:      link,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
