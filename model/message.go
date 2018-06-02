@@ -44,16 +44,6 @@ type RecoverMsg struct {
 	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
 }
 
-type SavingToCheckingMsg struct {
-	Username string `json:"username"`
-	Amount   string `json:"amount"`
-}
-
-type CheckingToSavingMsg struct {
-	Username string `json:"username"`
-	Amount   string `json:"amount"`
-}
-
 // Post related messages
 type CreatePostMsg struct {
 	PostCreateParams

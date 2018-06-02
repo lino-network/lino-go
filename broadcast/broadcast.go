@@ -102,22 +102,6 @@ func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newPostPubKeyH
 	return broadcast.broadcastTransaction(msg, privKeyHex)
 }
 
-func (broadcast *Broadcast) SavingToChecking(username, amount, privKeyHex string) error {
-	msg := model.SavingToCheckingMsg{
-		Username: username,
-		Amount:   amount,
-	}
-	return broadcast.broadcastTransaction(msg, privKeyHex)
-}
-
-func (broadcast *Broadcast) CheckingToSaving(username, amount, privKeyHex string) error {
-	msg := model.CheckingToSavingMsg{
-		Username: username,
-		Amount:   amount,
-	}
-	return broadcast.broadcastTransaction(msg, privKeyHex)
-}
-
 // Post related tx
 func (broadcast *Broadcast) CreatePost(postID, title, content, author, parentAuthor, parentPostID,
 	sourceAuthor, sourcePostID, redistributionSplitRate, privKeyHex string, links map[string]string) error {
