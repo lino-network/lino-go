@@ -99,8 +99,18 @@ func (broadcast *Broadcast) Recover(seq int64, username, newMasterPubKeyHex, new
 	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
 }
 
+func (broadcast *Broadcast) UpdateAccount(seq int64, username, jsonMeta, privKeyHex string) error {
+	msg := model.UpdateAccountMsg{
+		Username: username,
+		JSONMeta: jsonMeta,
+	}
+	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
+}
+
+//
 // Post related tx
-func (broadcast *Broadcast) CreatePost(seq int64, postID, title, content, author, parentAuthor, parentPostID,
+//
+func (broadcast *Broadcast) CreatePost(seq int64, author, postID, title, content, parentAuthor, parentPostID,
 	sourceAuthor, sourcePostID, redistributionSplitRate, privKeyHex string, links map[string]string) error {
 	var mLinks []model.IDToURLMapping
 	if links == nil || len(links) == 0 {
@@ -112,67 +122,19 @@ func (broadcast *Broadcast) CreatePost(seq int64, postID, title, content, author
 	}
 
 	para := model.PostCreateParams{
-		PostID:                  postID,
-		Title:                   title,
-		Content:                 content,
-		Author:                  author,
-		ParentAuthor:            parentAuthor,
-		ParentPostID:            parentPostID,
-		SourceAuthor:            sourceAuthor,
-		SourcePostID:            sourcePostID,
+		Author:       author,
+		PostID:       postID,
+		Title:        title,
+		Content:      content,
+		ParentAuthor: parentAuthor,
+		ParentPostID: parentPostID,
+		SourceAuthor: sourceAuthor,
+		SourcePostID: sourcePostID,
+		Links:        mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
-		Links: mLinks,
 	}
 	msg := model.CreatePostMsg{
 		para,
-	}
-	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
-}
-
-func (broadcast *Broadcast) Like(seq int64, username, author, postID, privKeyHex string, weight int64) error {
-	msg := model.LikeMsg{
-		Username: username,
-		Weight:   weight,
-		Author:   author,
-		PostID:   postID,
-	}
-	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
-}
-
-func (broadcast *Broadcast) Donate(seq int64, username, author, postID, amount, fromApp, privKeyHex string) error {
-	msg := model.DonateMsg{
-		Username: username,
-		Author:   author,
-		PostID:   postID,
-		FromApp:  fromApp,
-		Amount:   amount,
-	}
-	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
-}
-
-func (broadcast *Broadcast) ReportOrUpvote(seq int64, username, author, postID, privKeyHex string, isReport bool) error {
-	msg := model.ReportOrUpvoteMsg{
-		Username: username,
-		Author:   author,
-		PostID:   postID,
-		IsReport: isReport,
-	}
-	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
-}
-
-func (broadcast *Broadcast) View(seq int64, username, author, postID, privKeyHex string) error {
-	msg := model.ViewMsg{
-		Username: username,
-		Author:   author,
-		PostID:   postID,
-	}
-	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
-}
-
-func (broadcast *Broadcast) DeletePost(seq int64, title, author, postID, privKeyHex string) error {
-	msg := model.DeletePostMsg{
-		Author: author,
-		PostID: postID,
 	}
 	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
 }
@@ -198,7 +160,58 @@ func (broadcast *Broadcast) UpdatePost(seq int64, author, postID, title, content
 	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
 }
 
+func (broadcast *Broadcast) DeletePost(seq int64, title, author, postID, privKeyHex string) error {
+	msg := model.DeletePostMsg{
+		Author: author,
+		PostID: postID,
+	}
+	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) Like(seq int64, username, author, postID, privKeyHex string, weight int64) error {
+	msg := model.LikeMsg{
+		Username: username,
+		Weight:   weight,
+		Author:   author,
+		PostID:   postID,
+	}
+	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) Donate(seq int64, username, amount, author, postID, fromApp, memo, privKeyHex string) error {
+	msg := model.DonateMsg{
+		Username: username,
+		Amount:   amount,
+		Author:   author,
+		PostID:   postID,
+		FromApp:  fromApp,
+		Memo:     memo,
+	}
+	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) View(seq int64, username, author, postID, privKeyHex string) error {
+	msg := model.ViewMsg{
+		Username: username,
+		Author:   author,
+		PostID:   postID,
+	}
+	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ReportOrUpvote(seq int64, username, author, postID, privKeyHex string, isReport bool) error {
+	msg := model.ReportOrUpvoteMsg{
+		Username: username,
+		Author:   author,
+		PostID:   postID,
+		IsReport: isReport,
+	}
+	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
+}
+
+//
 // Validator related tx
+//
 func (broadcast *Broadcast) ValidatorDeposit(seq int64, username, deposit, validatorPubKey, link, privKeyHex string) error {
 	valPubKey, err := transport.GetPubKeyFromHex(validatorPubKey)
 	if err != nil {
@@ -228,7 +241,9 @@ func (broadcast *Broadcast) ValidatorRevoke(seq int64, username, privKeyHex stri
 	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
 }
 
+//
 // Vote related tx
+//
 func (broadcast *Broadcast) Vote(seq int64, voter, proposalID, privKeyHex string, result bool) error {
 	msg := model.VoteMsg{
 		Voter:      voter,
@@ -287,7 +302,9 @@ func (broadcast *Broadcast) RevokeDelegation(seq int64, delegator, voter, privKe
 	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
 }
 
+//
 // Developer related tx
+//
 func (broadcast *Broadcast) DeveloperRegister(seq int64, username, deposit, privKeyHex string) error {
 	msg := model.DeveloperRegisterMsg{
 		Username: username,
@@ -303,7 +320,7 @@ func (broadcast *Broadcast) DeveloperRevoke(seq int64, username, privKeyHex stri
 	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
 }
 
-func (broadcast *Broadcast) GrantDeveloper(seq int64, username, authenticateApp, privKeyHex string, validityPeriod, grantLevel int64) error {
+func (broadcast *Broadcast) GrantDeveloper(seq int64, username, authenticateApp, privKeyHex string, validityPeriod int64, grantLevel int) error {
 	msg := model.GrantDeveloperMsg{
 		Username:        username,
 		AuthenticateApp: authenticateApp,
@@ -313,7 +330,9 @@ func (broadcast *Broadcast) GrantDeveloper(seq int64, username, authenticateApp,
 	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
 }
 
+//
 // infra related tx
+//
 func (broadcast *Broadcast) ProviderReport(seq int64, username, privKeyHex string, usage int64) error {
 	msg := model.ProviderReportMsg{
 		Username: username,
@@ -322,17 +341,27 @@ func (broadcast *Broadcast) ProviderReport(seq int64, username, privKeyHex strin
 	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
 }
 
+//
 // proposal related tx
-func (broadcast *Broadcast) ChangeGlobalAllocationParam(seq int64, creator, privKeyHex string, parameter model.GlobalAllocationParam) error {
-	msg := model.ChangeGlobalAllocationParamMsg{
-		Creator:   creator,
-		Parameter: parameter,
+//
+func (broadcast *Broadcast) DeletePostContent(seq int64, creator, permLink, privKeyHex string) error {
+	msg := model.DeletePostContentMsg{
+		Creator:  creator,
+		PermLink: permLink,
 	}
 	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
 }
 
 func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(seq int64, creator, privKeyHex string, parameter model.EvaluateOfContentValueParam) error {
 	msg := model.ChangeEvaluateOfContentValueParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
+}
+
+func (broadcast *Broadcast) ChangeGlobalAllocationParam(seq int64, creator, privKeyHex string, parameter model.GlobalAllocationParam) error {
+	msg := model.ChangeGlobalAllocationParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
 	}
@@ -403,15 +432,9 @@ func (broadcast *Broadcast) ChangeAccountParam(seq int64, creator, privKeyHex st
 	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
 }
 
-func (broadcast *Broadcast) DeletePostContent(seq int64, creator, permLink, privKeyHex string) error {
-	msg := model.DeletePostContentMsg{
-		Creator:  creator,
-		PermLink: permLink,
-	}
-	return broadcast.broadcastTransaction(seq, msg, privKeyHex)
-}
-
+//
 // internal helper functions
+//
 func (broadcast *Broadcast) broadcastTransaction(seq int64, transaction interface{}, privKeyHex string) error {
 	res, err := broadcast.transport.SignBuildBroadcast(transaction, privKeyHex, seq)
 	if err != nil {
