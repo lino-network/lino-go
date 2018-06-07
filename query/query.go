@@ -60,6 +60,20 @@ func (query *Query) GetAccountInfo(username string) (*model.AccountInfo, error) 
 	return info, nil
 }
 
+func (query *Query) LoginVerify(username, privKeyHex string) (bool, error) {
+	accInfo, err := query.GetAccountInfo(username)
+	if err != nil {
+		return false, err
+	}
+
+	privKey, err := transport.GetPrivKeyFromHex(privKeyHex)
+	if err != nil {
+		return false, err
+	}
+
+	return accInfo.MasterKey.Equals(privKey.PubKey()), nil
+}
+
 func (query *Query) GetGrantList(username string) (*model.GrantKeyList, error) {
 	resp, err := query.transport.Query(getGrantKeyListKey(username), AccountKVStoreKey)
 	if err != nil {
