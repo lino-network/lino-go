@@ -1,8 +1,11 @@
 package query
 
 import (
+	"time"
+
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
+	"github.com/lino-network/lino-go/types"
 )
 
 type Query struct {
@@ -153,7 +156,9 @@ func (query *Query) GetRelationship(me, other string) (*model.Relationship, erro
 	return relationship, nil
 }
 
-func (query *Query) GetBalanceHistory(me string, timeSlot int64) (*model.BalanceHistory, error) {
+func (query *Query) GetBalanceHistory(me string) (*model.BalanceHistory, error) {
+	timeSlot := time.Now().UnixNano() / types.BalanceHistoryIntervalTime
+
 	resp, err := query.transport.Query(getBalanceHistoryKey(me, timeSlot), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
