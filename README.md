@@ -1,14 +1,17 @@
 # lino-go
 
 ## Examples
+
 ### Broadcast transfer transaction
 ```
-broadcast.Transfer("Lino", "", "89920E0CF4C7910B54AB543B46F30ECAAA19EBF3", "10000", "memo", privKeyHex)
-  
+api := api.NewLinoAPIFromConfig()
+err := api.Broadcast.Transfer(1, "Lino", "receiver", "10000", "memo", privKeyHex)
 ```
 
-### Get Validators
+### Get Validator
 ```
-query.GetValidator("Lino")
-  
+api := api.NewLinoAPIFromConfig()
+validator, err := api.Query.GetValidator("Lino")
 ```
+
+### More examples are under folder of /lino-go/example/...
