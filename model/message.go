@@ -9,6 +9,15 @@ type Msg interface{}
 //
 // Account related messages
 //
+type RegisterMsg struct {
+	Referrer             string        `json:"referrer"`
+	RegisterFee          string        `json:"register_fee"`
+	NewUser              string        `json:"new_username"`
+	NewMasterPubKey      crypto.PubKey `json:"new_master_public_key"`
+	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
+	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
+}
+
 type FollowMsg struct {
 	Follower string `json:"follower"`
 	Followee string `json:"followee"`
@@ -37,15 +46,6 @@ type TransferMsg struct {
 	Memo     string `json:"memo"`
 }
 
-type RegisterMsg struct {
-	Referrer             string        `json:"referrer"`
-	RegisterFee          string        `json:"register_fee"`
-	NewUser              string        `json:"new_username"`
-	NewMasterPubKey      crypto.PubKey `json:"new_master_public_key"`
-	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
-	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
-}
-
 type UpdateAccountMsg struct {
 	Username string `json:"username"`
 	JSONMeta string `json:"json_meta"`
@@ -55,10 +55,6 @@ type UpdateAccountMsg struct {
 // Post related messages
 //
 type CreatePostMsg struct {
-	PostCreateParams
-}
-
-type PostCreateParams struct {
 	Author                  string           `json:"author"`
 	PostID                  string           `json:"post_id"`
 	Title                   string           `json:"title"`
@@ -211,6 +207,7 @@ type ProviderReportMsg struct {
 type DeletePostContentMsg struct {
 	Creator  string `json:"creator"`
 	PermLink string `json:"permLink"`
+	Reason   string `json:"reason"`
 }
 
 type ChangeGlobalAllocationParamMsg struct {

@@ -1,11 +1,8 @@
 package query
 
 import (
-	"time"
-
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
-	"github.com/lino-network/lino-go/types"
 )
 
 type Query struct {
@@ -33,7 +30,7 @@ func (query *Query) GetAccountInfo(username string) (*model.AccountInfo, error) 
 	return info, nil
 }
 
-func (query *Query) LoginVerify(username, privKeyHex string) (bool, error) {
+func (query *Query) DoesUsernameMatchPrivKey(username, privKeyHex string) (bool, error) {
 	accInfo, err := query.GetAccountInfo(username)
 	if err != nil {
 		return false, err
@@ -59,16 +56,56 @@ func (query *Query) GetAccountBank(username string) (*model.AccountBank, error) 
 	return bank, nil
 }
 
-func (query *Query) GetPendingStakeQueue(username string) (*model.PendingStakeQueue, error) {
-	resp, err := query.transport.Query(getPendingStakeQueueKey(username), AccountKVStoreKey)
+func (query *Query) GetAccountMeta(username string) (*model.AccountMeta, error) {
+	resp, err := query.transport.Query(getAccountMetaKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
-	pendingStakeQueue := new(model.PendingStakeQueue)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, pendingStakeQueue); err != nil {
+	meta := new(model.AccountMeta)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, meta); err != nil {
 		return nil, err
 	}
-	return pendingStakeQueue, nil
+	return meta, nil
+}
+
+func (query *Query) GetSeqNumber(username string) int64 {
+	meta, err := query.GetAccountMeta(username)
+	if err != nil {
+		return 0
+	}
+	return meta.Sequence
+}
+
+func (query *Query) GetAllBalanceHistory(username string) (*model.BalanceHistory, error) {
+	accountBank, err := query.GetAccountBank(username)
+	if err != nil {
+		return nil, err
+	}
+
+	allBalanceHistory := new(model.BalanceHistory)
+	bucketSlot := accountBank.NumOfTx / 100
+	for i := int64(0); i <= bucketSlot; i++ {
+		balanceHistory, err := query.GetBalanceHistory(username, i)
+		if err != nil {
+			return nil, err
+		}
+
+		allBalanceHistory.Details = append(allBalanceHistory.Details, balanceHistory.Details...)
+	}
+
+	return allBalanceHistory, nil
+}
+
+func (query *Query) GetBalanceHistory(username string, index int64) (*model.BalanceHistory, error) {
+	resp, err := query.transport.Query(getBalanceHistoryKey(username, index), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	balanceHistory := new(model.BalanceHistory)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, balanceHistory); err != nil {
+		return nil, err
+	}
+	return balanceHistory, nil
 }
 
 func (query *Query) GetGrantList(username string) (*model.GrantKeyList, error) {
@@ -82,52 +119,6 @@ func (query *Query) GetGrantList(username string) (*model.GrantKeyList, error) {
 		return grantKeyList, err
 	}
 	return grantKeyList, nil
-}
-
-func (query *Query) GetAccountMeta(username string) (*model.AccountMeta, error) {
-	resp, err := query.transport.Query(getAccountMetaKey(username), AccountKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-	meta := new(model.AccountMeta)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, meta); err != nil {
-		return nil, err
-	}
-	return meta, nil
-}
-
-func (query *Query) GetAccountSequence(username string) int64 {
-	meta, err := query.GetAccountMeta(username)
-	if err != nil {
-		return 0
-	}
-	return meta.Sequence
-}
-
-func (query *Query) GetFollowerMeta(me, myFollower string) (*model.FollowerMeta, error) {
-	resp, err := query.transport.Query(getFollowerKey(me, myFollower), AccountKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-
-	followerMeta := new(model.FollowerMeta)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, followerMeta); err != nil {
-		return followerMeta, err
-	}
-	return followerMeta, nil
-}
-
-func (query *Query) GetFollowingMeta(me, myFollowing string) (*model.FollowingMeta, error) {
-	resp, err := query.transport.Query(getFollowerKey(me, myFollowing), AccountKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-
-	followingMeta := new(model.FollowingMeta)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, followingMeta); err != nil {
-		return followingMeta, err
-	}
-	return followingMeta, nil
 }
 
 func (query *Query) GetReward(username string) (*model.Reward, error) {
@@ -156,19 +147,30 @@ func (query *Query) GetRelationship(me, other string) (*model.Relationship, erro
 	return relationship, nil
 }
 
-func (query *Query) GetBalanceHistory(me string) (*model.BalanceHistory, error) {
-	timeSlot := time.Now().UnixNano() / types.BalanceHistoryIntervalTime
-
-	resp, err := query.transport.Query(getBalanceHistoryKey(me, timeSlot), AccountKVStoreKey)
+func (query *Query) GetFollowerMeta(me, myFollower string) (*model.FollowerMeta, error) {
+	resp, err := query.transport.Query(getFollowerKey(me, myFollower), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
-	balanceHistory := new(model.BalanceHistory)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, balanceHistory); err != nil {
-		return balanceHistory, err
+	followerMeta := new(model.FollowerMeta)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, followerMeta); err != nil {
+		return followerMeta, err
 	}
-	return balanceHistory, nil
+	return followerMeta, nil
+}
+
+func (query *Query) GetFollowingMeta(me, myFollowing string) (*model.FollowingMeta, error) {
+	resp, err := query.transport.Query(getFollowerKey(me, myFollowing), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	followingMeta := new(model.FollowingMeta)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, followingMeta); err != nil {
+		return followingMeta, err
+	}
+	return followingMeta, nil
 }
 
 //
@@ -200,32 +202,6 @@ func (query *Query) GetPostMeta(author, postID string) (*model.PostMeta, error) 
 		return nil, err
 	}
 	return postMeta, nil
-}
-
-func (query *Query) GetPostLike(author, postID, likeUser string) (*model.Like, error) {
-	postKey := getPostKey(author, postID)
-	resp, err := query.transport.Query(getPostLikeKey(postKey, likeUser), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-	like := new(model.Like)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, like); err != nil {
-		return nil, err
-	}
-	return like, nil
-}
-
-func (query *Query) GetPostReportOrUpvote(author, postID, user string) (*model.ReportOrUpvote, error) {
-	postKey := getPostKey(author, postID)
-	resp, err := query.transport.Query(getPostReportOrUpvoteKey(postKey, user), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-	reportOrUpvote := new(model.ReportOrUpvote)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, reportOrUpvote); err != nil {
-		return nil, err
-	}
-	return reportOrUpvote, nil
 }
 
 func (query *Query) GetPostComment(author, postID, commentPostKey string) (*model.Comment, error) {
@@ -267,6 +243,32 @@ func (query *Query) GetPostDonation(author, postID, donateUser string) (*model.D
 	return donation, nil
 }
 
+func (query *Query) GetPostReportOrUpvote(author, postID, user string) (*model.ReportOrUpvote, error) {
+	postKey := getPostKey(author, postID)
+	resp, err := query.transport.Query(getPostReportOrUpvoteKey(postKey, user), PostKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	reportOrUpvote := new(model.ReportOrUpvote)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, reportOrUpvote); err != nil {
+		return nil, err
+	}
+	return reportOrUpvote, nil
+}
+
+func (query *Query) GetPostLike(author, postID, likeUser string) (*model.Like, error) {
+	postKey := getPostKey(author, postID)
+	resp, err := query.transport.Query(getPostLikeKey(postKey, likeUser), PostKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	like := new(model.Like)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, like); err != nil {
+		return nil, err
+	}
+	return like, nil
+}
+
 //
 // Validator related query
 //
@@ -298,6 +300,19 @@ func (query *Query) GetAllValidators() (*model.ValidatorList, error) {
 //
 // Vote related query
 //
+
+func (query *Query) GetDelegation(voter, delegator string) (*model.Delegation, error) {
+	resp, err := query.transport.Query(getDelegationKey(voter, delegator), VoteKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	delegation := new(model.Delegation)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, delegation); err != nil {
+		return nil, err
+	}
+	return delegation, nil
+}
+
 func (query *Query) GetVoter(voterName string) (*model.Voter, error) {
 	resp, err := query.transport.Query(getVoterKey(voterName), VoteKVStoreKey)
 	if err != nil {
@@ -310,6 +325,18 @@ func (query *Query) GetVoter(voterName string) (*model.Voter, error) {
 	return voter, nil
 }
 
+func (query *Query) GetDelegateeList(delegatorName string) (*model.DelegateeList, error) {
+	resp, err := query.transport.Query(GetDelegateeListKey(delegatorName), VoteKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	delegateeList := new(model.DelegateeList)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, delegateeList); err != nil {
+		return nil, err
+	}
+	return delegateeList, nil
+}
+
 func (query *Query) GetVote(proposalID, voter string) (*model.Vote, error) {
 	resp, err := query.transport.Query(getVoteKey(proposalID, voter), VoteKVStoreKey)
 	if err != nil {
@@ -320,18 +347,6 @@ func (query *Query) GetVote(proposalID, voter string) (*model.Vote, error) {
 		return nil, err
 	}
 	return vote, nil
-}
-
-func (query *Query) GetDelegation(voter, delegator string) (*model.Delegation, error) {
-	resp, err := query.transport.Query(getDelegationKey(voter, delegator), VoteKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-	delegation := new(model.Delegation)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, delegation); err != nil {
-		return nil, err
-	}
-	return delegation, nil
 }
 
 //
@@ -419,6 +434,44 @@ func (query *Query) GetProposal(proposalID string) (*model.Proposal, error) {
 	return proposal, nil
 }
 
+func (query *Query) GetOngoingProposal() ([]*model.Proposal, error) {
+	proposalList, err := query.GetProposalList()
+	if err != nil {
+		return nil, err
+	}
+
+	var ongoingProposals []*model.Proposal
+	for _, proposalID := range proposalList.OngoingProposal {
+		p, err := query.GetProposal(proposalID)
+		if err != nil {
+			return nil, err
+		}
+
+		ongoingProposals = append(ongoingProposals, p)
+	}
+
+	return ongoingProposals, nil
+}
+
+func (query *Query) GetExpiredProposal() ([]*model.Proposal, error) {
+	proposalList, err := query.GetProposalList()
+	if err != nil {
+		return nil, err
+	}
+
+	var expiredProposals []*model.Proposal
+	for _, proposalID := range proposalList.PastProposal {
+		p, err := query.GetProposal(proposalID)
+		if err != nil {
+			return nil, err
+		}
+
+		expiredProposals = append(expiredProposals, p)
+	}
+
+	return expiredProposals, nil
+}
+
 //
 // param related query
 //
@@ -461,6 +514,19 @@ func (query *Query) GetInfraInternalAllocationParam() (*model.InfraInternalAlloc
 	return param, nil
 }
 
+func (query *Query) GetDeveloperParam() (*model.DeveloperParam, error) {
+	resp, err := query.transport.Query(getDeveloperParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.DeveloperParam)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
 func (query *Query) GetVoteParam() (*model.VoteParam, error) {
 	resp, err := query.transport.Query(getVoteParamKey(), ParamKVStoreKey)
 	if err != nil {
@@ -481,19 +547,6 @@ func (query *Query) GetProposalParam() (*model.ProposalParam, error) {
 	}
 
 	param := new(model.ProposalParam)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
-		return nil, err
-	}
-	return param, nil
-}
-
-func (query *Query) GetDeveloperParam() (*model.DeveloperParam, error) {
-	resp, err := query.transport.Query(getDeveloperParamKey(), ParamKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-
-	param := new(model.DeveloperParam)
 	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}

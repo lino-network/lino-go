@@ -1,7 +1,6 @@
 package query
 
 import (
-	"encoding/hex"
 	"strconv"
 )
 
@@ -43,9 +42,11 @@ var (
 	validatorSubstore     = []byte{0x00}
 	validatorListSubstore = []byte{0x01}
 
-	delegatorSubstore = []byte{0x00}
-	voterSubstore     = []byte{0x01}
-	voteSubstore      = []byte{0x02}
+	delegationSubstore    = []byte{0x00}
+	voterSubstore         = []byte{0x01}
+	voteSubstore          = []byte{0x02}
+	referenceListSubStore = []byte{0x03}
+	delegateeListSubStore = []byte{0x04}
 
 	developerSubstore     = []byte{0x00}
 	developerListSubstore = []byte{0x01}
@@ -75,14 +76,46 @@ func getAccountInfoKey(accKey string) []byte {
 	return append(accountInfoSubstore, accKey...)
 }
 
-func getAccountBankKey(address string) []byte {
-	bz, _ := hex.DecodeString(address)
-	return append(accountBankSubstore, []byte(bz)...)
+func getAccountBankKey(accKey string) []byte {
+	return append(accountBankSubstore, accKey...)
 }
 
 func getAccountMetaKey(accKey string) []byte {
 	return append(accountMetaSubstore, accKey...)
 }
+
+func getFollowerKey(me string, myFollower string) []byte {
+	return append(getFollowerPrefix(me), myFollower...)
+}
+
+func getFollowerPrefix(me string) []byte {
+	return append(append(accountFollowerSubstore, me...), KeySeparator...)
+}
+
+func getFollowingKey(me string, myFollowing string) []byte {
+	return append(getFollowingPrefix(me), myFollowing...)
+}
+
+func getFollowingPrefix(me string) []byte {
+	return append(append(accountFollowingSubstore, me...), KeySeparator...)
+}
+
+func getRewardKey(accKey string) []byte {
+	return append(accountRewardSubstore, accKey...)
+}
+
+func getRelationshipKey(me string, other string) []byte {
+	return append(getRelationshipPrefix(me), other...)
+}
+
+func getRelationshipPrefix(me string) []byte {
+	return append(append(accountRelationshipSubstore, me...), KeySeparator...)
+}
+
+func getPendingStakeQueueKey(accKey string) []byte {
+	return append(accountPendingStakeQueueSubstore, accKey...)
+}
+
 func getGrantKeyListKey(accKey string) []byte {
 	return append(accountGrantListSubstore, accKey...)
 }
@@ -90,47 +123,15 @@ func getGrantKeyListKey(accKey string) []byte {
 func getBalanceHistoryPrefix(me string) []byte {
 	return append(append(accountBalanceHistorySubstore, me...), KeySeparator...)
 }
-func getBalanceHistoryKey(me string, atWhen int64) []byte {
-	return strconv.AppendInt(getBalanceHistoryPrefix(me), atWhen, 10)
-}
-
-func getRewardKey(accKey string) []byte {
-	return append(accountRewardSubstore, accKey...)
-}
-
-func getPendingStakeQueueKey(accKey string) []byte {
-	return append(accountPendingStakeQueueSubstore, accKey...)
-}
-
-func getRelationshipPrefix(me string) []byte {
-	return append(append(accountRelationshipSubstore, me...), KeySeparator...)
-}
-
-func getRelationshipKey(me string, other string) []byte {
-	return append(getRelationshipPrefix(me), other...)
-}
-
-func getFollowerPrefix(me string) []byte {
-	return append(append(accountFollowerSubstore, me...), KeySeparator...)
-}
-
-func getFollowingPrefix(me string) []byte {
-	return append(append(accountFollowingSubstore, me...), KeySeparator...)
-}
-
-func getFollowerKey(me string, myFollower string) []byte {
-	return append(getFollowerPrefix(me), myFollower...)
-}
-
-func getFollowingKey(me string, myFollowing string) []byte {
-	return append(getFollowingPrefix(me), myFollowing...)
+func getBalanceHistoryKey(me string, bucketSlot int64) []byte {
+	return strconv.AppendInt(getBalanceHistoryPrefix(me), bucketSlot, 10)
 }
 
 //
 // post related
 //
 func getPostInfoKey(postKey string) []byte {
-	return append([]byte(postInfoSubStore), postKey...)
+	return append(postInfoSubStore, postKey...)
 }
 
 func getPostKey(author string, postID string) string {
@@ -138,11 +139,11 @@ func getPostKey(author string, postID string) string {
 }
 
 func getPostMetaKey(postKey string) []byte {
-	return append([]byte(postMetaSubStore), postKey...)
+	return append(postMetaSubStore, postKey...)
 }
 
 func getPostLikePrefix(postKey string) []byte {
-	return append(append([]byte(postLikeSubStore), postKey...), KeySeparator...)
+	return append(append(postLikeSubStore, postKey...), KeySeparator...)
 }
 
 func getPostLikeKey(postKey string, likeUser string) []byte {
@@ -150,7 +151,7 @@ func getPostLikeKey(postKey string, likeUser string) []byte {
 }
 
 func getPostReportOrUpvotePrefix(postKey string) []byte {
-	return append(append([]byte(postReportOrUpvoteSubStore), postKey...), KeySeparator...)
+	return append(append(postReportOrUpvoteSubStore, postKey...), KeySeparator...)
 }
 
 func getPostReportOrUpvoteKey(postKey string, user string) []byte {
@@ -158,7 +159,7 @@ func getPostReportOrUpvoteKey(postKey string, user string) []byte {
 }
 
 func getPostViewPrefix(postKey string) []byte {
-	return append(append([]byte(postViewsSubStore), postKey...), KeySeparator...)
+	return append(append(postViewsSubStore, postKey...), KeySeparator...)
 }
 
 func getPostViewKey(postKey string, viewUser string) []byte {
@@ -166,7 +167,7 @@ func getPostViewKey(postKey string, viewUser string) []byte {
 }
 
 func getPostCommentPrefix(postKey string) []byte {
-	return append(append([]byte(postCommentSubStore), postKey...), KeySeparator...)
+	return append(append(postCommentSubStore, postKey...), KeySeparator...)
 }
 
 func getPostCommentKey(postKey string, commentPostKey string) []byte {
@@ -174,7 +175,7 @@ func getPostCommentKey(postKey string, commentPostKey string) []byte {
 }
 
 func getPostDonationPrefix(postKey string) []byte {
-	return append(append([]byte(postDonationsSubStore), postKey...), KeySeparator...)
+	return append(append(postDonationsSubStore, postKey...), KeySeparator...)
 }
 
 func getPostDonationKey(postKey string, donateUser string) []byte {
@@ -195,6 +196,14 @@ func getValidatorListKey() []byte {
 //
 // vote related
 //
+func getDelegationPrefix(me string) []byte {
+	return append(append(delegationSubstore, me...), KeySeparator...)
+}
+
+func getDelegationKey(me string, myDelegator string) []byte {
+	return append(getDelegationPrefix(me), myDelegator...)
+}
+
 func getVotePrefix(id string) []byte {
 	return append(append(voteSubstore, id...), KeySeparator...)
 }
@@ -203,16 +212,16 @@ func getVoteKey(proposalID string, voter string) []byte {
 	return append(getVotePrefix(proposalID), voter...)
 }
 
-func getDelegatorPrefix(me string) []byte {
-	return append(append(delegatorSubstore, me...), KeySeparator...)
-}
-
-func getDelegationKey(me string, myDelegator string) []byte {
-	return append(getDelegatorPrefix(me), myDelegator...)
-}
-
 func getVoterKey(me string) []byte {
 	return append(voterSubstore, me...)
+}
+
+func GetReferenceListKey() []byte {
+	return referenceListSubStore
+}
+
+func GetDelegateeListKey(me string) []byte {
+	return append(delegateeListSubStore, me...)
 }
 
 //
