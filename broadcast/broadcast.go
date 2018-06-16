@@ -1,11 +1,10 @@
 package broadcast
 
 import (
+	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
 	"github.com/lino-network/lino-go/types"
-
-	errors "github.com/dlive-io/dlive-backend-errors"
 )
 
 type Broadcast struct {
@@ -18,7 +17,9 @@ func NewBroadcast(transport *transport.Transport) *Broadcast {
 	}
 }
 
+//
 // Account related tx
+//
 func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubKeyHex, transactionPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
 	masterPubKey, err := transport.GetPubKeyFromHex(masterPubKeyHex)
 	if err != nil {
