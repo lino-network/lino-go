@@ -1,10 +1,10 @@
 package broadcast
 
 import (
-	"fmt"
-
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
+
+	errors "github.com/dlive-io/dlive-backend-errors"
 )
 
 type Broadcast struct {
@@ -241,15 +241,6 @@ func (broadcast *Broadcast) ValidatorRevoke(username, privKeyHex string, seq int
 //
 // Vote related tx
 //
-func (broadcast *Broadcast) Vote(voter, proposalID string, result bool, privKeyHex string, seq int64) error {
-	msg := model.VoteMsg{
-		Voter:      voter,
-		ProposalID: proposalID,
-		Result:     result,
-	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
-}
-
 func (broadcast *Broadcast) VoterDeposit(username, deposit, privKeyHex string, seq int64) error {
 	msg := model.VoterDepositMsg{
 		Username: username,
@@ -432,19 +423,28 @@ func (broadcast *Broadcast) DeletePostContent(creator, postAuthor, postID, reaso
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+func (broadcast *Broadcast) VoteProposal(voter, proposalID string, result bool, privKeyHex string, seq int64) error {
+	msg := model.VoteProposalMsg{
+		Voter:      voter,
+		ProposalID: proposalID,
+		Result:     result,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+}
+
 //
 // internal helper functions
 //
-func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex string, seq int64) errors.Error {
 	res, err := broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq)
 	if err != nil {
-		return err
+		return errors.Internalf("failed to broadcast: %v, with privKey: %s and seq: %v", msg, privKeyHex, seq).TraceCause(err, "")
 	}
 	if res.CheckTx.Code != uint32(0) {
-		return fmt.Errorf("CheckTx failed ! (%d) %s", res.CheckTx.Code, res.CheckTx.Log)
+		return errors.APIErrorf("CheckTx failed! (%d) %s", res.CheckTx.Code, res.CheckTx.Log)
 	}
 	if res.DeliverTx.Code != uint32(0) {
-		return fmt.Errorf("DeliverTx failed ! (%d) %s ", res.DeliverTx.Code, res.DeliverTx.Log)
+		return errors.APIErrorf("DeliverTx failed! (%d) %s", res.DeliverTx.Code, res.DeliverTx.Log)
 	}
 	return nil
 }

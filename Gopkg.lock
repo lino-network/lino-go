@@ -27,6 +27,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/dlive-io/dlive-backend-errors"
+  packages = ["."]
+  revision = "b7fc428a3e13d380ff8b479c63cbc3df5c4a1686"
+
+[[projects]]
+  branch = "master"
   name = "github.com/ebuchman/fail-test"
   packages = ["."]
   revision = "95f809107225be108efcf10a3509e4ea6ceef3c4"
@@ -383,6 +389,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3b5fcd7a6c1109d7889811a9045032afdd99004f6b7fa2afbedc26a35d049edc"
+  inputs-digest = "3cd882e27ec8e9cbf515770c2217ca2a501592567489247b1e4095a7af21fcc1"
   solver-name = "gps-cdcl"
   solver-version = 1
