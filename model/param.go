@@ -79,6 +79,7 @@ type BandwidthParam struct {
 }
 
 type AccountParam struct {
-	MinimumBalance Coin `json:"minimum_balance"`
-	RegisterFee    Coin `json:"register_fee"`
+	MinimumBalance             Coin  `json:"minimum_balance"`
+	RegisterFee                Coin  `json:"register_fee"`
+	BalanceHistoryIntervalTime int64 `json:"BalanceHistoryIntervalTimes"`
 }

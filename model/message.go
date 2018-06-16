@@ -6,20 +6,16 @@ import (
 
 type Msg interface{}
 
+//
 // Account related messages
+//
 type RegisterMsg struct {
-	NewUser              string        `json:"new_user"`
+	Referrer             string        `json:"referrer"`
+	RegisterFee          string        `json:"register_fee"`
+	NewUser              string        `json:"new_username"`
 	NewMasterPubKey      crypto.PubKey `json:"new_master_public_key"`
-	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
 	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
-}
-
-type TransferMsg struct {
-	Sender       string `json:"sender"`
-	ReceiverName string `json:"receiver_name"`
-	ReceiverAddr string `json:"receiver_addr"`
-	Amount       string `json:"amount"`
-	Memo         string `json:"memo"`
+	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
 }
 
 type FollowMsg struct {
@@ -38,30 +34,31 @@ type ClaimMsg struct {
 
 type RecoverMsg struct {
 	Username             string        `json:"username"`
+	NewMasterPubKey      crypto.PubKey `json:"new_master_public_key"`
 	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
 	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
 }
 
-type SavingToCheckingMsg struct {
-	Username string `json:"username"`
+type TransferMsg struct {
+	Sender   string `json:"sender"`
+	Receiver string `json:"receiver"`
 	Amount   string `json:"amount"`
+	Memo     string `json:"memo"`
 }
 
-type CheckingToSavingMsg struct {
+type UpdateAccountMsg struct {
 	Username string `json:"username"`
-	Amount   string `json:"amount"`
+	JSONMeta string `json:"json_meta"`
 }
 
+//
 // Post related messages
+//
 type CreatePostMsg struct {
-	PostCreateParams
-}
-
-type PostCreateParams struct {
+	Author                  string           `json:"author"`
 	PostID                  string           `json:"post_id"`
 	Title                   string           `json:"title"`
 	Content                 string           `json:"content"`
-	Author                  string           `json:"author"`
 	ParentAuthor            string           `json:"parent_author"`
 	ParentPostID            string           `json:"parent_postID"`
 	SourceAuthor            string           `json:"source_author"`
@@ -75,41 +72,6 @@ type IDToURLMapping struct {
 	URL        string `json:"url"`
 }
 
-type LikeMsg struct {
-	Username string `json:"username"`
-	Weight   int64  `json:"weight"`
-	Author   string `json:"author"`
-	PostID   string `json:"post_id"`
-}
-
-type DonateMsg struct {
-	Username     string `json:"username"`
-	Amount       string `json:"amount"`
-	Author       string `json:"author"`
-	PostID       string `json:"post_id"`
-	FromApp      string `json:"from_app"`
-	FromChecking bool   `json:"from_checking"`
-	Memo         string `json:"memo"`
-}
-
-type ReportOrUpvoteMsg struct {
-	Username string `json:"username"`
-	Author   string `json:"author"`
-	PostID   string `json:"post_id"`
-	IsReport bool   `json:"is_report"`
-}
-
-type DeletePostMsg struct {
-	Author string `json:"author"`
-	PostID string `json:"post_id"`
-}
-
-type ViewMsg struct {
-	Username string `json:"username"`
-	Author   string `json:"author"`
-	PostID   string `json:"post_id"`
-}
-
 type UpdatePostMsg struct {
 	Author                  string           `json:"author"`
 	PostID                  string           `json:"post_id"`
@@ -119,11 +81,48 @@ type UpdatePostMsg struct {
 	RedistributionSplitRate string           `json:"redistribution_split_rate"`
 }
 
+type DeletePostMsg struct {
+	Author string `json:"author"`
+	PostID string `json:"post_id"`
+}
+
+type LikeMsg struct {
+	Username string `json:"username"`
+	Weight   int64  `json:"weight"`
+	Author   string `json:"author"`
+	PostID   string `json:"post_id"`
+}
+
+type DonateMsg struct {
+	Username string `json:"username"`
+	Amount   string `json:"amount"`
+	Author   string `json:"author"`
+	PostID   string `json:"post_id"`
+	FromApp  string `json:"from_app"`
+	Memo     string `json:"memo"`
+}
+
+type ViewMsg struct {
+	Username string `json:"username"`
+	Author   string `json:"author"`
+	PostID   string `json:"post_id"`
+}
+
+type ReportOrUpvoteMsg struct {
+	Username string `json:"username"`
+	Author   string `json:"author"`
+	PostID   string `json:"post_id"`
+	IsReport bool   `json:"is_report"`
+}
+
+//
 // Validator related messages
+//
 type ValidatorDepositMsg struct {
 	Username  string        `json:"username"`
 	Deposit   string        `json:"deposit"`
 	ValPubKey crypto.PubKey `json:"validator_public_key"`
+	Link      string        `json:"link"`
 }
 
 type ValidatorWithdrawMsg struct {
@@ -135,12 +134,9 @@ type ValidatorRevokeMsg struct {
 	Username string `json:"username"`
 }
 
+//
 // Vote related messages
-type VoteMsg struct {
-	Voter      string `json:"voter"`
-	ProposalID string `json:"proposal_id"`
-	Result     bool   `json:"result"`
-}
+//
 
 type VoterDepositMsg struct {
 	Username string `json:"username"`
@@ -173,7 +169,9 @@ type RevokeDelegationMsg struct {
 	Voter     string `json:"voter"`
 }
 
+//
 // developer related messages
+//
 type DeveloperRegisterMsg struct {
 	Username string `json:"username"`
 	Deposit  string `json:"deposit"`
@@ -187,19 +185,35 @@ type GrantDeveloperMsg struct {
 	Username        string `json:"username"`
 	AuthenticateApp string `json:"authenticate_app"`
 	ValidityPeriod  int64  `json:"validity_period"`
-	GrantLevel      int64  `json:"grant_level"`
+	GrantLevel      int    `json:"grant_level"`
 }
 
+//
 // infra related messages
+//
 type ProviderReportMsg struct {
 	Username string `json:"username"`
 	Usage    int64  `json:"usage"`
 }
 
+//
 // proposal related messages
+//
 type DeletePostContentMsg struct {
 	Creator  string `json:"creator"`
 	PermLink string `json:"permLink"`
+	Reason   string `json:"reason"`
+}
+
+type VoteProposalMsg struct {
+	Voter      string `json:"voter"`
+	ProposalID string `json:"proposal_id"`
+	Result     bool   `json:"result"`
+}
+
+type UpgradeProtocolMsg struct {
+	Creator string `json:"creator"`
+	Link    string `json:"link"`
 }
 
 type ChangeGlobalAllocationParamMsg struct {

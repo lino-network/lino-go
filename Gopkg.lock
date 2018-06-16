@@ -5,13 +5,13 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "bc0944904505aab55e089371a892be2f87883161"
+  revision = "86fed781132ac890ee03e906e4ecd5d6fa180c64"
 
 [[projects]]
   name = "github.com/cosmos/cosmos-sdk"
   packages = ["wire"]
-  revision = "187be1a5df81de1fd71da9053102d3a4868ec979"
-  version = "v0.17.2"
+  revision = "c6711810a86f09457481a8dadae899681a9d77ab"
+  version = "v0.19.0"
 
 [[projects]]
   branch = "master"
@@ -140,8 +140,8 @@
 [[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
-  revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
-  version = "v1.1.0"
+  revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -161,8 +161,8 @@
     ".",
     "mem"
   ]
-  revision = "63644898a8da0bc22138abf860edaf5277b6102e"
-  version = "v1.1.0"
+  revision = "787d034dfe70e44075ccc060d346146ef53270ad"
+  version = "v1.1.1"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -205,7 +205,7 @@
     "leveldb/table",
     "leveldb/util"
   ]
-  revision = "5d6fca44a948d2be89a9702de7717f0168403d3d"
+  revision = "e2150783cd35f5b607daca48afd8c57ec54cc995"
 
 [[projects]]
   name = "github.com/tendermint/abci"
@@ -247,12 +247,16 @@
     "consensus",
     "consensus/types",
     "evidence",
+    "libs/events",
+    "libs/pubsub",
+    "libs/pubsub/query",
     "mempool",
     "node",
     "p2p",
     "p2p/conn",
     "p2p/pex",
     "p2p/upnp",
+    "privval",
     "proxy",
     "rpc/client",
     "rpc/core",
@@ -267,11 +271,10 @@
     "state/txindex/kv",
     "state/txindex/null",
     "types",
-    "types/priv_validator",
     "version"
   ]
-  revision = "747f28f85f77e6449a3a5b31784bc25673d68d43"
-  version = "v0.19.5"
+  revision = "057e076ca914e25933a7517af64d7f86c8abdf97"
+  version = "v0.19.9"
 
 [[projects]]
   name = "github.com/tendermint/tmlibs"
@@ -282,18 +285,17 @@
     "db",
     "flowrate",
     "log",
-    "merkle",
-    "pubsub",
-    "pubsub/query"
+    "merkle"
   ]
-  revision = "d970af87248a4e162590300dbb74e102183a417d"
-  version = "v0.8.3"
+  revision = "692f1d86a6e2c0efa698fd1e4541b68c74ffaf38"
+  version = "v0.8.4"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
+    "internal/subtle",
     "nacl/box",
     "nacl/secretbox",
     "openpgp/armor",
@@ -302,7 +304,7 @@
     "ripemd160",
     "salsa20/salsa"
   ]
-  revision = "ab813273cd59e1333f7ae7bff5d027d4aadf528c"
+  revision = "a8fb68e7206f8c78be19b432c58eb52a6aa34462"
 
 [[projects]]
   branch = "master"
@@ -316,13 +318,13 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "dfa909b99c79129e1100513e5cd36307665e5723"
+  revision = "db08ff08e8622530d9ed3a0e8ac279f6d4c02196"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "c11f84a56e43e20a78cee75a7c034031ecf57d1f"
+  revision = "6c888cc515d3ed83fc103cf1d84468aad274b0a7"
 
 [[projects]]
   name = "golang.org/x/text"
