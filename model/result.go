@@ -21,6 +21,7 @@ type AccountBank struct {
 	Saving          Coin          `json:"saving"`
 	Stake           Coin          `json:"stake"`
 	FrozenMoneyList []FrozenMoney `json:"frozen_money_list"`
+	NumOfTx         int64         `json:"number_of_transaction"`
 }
 
 type FrozenMoney struct {
@@ -28,20 +29,6 @@ type FrozenMoney struct {
 	StartAt  int64 `json:"start_at"`
 	Times    int64 `json:"times"`
 	Interval int64 `json:"interval"`
-}
-
-type PendingStakeQueue struct {
-	LastUpdatedAt    int64          `json:"last_updated_at"`
-	StakeCoinInQueue Rat            `json:"stake_coin_in_queue"`
-	TotalCoin        Coin           `json:"total_coin"`
-	PendingStakeList []PendingStake `json:"pending_stake_list"`
-}
-
-// pending stake in the list
-type PendingStake struct {
-	StartTime int64 `json:"start_time"`
-	EndTime   int64 `json:"end_time"`
-	Coin      Coin  `json:"coin"`
 }
 
 type GrantKeyList struct {
@@ -59,6 +46,11 @@ type AccountMeta struct {
 	LastActivityAt      int64  `json:"last_activity_at"`
 	TransactionCapacity Coin   `json:"transaction_capacity"`
 	JSONMeta            string `json:"json_meta"`
+}
+
+type AccountInfraConsumption struct {
+	Storage   int64 `json:"storage"`
+	Bandwidth int64 `json:"bandwidth"`
 }
 
 type FollowerMeta struct {
@@ -82,16 +74,17 @@ type Relationship struct {
 	DonationTimes int64 `json:"donation_times"`
 }
 
-// BalanceHistory records all transactions in a certain time period
 type BalanceHistory struct {
 	Details []Detail `json:"details"`
 }
 
-// Detail is information about each transaction related to balance
 type Detail struct {
-	DetailType int   `json:"detail"`
-	Amount     Coin  `json:"amount"`
-	CreatedAt  int64 `json:"created_at"`
+	DetailType int    `json:"detail"`
+	From       string `json:"from"`
+	To         string `json:"to"`
+	Amount     Coin   `json:"amount"`
+	CreatedAt  int64  `json:"created_at"`
+	Memo       string `json:"memo"`
 }
 
 //
@@ -206,6 +199,10 @@ type Delegation struct {
 	Amount    Coin   `json:"amount"`
 }
 
+type DelegateeList struct {
+	DelegateeList []string `json:"delegatee_list"`
+}
+
 //
 // developer related
 //
@@ -242,6 +239,8 @@ type ProposalInfo struct {
 	AgreeVotes    Coin   `json:"agree_vote"`
 	DisagreeVotes Coin   `json:"disagree_vote"`
 	Result        int    `json:"result"`
+	CreatedAt     int64  `json:"created_at"`
+	ExpiredAt     int64  `json:"expired_at"`
 }
 
 type ChangeParamProposal struct {
@@ -252,6 +251,7 @@ type ChangeParamProposal struct {
 type ContentCensorshipProposal struct {
 	ProposalInfo
 	PermLink string `json:"perm_link"`
+	Reason   string `json:"reason"`
 }
 
 type ProtocolUpgradeProposal struct {
