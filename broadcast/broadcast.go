@@ -446,6 +446,5 @@ func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex str
 	if res.DeliverTx.Code != uint32(0) {
 		return fmt.Errorf("DeliverTx failed ! (%d) %s ", res.DeliverTx.Code, res.DeliverTx.Log)
 	}
-	fmt.Printf("Committed at block %d. Hash: %s\n", res.Height, res.Hash.String())
 	return nil
 }
