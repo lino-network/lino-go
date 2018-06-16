@@ -3,6 +3,7 @@ package broadcast
 import (
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
+	"github.com/lino-network/lino-go/types"
 
 	errors "github.com/dlive-io/dlive-backend-errors"
 )
@@ -438,13 +439,18 @@ func (broadcast *Broadcast) VoteProposal(voter, proposalID string, result bool, 
 func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex string, seq int64) errors.Error {
 	res, err := broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq)
 	if err != nil {
-		return errors.Internalf("failed to broadcast: %v, with privKey: %s and seq: %v", msg, privKeyHex, seq).TraceCause(err, "")
+		return errors.FailedToBroadcastf("failed to broadcast msg: %v, with privKey: %s and seq: %v", msg, privKeyHex, seq).TraceCause(err, "")
 	}
+
+	if err == nil && res.CheckTx.Code == types.InvalidSeqErrCode {
+		return errors.InvalidSeqNumberf("invalid seq [%v] for msg %v", seq, msg)
+	}
+
 	if res.CheckTx.Code != uint32(0) {
-		return errors.APIErrorf("CheckTx failed! (%d) %s", res.CheckTx.Code, res.CheckTx.Log)
+		return errors.CheckTxFailf("CheckTx failed! (%d) %s", res.CheckTx.Code, res.CheckTx.Log)
 	}
 	if res.DeliverTx.Code != uint32(0) {
-		return errors.APIErrorf("DeliverTx failed! (%d) %s", res.DeliverTx.Code, res.DeliverTx.Log)
+		return errors.DeliverTxFailf("DeliverTx failed! (%d) %s", res.DeliverTx.Code, res.DeliverTx.Log)
 	}
 	return nil
 }
