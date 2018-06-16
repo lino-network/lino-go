@@ -137,11 +137,6 @@ type ValidatorRevokeMsg struct {
 //
 // Vote related messages
 //
-type VoteMsg struct {
-	Voter      string `json:"voter"`
-	ProposalID string `json:"proposal_id"`
-	Result     bool   `json:"result"`
-}
 
 type VoterDepositMsg struct {
 	Username string `json:"username"`
@@ -208,6 +203,17 @@ type DeletePostContentMsg struct {
 	Creator  string `json:"creator"`
 	PermLink string `json:"permLink"`
 	Reason   string `json:"reason"`
+}
+
+type VoteProposalMsg struct {
+	Voter      string `json:"voter"`
+	ProposalID string `json:"proposal_id"`
+	Result     bool   `json:"result"`
+}
+
+type UpgradeProtocolMsg struct {
+	Creator string `json:"creator"`
+	Link    string `json:"link"`
 }
 
 type ChangeGlobalAllocationParamMsg struct {

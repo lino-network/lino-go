@@ -43,7 +43,6 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.DelegateMsg{}, "delegate", nil)
 	cdc.RegisterConcrete(model.DelegatorWithdrawMsg{}, "delegate/withdraw", nil)
 	cdc.RegisterConcrete(model.RevokeDelegationMsg{}, "delegate/revoke", nil)
-	cdc.RegisterConcrete(model.VoteMsg{}, "vote", nil)
 	cdc.RegisterConcrete(model.DeveloperRegisterMsg{}, "developer/register", nil)
 	cdc.RegisterConcrete(model.DeveloperRevokeMsg{}, "developer/revoke", nil)
 	cdc.RegisterConcrete(model.ProviderReportMsg{}, "provider/report", nil)
@@ -54,7 +53,9 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(&model.ProtocolUpgradeProposal{}, "upgrade", nil)
 	cdc.RegisterConcrete(&model.ContentCensorshipProposal{}, "censorship", nil)
 
+	cdc.RegisterConcrete(model.VoteProposalMsg{}, "voteProposal", nil)
 	cdc.RegisterConcrete(model.DeletePostContentMsg{}, "deletePostContent", nil)
+	cdc.RegisterConcrete(model.UpgradeProtocolMsg{}, "upgradeProtocol", nil)
 	cdc.RegisterConcrete(model.ChangeGlobalAllocationParamMsg{}, "changeGlobalAllocation", nil)
 	cdc.RegisterConcrete(model.ChangeEvaluateOfContentValueParamMsg{}, "changeEvaluation", nil)
 	cdc.RegisterConcrete(model.ChangeInfraInternalAllocationParamMsg{}, "changeInfraAllocation", nil)
