@@ -30,18 +30,46 @@ func (query *Query) GetAccountInfo(username string) (*model.AccountInfo, error) 
 	return info, nil
 }
 
-func (query *Query) DoesUsernameMatchPrivKey(username, privKeyHex string) (bool, error) {
+func (query *Query) DoesUsernameMatchMasterPrivKey(username, masterPrivKeyHex string) (bool, error) {
 	accInfo, err := query.GetAccountInfo(username)
 	if err != nil {
 		return false, err
 	}
 
-	privKey, err := transport.GetPrivKeyFromHex(privKeyHex)
+	masterPrivKey, err := transport.GetPrivKeyFromHex(masterPrivKeyHex)
 	if err != nil {
 		return false, err
 	}
 
-	return accInfo.MasterKey.Equals(privKey.PubKey()), nil
+	return accInfo.MasterKey.Equals(masterPrivKey.PubKey()), nil
+}
+
+func (query *Query) DoesUsernameMatchTxPrivKey(username, txPrivKeyHex string) (bool, error) {
+	accInfo, err := query.GetAccountInfo(username)
+	if err != nil {
+		return false, err
+	}
+
+	txPrivKey, err := transport.GetPrivKeyFromHex(txPrivKeyHex)
+	if err != nil {
+		return false, err
+	}
+
+	return accInfo.TransactionKey.Equals(txPrivKey.PubKey()), nil
+}
+
+func (query *Query) DoesUsernameMatchPostPrivKey(username, postPrivKeyHex string) (bool, error) {
+	accInfo, err := query.GetAccountInfo(username)
+	if err != nil {
+		return false, err
+	}
+
+	postPrivKey, err := transport.GetPrivKeyFromHex(postPrivKeyHex)
+	if err != nil {
+		return false, err
+	}
+
+	return accInfo.PostKey.Equals(postPrivKey.PubKey()), nil
 }
 
 func (query *Query) GetAccountBank(username string) (*model.AccountBank, error) {
@@ -68,12 +96,12 @@ func (query *Query) GetAccountMeta(username string) (*model.AccountMeta, error) 
 	return meta, nil
 }
 
-func (query *Query) GetSeqNumber(username string) int64 {
+func (query *Query) GetSeqNumber(username string) (int64, error) {
 	meta, err := query.GetAccountMeta(username)
 	if err != nil {
-		return 0
+		return 0, err
 	}
-	return meta.Sequence
+	return meta.Sequence, nil
 }
 
 func (query *Query) GetAllBalanceHistory(username string) (*model.BalanceHistory, error) {
@@ -83,7 +111,11 @@ func (query *Query) GetAllBalanceHistory(username string) (*model.BalanceHistory
 	}
 
 	allBalanceHistory := new(model.BalanceHistory)
-	bucketSlot := accountBank.NumOfTx / 100
+	bucketSlot := int64(0)
+	if accountBank.NumOfTx != 0 {
+		bucketSlot = (accountBank.NumOfTx - 1) / 100
+	}
+
 	for i := int64(0); i <= bucketSlot; i++ {
 		balanceHistory, err := query.GetBalanceHistory(username, i)
 		if err != nil {
