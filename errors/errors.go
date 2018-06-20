@@ -49,7 +49,6 @@ type serverError struct {
 }
 
 func newError(code CodeType, msg string) *serverError {
-	// TODO capture stacktrace if ENV is set.
 	if msg == "" {
 		msg = CodeToDefaultMsg(code)
 	}
