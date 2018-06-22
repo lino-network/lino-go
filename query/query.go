@@ -2,6 +2,7 @@ package query
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
@@ -114,18 +115,117 @@ func (query *Query) GetAllBalanceHistory(username string) (*model.BalanceHistory
 	}
 
 	allBalanceHistory := new(model.BalanceHistory)
-	bucketSlot := int64(0)
-	if accountBank.NumOfTx != 0 {
-		bucketSlot = (accountBank.NumOfTx - 1) / 100
+	if accountBank.NumOfTx == 0 {
+		return allBalanceHistory, nil
 	}
 
-	for i := int64(0); i <= bucketSlot; i++ {
+	bucketSlot := (accountBank.NumOfTx - 1) / 100
+
+	for i := bucketSlot; i >= 0; i-- {
 		balanceHistory, err := query.GetBalanceHistory(username, i)
 		if err != nil {
 			return nil, err
 		}
 
-		allBalanceHistory.Details = append(allBalanceHistory.Details, balanceHistory.Details...)
+		for index := len(balanceHistory.Details) - 1; index >= 0; index-- {
+			allBalanceHistory.Details = append(allBalanceHistory.Details, balanceHistory.Details[index])
+		}
+	}
+
+	return allBalanceHistory, nil
+}
+
+func (query *Query) GetRecentBalanceHistory(username string, numHistory int64) (*model.BalanceHistory, errors.Error) {
+	if numHistory <= 0 || numHistory > math.MaxInt64 {
+		return nil, errors.InvalidArgf("GetRecentBalanceHistory: numHistory is invalid: %v", numHistory)
+	}
+
+	accountBank, err := query.GetAccountBank(username)
+	if err != nil {
+		return nil, err
+	}
+
+	allBalanceHistory := new(model.BalanceHistory)
+	if accountBank.NumOfTx == 0 {
+		return allBalanceHistory, nil
+	}
+
+	bucketSlot := (accountBank.NumOfTx - 1) / 100
+
+	for bucketSlot > -1 {
+		balanceHistory, err := query.GetBalanceHistory(username, bucketSlot)
+		if err != nil {
+			return nil, err
+		}
+		for i := len(balanceHistory.Details) - 1; i >= 0 && numHistory > 0; i-- {
+			allBalanceHistory.Details = append(allBalanceHistory.Details, balanceHistory.Details[i])
+			numHistory--
+		}
+
+		if numHistory == 0 {
+			break
+		}
+
+		bucketSlot--
+	}
+
+	return allBalanceHistory, nil
+}
+
+func (query *Query) GetBalanceHistoryFromTo(username string, from, to int64) (*model.BalanceHistory, errors.Error) {
+	if from < 0 || from > math.MaxInt64 || to < 0 || to > math.MaxInt64 || from > to {
+		return nil, errors.InvalidArgf("GetBalanceHistoryFromTo: from [%v] or to [%v] is invalid", from, to)
+	}
+
+	accountBank, err := query.GetAccountBank(username)
+	if err != nil {
+		return nil, err
+	}
+
+	allBalanceHistory := new(model.BalanceHistory)
+	if accountBank.NumOfTx == 0 {
+		return allBalanceHistory, nil
+	}
+
+	if from > accountBank.NumOfTx {
+		return allBalanceHistory, errors.InvalidArgf("GetBalanceHistoryFromTo: invalid from [%v] which bigger than total num of tx", from)
+	}
+	if to > accountBank.NumOfTx {
+		to = accountBank.NumOfTx
+	}
+
+	// number of banlance history is wanted
+	numHistory := to - from + 1
+
+	targetBucketOfTo := (to - 1) / 100
+	bucketSlot := targetBucketOfTo
+
+	// The index of 'to' in the target bucket
+	indexOfTo := (to - 1) % 100
+
+	for bucketSlot > -1 {
+		balanceHistory, err := query.GetBalanceHistory(username, bucketSlot)
+		if err != nil {
+			return nil, err
+		}
+
+		var startIndex int64
+		if bucketSlot == targetBucketOfTo {
+			startIndex = indexOfTo
+		} else {
+			startIndex = int64(len(balanceHistory.Details) - 1)
+		}
+
+		for i := startIndex; i >= 0 && numHistory > 0; i-- {
+			allBalanceHistory.Details = append(allBalanceHistory.Details, balanceHistory.Details[i])
+			numHistory--
+		}
+
+		if numHistory == 0 {
+			break
+		}
+
+		bucketSlot--
 	}
 
 	return allBalanceHistory, nil

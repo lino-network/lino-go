@@ -11,4 +11,5 @@ const (
 	CodeQueryFail
 	CodeUnmarshalFail
 	CodeFailedToGetPrivKeyFromHex
+	CodeInvalidArg
 )

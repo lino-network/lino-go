@@ -21,6 +21,8 @@ func CodeToDefaultMsg(code CodeType) string {
 		return "Failed To Unmarshal"
 	case CodeFailedToGetPrivKeyFromHex:
 		return "Failed To Get Priv Key From Hex"
+	case CodeInvalidArg:
+		return "Invalid argument"
 	default:
 		return fmt.Sprintf("Unknown code %d", code)
 	}
@@ -104,4 +106,14 @@ func FailedToGetPrivKeyFromHex(msg string) Error {
 //FailedToGetPrivKeyFromHexf creates an error with CodeFailedToGetPrivKeyFromHex and formatted message
 func FailedToGetPrivKeyFromHexf(format string, args ...interface{}) Error {
 	return newError(CodeFailedToGetPrivKeyFromHex, fmt.Sprintf(format, args...))
+}
+
+//InvalidArg creates an error with CodeInvalidArg
+func InvalidArg(msg string) Error {
+	return newError(CodeInvalidArg, msg)
+}
+
+//InvalidArgf creates an error with CodeInvalidArg and formatted message
+func InvalidArgf(format string, args ...interface{}) Error {
+	return newError(CodeInvalidArg, fmt.Sprintf(format, args...))
 }
