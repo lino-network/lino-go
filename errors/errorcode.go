@@ -7,4 +7,8 @@ const (
 	CodeInvalidSeqNumber
 	CodeCheckTxFail
 	CodeDeliverTxFail
+	CodeFialedToGetPubKeyFromHex
+	CodeQueryFail
+	CodeUnmarshalFail
+	CodeFailedToGetPrivKeyFromHex
 )

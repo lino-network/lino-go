@@ -67,6 +67,18 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.ChangeBandwidthParamMsg{}, "changeBandwidthParam", nil)
 	cdc.RegisterConcrete(model.ChangeAccountParamMsg{}, "changeAccountParam", nil)
 
+	// cdc.RegisterInterface((*model.Parameter)(nil), nil)
+	// cdc.RegisterConcrete(model.GlobalAllocationParam{}, "allocation", nil)
+	// cdc.RegisterConcrete(model.InfraInternalAllocationParam{}, "infraAllocation", nil)
+	// cdc.RegisterConcrete(model.EvaluateOfContentValueParam{}, "contentValue", nil)
+	// cdc.RegisterConcrete(model.VoteParam{}, "voteParam", nil)
+	// cdc.RegisterConcrete(model.ProposalParam{}, "proposalParam", nil)
+	// cdc.RegisterConcrete(model.DeveloperParam{}, "developerParam", nil)
+	// cdc.RegisterConcrete(model.ValidatorParam{}, "validatorParam", nil)
+	// cdc.RegisterConcrete(model.CoinDayParam{}, "coinDayParam", nil)
+	// cdc.RegisterConcrete(model.BandwidthParam{}, "bandwidthParam", nil)
+	// cdc.RegisterConcrete(model.AccountParam{}, "accountParam", nil)
+
 	wire.RegisterCrypto(cdc)
 	return cdc
 }

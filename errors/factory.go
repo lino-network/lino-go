@@ -13,6 +13,14 @@ func CodeToDefaultMsg(code CodeType) string {
 		return "Check Tx Error"
 	case CodeDeliverTxFail:
 		return "Deliver Tx Error"
+	case CodeFialedToGetPubKeyFromHex:
+		return "Failed To Get Pub Key From Hex"
+	case CodeQueryFail:
+		return "Failed To Query"
+	case CodeUnmarshalFail:
+		return "Failed To Unmarshal"
+	case CodeFailedToGetPrivKeyFromHex:
+		return "Failed To Get Priv Key From Hex"
 	default:
 		return fmt.Sprintf("Unknown code %d", code)
 	}
@@ -56,4 +64,44 @@ func DeliverTxFail(msg string) Error {
 //DeliverTxFailf creates an error with CodeDeliverTxFail and formatted message
 func DeliverTxFailf(format string, args ...interface{}) Error {
 	return newError(CodeDeliverTxFail, fmt.Sprintf(format, args...))
+}
+
+//FailedToGetPubKeyFromHex creates an error with CodeFialedToGetPubKeyFromHex
+func FailedToGetPubKeyFromHex(msg string) Error {
+	return newError(CodeFialedToGetPubKeyFromHex, msg)
+}
+
+//FailedToGetPubKeyFromHex creates an error with CodeDeliverTxFail and formatted message
+func FailedToGetPubKeyFromHexf(format string, args ...interface{}) Error {
+	return newError(CodeFialedToGetPubKeyFromHex, fmt.Sprintf(format, args...))
+}
+
+//CodeQueryFail creates an error with CodeQueryFail
+func QueryFail(msg string) Error {
+	return newError(CodeQueryFail, msg)
+}
+
+//QueryFailf creates an error with CodeQueryFail and formatted message
+func QueryFailf(format string, args ...interface{}) Error {
+	return newError(CodeQueryFail, fmt.Sprintf(format, args...))
+}
+
+//UnmarshalFail creates an error with CodeUnmarshalFail
+func UnmarshalFail(msg string) Error {
+	return newError(CodeUnmarshalFail, msg)
+}
+
+//UnmarshalFailf creates an error with CodeUnmarshalFail and formatted message
+func UnmarshalFailf(format string, args ...interface{}) Error {
+	return newError(CodeUnmarshalFail, fmt.Sprintf(format, args...))
+}
+
+//FailedToGetPrivKeyFromHex creates an error with CodeFailedToGetPrivKeyFromHex
+func FailedToGetPrivKeyFromHex(msg string) Error {
+	return newError(CodeFailedToGetPrivKeyFromHex, msg)
+}
+
+//FailedToGetPrivKeyFromHexf creates an error with CodeFailedToGetPrivKeyFromHex and formatted message
+func FailedToGetPrivKeyFromHexf(format string, args ...interface{}) Error {
+	return newError(CodeFailedToGetPrivKeyFromHex, fmt.Sprintf(format, args...))
 }

@@ -135,7 +135,7 @@ func getPostInfoKey(postKey string) []byte {
 }
 
 func getPostKey(author string, postID string) string {
-	return string(string(author) + "#" + postID)
+	return string(author + "#" + postID)
 }
 
 func getPostMetaKey(postKey string) []byte {
