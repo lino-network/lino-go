@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
-	"github.com/pkg/errors"
 
 	crypto "github.com/tendermint/go-crypto"
 )
@@ -132,7 +132,7 @@ func GetPubKeyFromHex(pubHex string) (crypto.PubKey, error) {
 	}
 
 	if keyBytes == nil || len(keyBytes) == 0 {
-		return nil, errors.Errorf("Empty bytes !")
+		return nil, errors.EmptyResponse("Empty bytes !")
 	}
 	return crypto.PubKeyFromBytes(keyBytes)
 }

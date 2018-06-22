@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/pkg/errors"
+	"github.com/lino-network/lino-go/errors"
 	"github.com/spf13/viper"
 
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
@@ -67,11 +67,11 @@ func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err er
 
 	resp := result.Response
 	if resp.Code != uint32(0) {
-		return res, errors.Errorf("Query failed: (%d) %s", resp.Code, resp.Log)
+		return res, errors.QueryFail("Query failed").AddBlockChainCode(resp.Code).AddBlockChainLog(resp.Log)
 	}
 
 	if resp.Value == nil || len(resp.Value) == 0 {
-		return nil, errors.Errorf("Empty response !")
+		return nil, errors.EmptyResponse("Empty response!")
 	}
 	return resp.Value, nil
 }
@@ -123,7 +123,7 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 
 func (t Transport) GetNode() (rpcclient.Client, error) {
 	if t.client == nil {
-		return nil, errors.New("Must define node URI")
+		return nil, errors.InvalidArg("Must define node URI")
 	}
 	return t.client, nil
 }
