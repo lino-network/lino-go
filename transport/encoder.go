@@ -3,6 +3,7 @@ package transport
 import (
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/lino-network/lino-go/errors"
@@ -12,7 +13,7 @@ import (
 )
 
 var ZeroFee = model.Fee{
-	Amount: []int64{},
+	Amount: model.SDKCoins{},
 	Gas:    0,
 }
 
@@ -20,52 +21,67 @@ func MakeCodec() *wire.Codec {
 	cdc := wire.NewCodec()
 
 	cdc.RegisterInterface((*model.Msg)(nil), nil)
-	cdc.RegisterConcrete(model.RegisterMsg{}, "register", nil)
-	cdc.RegisterConcrete(model.FollowMsg{}, "follow", nil)
-	cdc.RegisterConcrete(model.UnfollowMsg{}, "unfollow", nil)
-	cdc.RegisterConcrete(model.TransferMsg{}, "transfer", nil)
-	cdc.RegisterConcrete(model.ClaimMsg{}, "claim", nil)
-	cdc.RegisterConcrete(model.RecoverMsg{}, "recover", nil)
-	cdc.RegisterConcrete(model.UpdateAccountMsg{}, "update/account", nil)
-	cdc.RegisterConcrete(model.CreatePostMsg{}, "post", nil)
-	cdc.RegisterConcrete(model.UpdatePostMsg{}, "update/post", nil)
-	cdc.RegisterConcrete(model.DeletePostMsg{}, "delete/post", nil)
-	cdc.RegisterConcrete(model.LikeMsg{}, "like", nil)
-	cdc.RegisterConcrete(model.DonateMsg{}, "donate", nil)
-	cdc.RegisterConcrete(model.ViewMsg{}, "view", nil)
-	cdc.RegisterConcrete(model.ReportOrUpvoteMsg{}, "reportOrUpvote", nil)
-	cdc.RegisterConcrete(model.ValidatorDepositMsg{}, "val/deposit", nil)
-	cdc.RegisterConcrete(model.ValidatorWithdrawMsg{}, "val/withdraw", nil)
-	cdc.RegisterConcrete(model.ValidatorRevokeMsg{}, "val/revoke", nil)
-	cdc.RegisterConcrete(model.VoterDepositMsg{}, "vote/deposit", nil)
-	cdc.RegisterConcrete(model.VoterRevokeMsg{}, "vote/revoke", nil)
-	cdc.RegisterConcrete(model.VoterWithdrawMsg{}, "vote/withdraw", nil)
-	cdc.RegisterConcrete(model.DelegateMsg{}, "delegate", nil)
-	cdc.RegisterConcrete(model.DelegatorWithdrawMsg{}, "delegate/withdraw", nil)
-	cdc.RegisterConcrete(model.RevokeDelegationMsg{}, "delegate/revoke", nil)
-	cdc.RegisterConcrete(model.DeveloperRegisterMsg{}, "developer/register", nil)
-	cdc.RegisterConcrete(model.DeveloperRevokeMsg{}, "developer/revoke", nil)
-	cdc.RegisterConcrete(model.ProviderReportMsg{}, "provider/report", nil)
-	cdc.RegisterConcrete(model.GrantDeveloperMsg{}, "grant/developer", nil)
+	cdc.RegisterInterface((*model.Tx)(nil), nil)
 
-	cdc.RegisterInterface((*model.Proposal)(nil), nil)
-	cdc.RegisterConcrete(&model.ChangeParamProposal{}, "changeParam", nil)
-	cdc.RegisterConcrete(&model.ProtocolUpgradeProposal{}, "upgrade", nil)
-	cdc.RegisterConcrete(&model.ContentCensorshipProposal{}, "censorship", nil)
+	// account
+	cdc.RegisterConcrete(model.RegisterMsg{}, "lino/register", nil)
+	cdc.RegisterConcrete(model.FollowMsg{}, "lino/follow", nil)
+	cdc.RegisterConcrete(model.UnfollowMsg{}, "lino/unfollow", nil)
+	cdc.RegisterConcrete(model.TransferMsg{}, "lino/transfer", nil)
+	cdc.RegisterConcrete(model.ClaimMsg{}, "lino/claim", nil)
+	cdc.RegisterConcrete(model.RecoverMsg{}, "lino/recover", nil)
+	cdc.RegisterConcrete(model.UpdateAccountMsg{}, "lino/updateAcc", nil)
 
-	cdc.RegisterConcrete(model.VoteProposalMsg{}, "voteProposal", nil)
-	cdc.RegisterConcrete(model.DeletePostContentMsg{}, "deletePostContent", nil)
-	cdc.RegisterConcrete(model.UpgradeProtocolMsg{}, "upgradeProtocol", nil)
-	cdc.RegisterConcrete(model.ChangeGlobalAllocationParamMsg{}, "changeGlobalAllocation", nil)
-	cdc.RegisterConcrete(model.ChangeEvaluateOfContentValueParamMsg{}, "changeEvaluation", nil)
-	cdc.RegisterConcrete(model.ChangeInfraInternalAllocationParamMsg{}, "changeInfraAllocation", nil)
-	cdc.RegisterConcrete(model.ChangeVoteParamMsg{}, "changeVoteParam", nil)
-	cdc.RegisterConcrete(model.ChangeProposalParamMsg{}, "changeProposalParam", nil)
-	cdc.RegisterConcrete(model.ChangeDeveloperParamMsg{}, "changeDeveloperParam", nil)
-	cdc.RegisterConcrete(model.ChangeValidatorParamMsg{}, "changeValidatorParam", nil)
-	cdc.RegisterConcrete(model.ChangeCoinDayParamMsg{}, "changeCoinDayParam", nil)
-	cdc.RegisterConcrete(model.ChangeBandwidthParamMsg{}, "changeBandwidthParam", nil)
-	cdc.RegisterConcrete(model.ChangeAccountParamMsg{}, "changeAccountParam", nil)
+	// post
+	cdc.RegisterConcrete(model.CreatePostMsg{}, "lino/createPost", nil)
+	cdc.RegisterConcrete(model.UpdatePostMsg{}, "lino/updatePost", nil)
+	cdc.RegisterConcrete(model.DeletePostMsg{}, "lino/deletePost", nil)
+	cdc.RegisterConcrete(model.LikeMsg{}, "lino/like", nil)
+	cdc.RegisterConcrete(model.DonateMsg{}, "lino/donate", nil)
+	cdc.RegisterConcrete(model.ViewMsg{}, "lino/view", nil)
+	cdc.RegisterConcrete(model.ReportOrUpvoteMsg{}, "lino/reportOrUpvote", nil)
+
+	// validator
+	cdc.RegisterConcrete(model.ValidatorDepositMsg{}, "lino/valDeposit", nil)
+	cdc.RegisterConcrete(model.ValidatorWithdrawMsg{}, "lino/valWithdraw", nil)
+	cdc.RegisterConcrete(model.ValidatorRevokeMsg{}, "lino/valRevoke", nil)
+
+	// vote
+	cdc.RegisterConcrete(model.VoterDepositMsg{}, "lino/voteDeposit", nil)
+	cdc.RegisterConcrete(model.VoterRevokeMsg{}, "lino/voteRevoke", nil)
+	cdc.RegisterConcrete(model.VoterWithdrawMsg{}, "lino/voteWithdraw", nil)
+	cdc.RegisterConcrete(model.DelegateMsg{}, "lino/delegate", nil)
+	cdc.RegisterConcrete(model.DelegatorWithdrawMsg{}, "lino/delegateWithdraw", nil)
+	cdc.RegisterConcrete(model.RevokeDelegationMsg{}, "lino/delegateRevoke", nil)
+
+	// developer
+	cdc.RegisterConcrete(model.DeveloperRegisterMsg{}, "lino/devRegister", nil)
+	cdc.RegisterConcrete(model.DeveloperRevokeMsg{}, "lino/devRevoke", nil)
+	cdc.RegisterConcrete(model.GrantDeveloperMsg{}, "lino/grantDeveloper", nil)
+
+	// infra provider
+	cdc.RegisterConcrete(model.ProviderReportMsg{}, "lino/providerReport", nil)
+
+	// proposal
+	cdc.RegisterConcrete(model.VoteProposalMsg{}, "lino/voteProposal", nil)
+	cdc.RegisterConcrete(model.DeletePostContentMsg{}, "lino/deletePostContent", nil)
+	cdc.RegisterConcrete(model.UpgradeProtocolMsg{}, "lino/upgradeProtocol", nil)
+	cdc.RegisterConcrete(model.ChangeGlobalAllocationParamMsg{}, "lino/changeGlobalAllocation", nil)
+	cdc.RegisterConcrete(model.ChangeEvaluateOfContentValueParamMsg{}, "lino/changeEvaluation", nil)
+	cdc.RegisterConcrete(model.ChangeInfraInternalAllocationParamMsg{}, "lino/changeInfraAllocation", nil)
+	cdc.RegisterConcrete(model.ChangeVoteParamMsg{}, "lino/changeVoteParam", nil)
+	cdc.RegisterConcrete(model.ChangeProposalParamMsg{}, "lino/changeProposalParam", nil)
+	cdc.RegisterConcrete(model.ChangeDeveloperParamMsg{}, "lino/changeDeveloperParam", nil)
+	cdc.RegisterConcrete(model.ChangeValidatorParamMsg{}, "lino/changeValidatorParam", nil)
+	cdc.RegisterConcrete(model.ChangeCoinDayParamMsg{}, "lino/changeCoinDayParam", nil)
+	cdc.RegisterConcrete(model.ChangeBandwidthParamMsg{}, "lino/changeBandwidthParam", nil)
+	cdc.RegisterConcrete(model.ChangeAccountParamMsg{}, "lino/changeAccountParam", nil)
+
+	// // TODO:
+	// cdc.RegisterInterface((*model.Proposal)(nil), nil)
+	// cdc.RegisterConcrete(&model.ChangeParamProposal{}, "changeParam", nil)
+	// cdc.RegisterConcrete(&model.ProtocolUpgradeProposal{}, "upgrade", nil)
+	// cdc.RegisterConcrete(&model.ContentCensorshipProposal{}, "censorship", nil)
 
 	// cdc.RegisterInterface((*model.Parameter)(nil), nil)
 	// cdc.RegisterConcrete(model.GlobalAllocationParam{}, "allocation", nil)
@@ -100,21 +116,23 @@ func EncodeTx(cdc *wire.Codec, msg interface{}, pubKey crypto.PubKey,
 }
 
 func EncodeSignMsg(cdc *wire.Codec, msg interface{}, chainId string, seq int64) ([]byte, error) {
-	feeBytes, err := json.Marshal(ZeroFee)
+	feeBytes, err := cdc.MarshalJSON(ZeroFee)
 	if err != nil {
 		return nil, err
 	}
-	msgBytes, err := json.Marshal(msg)
+	msgBytes, err := cdc.MarshalJSON(msg)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("++++msg: ", string(msgBytes))
 	stdSignMsg := model.SignMsg{
-		ChainID:   chainId,
-		MsgBytes:  msgBytes,
-		Sequences: []int64{seq},
-		FeeBytes:  feeBytes,
+		ChainID:        chainId,
+		AccountNumbers: []int64{},
+		Sequences:      []int64{seq},
+		FeeBytes:       feeBytes,
+		MsgBytes:       msgBytes,
 	}
-	return cdc.MarshalJSON(stdSignMsg)
+	return json.Marshal(stdSignMsg)
 }
 
 func GetPrivKeyFromHex(privHex string) (crypto.PrivKey, error) {

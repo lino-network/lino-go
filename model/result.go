@@ -1,8 +1,11 @@
 package model
 
 import (
+	"math/big"
+
 	"github.com/cznic/mathutil"
 	"github.com/tendermint/go-crypto"
+
 	ttypes "github.com/tendermint/tendermint/types"
 )
 
@@ -102,11 +105,13 @@ type PostInfo struct {
 	Links        []IDToURLMapping `json:"links"`
 }
 
+// PostMeta stores tiny and frequently updated fields.
 type PostMeta struct {
 	CreatedAt               int64 `json:"created_at"`
 	LastUpdatedAt           int64 `json:"last_updated_at"`
 	LastActivityAt          int64 `json:"last_activity_at"`
 	AllowReplies            bool  `json:"allow_replies"`
+	IsDeleted               bool  `json:"is_deleted"`
 	TotalLikeCount          int64 `json:"total_like_count"`
 	TotalDonateCount        int64 `json:"total_donate_count"`
 	TotalLikeWeight         int64 `json:"total_like_weight"`
@@ -157,18 +162,29 @@ type Donations struct {
 //
 // validator related struct
 //
+// type ABCIValidator struct {
+// 	PubKey []byte `protobuf:"bytes,1,opt,name=pub_key,json=pubKey,proto3" json:"pub_key,omitempty"`
+// 	Power  int64  `protobuf:"varint,2,opt,name=power,proto3" json:"power,omitempty"`
+// }
+type PubKey struct {
+	Type string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Data []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+}
+
 type ABCIValidator struct {
-	PubKey []byte `protobuf:"bytes,1,opt,name=pub_key,json=pubKey,proto3" json:"pub_key,omitempty"`
-	Power  int64  `protobuf:"varint,2,opt,name=power,proto3" json:"power,omitempty"`
+	Address []byte `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	PubKey  PubKey `protobuf:"bytes,2,opt,name=pub_key,json=pubKey" json:"pub_key"`
+	Power   int64  `protobuf:"varint,3,opt,name=power,proto3" json:"power,omitempty"`
 }
 
 type Validator struct {
 	ABCIValidator
-	Username       string `json:"username"`
-	Deposit        Coin   `json:"deposit"`
-	AbsentCommit   int    `json:"absent_commit"`
-	ProducedBlocks int64  `json:"produced_blocks"`
-	Link           string `json:"link"`
+	Username        string `json:"username"`
+	Deposit         Coin   `json:"deposit"`
+	AbsentCommit    int64  `json:"absent_commit"`
+	ByzantineCommit int64  `json:"byzantine_commit"`
+	ProducedBlocks  int64  `json:"produced_blocks"`
+	Link            string `json:"link"`
 }
 
 type ValidatorList struct {
@@ -271,9 +287,32 @@ type Coin struct {
 	Amount mathutil.Int128 `json:"amount"`
 }
 
+type SDKCoin struct {
+	Denom  string `json:"denom"`
+	Amount int64  `json:"amount"`
+}
+
+type SDKCoins []SDKCoin
+
 type Rat struct {
-	Num   int64 `json:"num"`
-	Denom int64 `json:"denom"`
+	big.Rat `json:"rat"`
+}
+
+//Wraps r.MarshalText().
+func (r Rat) MarshalAmino() (string, error) {
+	bz, err := (&(r.Rat)).MarshalText()
+	return string(bz), err
+}
+
+// Requires a valid JSON string - strings quotes and calls UnmarshalText
+func (r *Rat) UnmarshalAmino(text string) (err error) {
+	tempRat := big.NewRat(0, 1)
+	err = tempRat.UnmarshalText([]byte(text))
+	if err != nil {
+		return err
+	}
+	r.Rat = *tempRat
+	return nil
 }
 
 type Block struct {

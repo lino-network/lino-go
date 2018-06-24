@@ -9,9 +9,12 @@
 
 [[projects]]
   name = "github.com/cosmos/cosmos-sdk"
-  packages = ["wire"]
-  revision = "c6711810a86f09457481a8dadae899681a9d77ab"
-  version = "v0.19.0"
+  packages = [
+    "types",
+    "wire"
+  ]
+  revision = "cf46be225b7f3853e36af0feac04e29188cd4c95"
+  version = "v0.17.5"
 
 [[projects]]
   branch = "master"
@@ -385,6 +388,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3b5fcd7a6c1109d7889811a9045032afdd99004f6b7fa2afbedc26a35d049edc"
+  inputs-digest = "736f57f6d4f5ffc000c4b117dc7b274ef83bf34cadeadea3355ea2138e6e2730"
   solver-name = "gps-cdcl"
   solver-version = 1

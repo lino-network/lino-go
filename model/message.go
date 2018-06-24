@@ -6,6 +6,8 @@ import (
 
 type Msg interface{}
 
+type Tx interface{}
+
 //
 // Account related messages
 //

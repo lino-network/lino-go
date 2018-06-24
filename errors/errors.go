@@ -50,7 +50,7 @@ func newError(code CodeType, msg string) *serverError {
 
 // Error returns error details.
 func (err *serverError) Error() string {
-	return fmt.Sprintf("%d:%s", err.code, err.msg)
+	return fmt.Sprintf("%d:%s, bcCode:%v, bcLog:%s", err.code, err.msg, err.blockChainCode, err.blockChainLog)
 }
 
 // CodeType returns the code of error.
