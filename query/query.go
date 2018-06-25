@@ -1,7 +1,6 @@
 package query
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/lino-network/lino-go/errors"
@@ -618,7 +617,7 @@ func (query *Query) GetEvaluateOfContentValueParam() (*model.EvaluateOfContentVa
 	}
 
 	param := new(model.EvaluateOfContentValueParam)
-	fmt.Println("---paramBytes: ", resp)
+	// fmt.Println("---paramBytes: ", resp)
 	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}

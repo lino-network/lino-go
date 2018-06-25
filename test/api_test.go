@@ -62,30 +62,30 @@ func setup(t *testing.T) {
 func TestAccount(t *testing.T) {
 	setup(t)
 
-	// _, err := testAPI.GetAccountInfo(myUser)
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get account info: %v", err)
-	// }
+	_, err := testAPI.GetAccountInfo(myUser)
+	if err != nil {
+		t.Errorf("TestAccount: failed to get account info: %v", err)
+	}
 
-	// _, err = testAPI.GetAccountBank("lino")
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get account bank: %v", err)
-	// }
+	_, err = testAPI.GetAccountBank("lino")
+	if err != nil {
+		t.Errorf("TestAccount: failed to get account bank: %v", err)
+	}
 
-	// _, err = testAPI.GetAccountMeta("lino")
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get account meta: %v", err)
-	// }
+	_, err = testAPI.GetAccountMeta("lino")
+	if err != nil {
+		t.Errorf("TestAccount: failed to get account meta: %v", err)
+	}
 
-	// _, err = testAPI.GetReward("lino")
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get reward: %v", err)
-	// }
+	_, err = testAPI.GetReward("lino")
+	if err != nil {
+		t.Errorf("TestAccount: failed to get reward: %v", err)
+	}
 
-	// _, err = testAPI.GetAllBalanceHistory(myUser)
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get balance history: %v", err)
-	// }
+	_, err = testAPI.GetAllBalanceHistory(myUser)
+	if err != nil {
+		t.Errorf("TestAccount: failed to get balance history: %v", err)
+	}
 
 	// Tested successfully
 	//
@@ -239,11 +239,10 @@ func TestPost(t *testing.T) {
 		t.Errorf("TestPost: failed to get post info: %v", err)
 	}
 
-	pm, err := testAPI.GetPostMeta(myUser, post1)
+	_, err = testAPI.GetPostMeta(myUser, post1)
 	if err != nil {
 		t.Errorf("TestPost: failed to get post meta: %v", err)
 	}
-	t.Errorf("---pm: %+v", pm)
 
 	seq, err := testAPI.GetSeqNumber(myUser)
 	if err != nil {
