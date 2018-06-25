@@ -20,7 +20,7 @@ func NewBroadcast(transport *transport.Transport) *Broadcast {
 //
 // Account related tx
 //
-func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubKeyHex, transactionPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubKeyHex, transactionPubKeyHex, micropaymentPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
 	masterPubKey, err := transport.GetPubKeyFromHex(masterPubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHex("Register: failed to get Master pub key").AddCause(err)
@@ -29,18 +29,23 @@ func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubK
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
 	}
+	micropaymentPubKey, err := transport.GetPubKeyFromHex(micropaymentPubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get Micropayment pub key").AddCause(err)
+	}
 	postPubKey, err := transport.GetPubKeyFromHex(postPubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHex("Register: failed to get Post pub key").AddCause(err)
 	}
 
 	msg := model.RegisterMsg{
-		Referrer:             referrer,
-		RegisterFee:          registerFee,
-		NewUser:              username,
-		NewMasterPubKey:      masterPubKey,
-		NewTransactionPubKey: txPubKey,
-		NewPostPubKey:        postPubKey,
+		Referrer:              referrer,
+		RegisterFee:           registerFee,
+		NewUser:               username,
+		NewMasterPubKey:       masterPubKey,
+		NewTransactionPubKey:  txPubKey,
+		NewMicropaymentPubKey: micropaymentPubKey,
+		NewPostPubKey:         postPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, referrerPrivKeyHex, seq)
 }
@@ -86,25 +91,30 @@ func (broadcast *Broadcast) UpdateAccount(username, jsonMeta, privKeyHex string,
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newPostPubKeyHex, newTransactionPubKeyHex, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newTransactionPubKeyHex, newMicropaymentPubKeyHex, newPostPubKeyHex, privKeyHex string, seq int64) error {
 	masterPubKey, err := transport.GetPubKeyFromHex(newMasterPubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Master pub key").AddCause(err)
-	}
-	postPubKey, err := transport.GetPubKeyFromHex(newPostPubKeyHex)
-	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Post pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(newTransactionPubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Tx pub key").AddCause(err)
 	}
+	micropaymentPubKey, err := transport.GetPubKeyFromHex(newMicropaymentPubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Micropayment pub key").AddCause(err)
+	}
+	postPubKey, err := transport.GetPubKeyFromHex(newPostPubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Post pub key").AddCause(err)
+	}
 
 	msg := model.RecoverMsg{
-		Username:             username,
-		NewMasterPubKey:      masterPubKey,
-		NewPostPubKey:        postPubKey,
-		NewTransactionPubKey: txPubKey,
+		Username:              username,
+		NewMasterPubKey:       masterPubKey,
+		NewTransactionPubKey:  txPubKey,
+		NewMicropaymentPubKey: micropaymentPubKey,
+		NewPostPubKey:         postPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
@@ -148,14 +158,15 @@ func (broadcast *Broadcast) Like(username, author string, weight int64, postID, 
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) Donate(username, author, amount, postID, fromApp, memo, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Donate(username, author, amount, postID, fromApp, memo string, isMicroPayment bool, privKeyHex string, seq int64) error {
 	msg := model.DonateMsg{
-		Username: username,
-		Amount:   amount,
-		Author:   author,
-		PostID:   postID,
-		FromApp:  fromApp,
-		Memo:     memo,
+		Username:       username,
+		Amount:         amount,
+		Author:         author,
+		PostID:         postID,
+		FromApp:        fromApp,
+		Memo:           memo,
+		IsMicroPayment: isMicroPayment,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
@@ -310,12 +321,27 @@ func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) GrantDeveloper(username, authenticateApp string, validityPeriod int64, grantLevel int, privKeyHex string, seq int64) error {
-	msg := model.GrantDeveloperMsg{
+func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, validityPeriod int64, grantLevel int, times int64, privKeyHex string, seq int64) error {
+	msg := model.GrantPermissionMsg{
 		Username:        username,
 		AuthenticateApp: authenticateApp,
 		ValidityPeriod:  validityPeriod,
 		GrantLevel:      grantLevel,
+		Times:           times,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+}
+
+func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string, grantLevel int, privKeyHex string, seq int64) error {
+	pubKey, err := transport.GetPubKeyFromHex(pubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get pub key").AddCause(err)
+	}
+
+	msg := model.RevokePermissionMsg{
+		Username:   username,
+		PubKey:     pubKey,
+		GrantLevel: grantLevel,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
@@ -409,6 +435,14 @@ func (broadcast *Broadcast) ChangeBandwidthParam(creator string, parameter model
 
 func (broadcast *Broadcast) ChangeAccountParam(creator string, parameter model.AccountParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeAccountParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+}
+
+func (broadcast *Broadcast) ChangePostParam(creator string, parameter model.PostParam, privKeyHex string, seq int64) error {
+	msg := model.ChangePostParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
 	}

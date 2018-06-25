@@ -3,7 +3,6 @@ package transport
 import (
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/lino-network/lino-go/errors"
@@ -57,7 +56,8 @@ func MakeCodec() *wire.Codec {
 	// developer
 	cdc.RegisterConcrete(model.DeveloperRegisterMsg{}, "lino/devRegister", nil)
 	cdc.RegisterConcrete(model.DeveloperRevokeMsg{}, "lino/devRevoke", nil)
-	cdc.RegisterConcrete(model.GrantDeveloperMsg{}, "lino/grantDeveloper", nil)
+	cdc.RegisterConcrete(model.GrantPermissionMsg{}, "lino/grantPermission", nil)
+	cdc.RegisterConcrete(model.RevokePermissionMsg{}, "lino/revokePermission", nil)
 
 	// infra provider
 	cdc.RegisterConcrete(model.ProviderReportMsg{}, "lino/providerReport", nil)
@@ -76,6 +76,7 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.ChangeCoinDayParamMsg{}, "lino/changeCoinDayParam", nil)
 	cdc.RegisterConcrete(model.ChangeBandwidthParamMsg{}, "lino/changeBandwidthParam", nil)
 	cdc.RegisterConcrete(model.ChangeAccountParamMsg{}, "lino/changeAccountParam", nil)
+	cdc.RegisterConcrete(model.ChangePostParamMsg{}, "lino/changePostParam", nil)
 
 	// // TODO:
 	// cdc.RegisterInterface((*model.Proposal)(nil), nil)
@@ -124,7 +125,7 @@ func EncodeSignMsg(cdc *wire.Codec, msg interface{}, chainId string, seq int64) 
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("++++msg: ", string(msgBytes))
+	// fmt.Println("++++msg: ", string(msgBytes))
 	stdSignMsg := model.SignMsg{
 		ChainID:        chainId,
 		AccountNumbers: []int64{},

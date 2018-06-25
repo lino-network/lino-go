@@ -7,6 +7,8 @@ import (
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
+
+	crypto "github.com/tendermint/go-crypto"
 )
 
 type Query struct {
@@ -243,17 +245,17 @@ func (query *Query) GetBalanceHistory(username string, index int64) (*model.Bala
 	return balanceHistory, nil
 }
 
-func (query *Query) GetGrantList(username string) (*model.GrantKeyList, error) {
-	resp, err := query.transport.Query(getGrantKeyListKey(username), AccountKVStoreKey)
+func (query *Query) GetGrantUser(username string, pubKey crypto.PubKey) (*model.GrantUser, error) {
+	resp, err := query.transport.Query(getGrantUserKey(username, pubKey), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
-	grantKeyList := new(model.GrantKeyList)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, grantKeyList); err != nil {
-		return grantKeyList, err
+	grantUser := new(model.GrantUser)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, grantUser); err != nil {
+		return grantUser, err
 	}
-	return grantKeyList, nil
+	return grantUser, nil
 }
 
 func (query *Query) GetReward(username string) (*model.Reward, error) {

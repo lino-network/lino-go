@@ -26,16 +26,22 @@
 
 [[constraint]]
   name = "github.com/tendermint/tendermint"
-  version = "0.19.5"
+  version = "v0.19.5"
+
+[[override]]
+  name = "github.com/tendermint/tmlibs"
+  version = "v0.8.4"
+
+[[override]]
+  name = "github.com/tendermint/go-crypto"
+  version = "v0.6.2"
 
 # this got updated and broke, so locked to an old working commit ...
 [[override]]
   name = "google.golang.org/genproto"
   revision = "7fd901a49ba6a7f87732eb344f6e3c5b19d1b200"
 
-[[override]]
-  name = "github.com/tendermint/go-amino"
-  revision = "ed62928576cfcaf887209dc96142cd79cdfff389"
+
 
 [prune]
   go-tests = true

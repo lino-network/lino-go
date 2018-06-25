@@ -125,7 +125,7 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("----signMsgBytes: ", string(signMsgBytes))
+	// fmt.Println("----signMsgBytes: ", string(signMsgBytes))
 	// SignatureFromBytes
 	sig := privKey.Sign(signMsgBytes)
 

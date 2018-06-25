@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"math/big"
 
 	"github.com/cznic/mathutil"
@@ -13,11 +14,12 @@ import (
 // account related
 //
 type AccountInfo struct {
-	Username       string        `json:"username"`
-	CreatedAt      int64         `json:"created_at"`
-	MasterKey      crypto.PubKey `json:"master_key"`
-	TransactionKey crypto.PubKey `json:"transaction_key"`
-	PostKey        crypto.PubKey `json:"post_key"`
+	Username        string        `json:"username"`
+	CreatedAt       int64         `json:"created_at"`
+	MasterKey       crypto.PubKey `json:"master_key"`
+	TransactionKey  crypto.PubKey `json:"transaction_key"`
+	MicropaymentKey crypto.PubKey `json:"micropayment_key"`
+	PostKey         crypto.PubKey `json:"post_key"`
 }
 
 type AccountBank struct {
@@ -34,14 +36,12 @@ type FrozenMoney struct {
 	Interval int64 `json:"interval"`
 }
 
-type GrantKeyList struct {
-	GrantPubKeyList []GrantPubKey `json:"grant_public_key_list"`
-}
-
-type GrantPubKey struct {
-	Username  string        `json:"username"`
-	PubKey    crypto.PubKey `json:"public_key"`
-	ExpiresAt int64         `json:"expires_at"`
+type GrantUser struct {
+	Username   string `json:"username"`
+	Permission int    `json:"permission"`
+	LeftTimes  int64  `json:"left_times"`
+	CreatedAt  int64  `json:"created_at"`
+	ExpiresAt  int64  `json:"expires_at"`
 }
 
 type AccountMeta struct {
@@ -107,20 +107,29 @@ type PostInfo struct {
 
 // PostMeta stores tiny and frequently updated fields.
 type PostMeta struct {
-	CreatedAt               int64 `json:"created_at"`
-	LastUpdatedAt           int64 `json:"last_updated_at"`
-	LastActivityAt          int64 `json:"last_activity_at"`
-	AllowReplies            bool  `json:"allow_replies"`
-	IsDeleted               bool  `json:"is_deleted"`
-	TotalLikeCount          int64 `json:"total_like_count"`
-	TotalDonateCount        int64 `json:"total_donate_count"`
-	TotalLikeWeight         int64 `json:"total_like_weight"`
-	TotalDislikeWeight      int64 `json:"total_dislike_weight"`
-	TotalReportStake        Coin  `json:"total_report_stake"`
-	TotalUpvoteStake        Coin  `json:"total_upvote_stake"`
-	TotalViewCount          int64 `json:"total_view_count"`
-	TotalReward             Coin  `json:"reward"`
-	RedistributionSplitRate Rat   `json:"redistribution_split_rate"`
+	CreatedAt               int64  `json:"created_at"`
+	LastUpdatedAt           int64  `json:"last_updated_at"`
+	LastActivityAt          int64  `json:"last_activity_at"`
+	AllowReplies            bool   `json:"allow_replies"`
+	IsDeleted               bool   `json:"is_deleted"`
+	TotalLikeCount          int64  `json:"total_like_count"`
+	TotalDonateCount        int64  `json:"total_donate_count"`
+	TotalLikeWeight         int64  `json:"total_like_weight"`
+	TotalDislikeWeight      int64  `json:"total_dislike_weight"`
+	TotalReportStake        Coin   `json:"total_report_stake"`
+	TotalUpvoteStake        Coin   `json:"total_upvote_stake"`
+	TotalViewCount          int64  `json:"total_view_count"`
+	TotalReward             Coin   `json:"reward"`
+	RedistributionSplitRate string `json:"redistribution_split_rate"`
+}
+
+func (pm PostMeta) Marshal() (string, error) {
+	bz, err := json.Marshal(pm)
+	return string(bz), err
+}
+
+func (pm *PostMeta) Unmarshal(text string) (err error) {
+	return json.Unmarshal([]byte(text), pm)
 }
 
 type Like struct {

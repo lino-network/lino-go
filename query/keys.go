@@ -2,6 +2,8 @@ package query
 
 import (
 	"strconv"
+
+	crypto "github.com/tendermint/go-crypto"
 )
 
 const (
@@ -30,6 +32,7 @@ var (
 	accountRelationshipSubstore      = []byte{0x07}
 	accountGrantListSubstore         = []byte{0x08}
 	accountBalanceHistorySubstore    = []byte{0x09}
+	AccountGrantUserSubstore         = []byte{0x10}
 
 	postInfoSubStore           = []byte{0x00} // SubStore for all post info
 	postMetaSubStore           = []byte{0x01} // SubStore for all post mata info
@@ -67,6 +70,7 @@ var (
 	coinDayParamSubStore                 = []byte{0x07} // Substore for coin day param
 	bandwidthParamSubStore               = []byte{0x08} // Substore for bandwidth param
 	accountParamSubstore                 = []byte{0x09} // Substore for account param
+	postParamSubStore                    = []byte{0x10} // Substore for evaluate of content value
 )
 
 //
@@ -116,15 +120,19 @@ func getPendingStakeQueueKey(accKey string) []byte {
 	return append(accountPendingStakeQueueSubstore, accKey...)
 }
 
-func getGrantKeyListKey(accKey string) []byte {
-	return append(accountGrantListSubstore, accKey...)
-}
-
 func getBalanceHistoryPrefix(me string) []byte {
 	return append(append(accountBalanceHistorySubstore, me...), KeySeparator...)
 }
 func getBalanceHistoryKey(me string, bucketSlot int64) []byte {
 	return strconv.AppendInt(getBalanceHistoryPrefix(me), bucketSlot, 10)
+}
+
+func getGrantUserPrefix(me string) []byte {
+	return append(append(AccountGrantUserSubstore, me...), KeySeparator...)
+}
+
+func getGrantUserKey(me string, pubKey crypto.PubKey) []byte {
+	return append(getGrantUserPrefix(me), pubKey.Bytes()...)
 }
 
 //
@@ -298,4 +306,8 @@ func getBandwidthParamKey() []byte {
 
 func getAccountParamKey() []byte {
 	return accountParamSubstore
+}
+
+func GetPostParamKey() []byte {
+	return postParamSubStore
 }
