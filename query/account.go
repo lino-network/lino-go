@@ -301,3 +301,77 @@ func (query *Query) GetFollowingMeta(me, myFollowing string) (*model.FollowingMe
 	}
 	return followingMeta, nil
 }
+
+//
+// Range Query
+//
+func (query *Query) GetAllGrantUsers(username string) ([]*model.GrantUser, error) {
+	resKVs, err := query.transport.QuerySubspace(getGrantUserPrefix(username), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	var grantUsers []*model.GrantUser
+	for _, KV := range resKVs {
+		grantUser := new(model.GrantUser)
+		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, grantUser); err != nil {
+			return nil, err
+		}
+		grantUsers = append(grantUsers, grantUser)
+	}
+
+	return grantUsers, nil
+}
+
+func (query *Query) GetAllRelationships(username string) ([]*model.Relationship, error) {
+	resKVs, err := query.transport.QuerySubspace(getRelationshipPrefix(username), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	var relationships []*model.Relationship
+	for _, KV := range resKVs {
+		relationship := new(model.Relationship)
+		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, relationship); err != nil {
+			return nil, err
+		}
+		relationships = append(relationships, relationship)
+	}
+
+	return relationships, nil
+}
+
+func (query *Query) GetAllFollowerMeta(username string) ([]*model.FollowerMeta, error) {
+	resKVs, err := query.transport.QuerySubspace(getFollowerPrefix(username), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	var followerMetas []*model.FollowerMeta
+	for _, KV := range resKVs {
+		followerMeta := new(model.FollowerMeta)
+		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, followerMeta); err != nil {
+			return nil, err
+		}
+		followerMetas = append(followerMetas, followerMeta)
+	}
+
+	return followerMetas, nil
+}
+
+func (query *Query) GetAllFollowingMeta(username string) ([]*model.FollowingMeta, error) {
+	resKVs, err := query.transport.QuerySubspace(getFollowingPrefix(username), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	var followingMetas []*model.FollowingMeta
+	for _, KV := range resKVs {
+		followingMeta := new(model.FollowingMeta)
+		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, followingMeta); err != nil {
+			return nil, err
+		}
+		followingMetas = append(followingMetas, followingMeta)
+	}
+
+	return followingMetas, nil
+}

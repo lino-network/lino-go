@@ -132,6 +132,32 @@ func (pm *PostMeta) Unmarshal(text string) (err error) {
 	return json.Unmarshal([]byte(text), pm)
 }
 
+type Post struct {
+	PostID                  string           `json:"post_id"`
+	Title                   string           `json:"title"`
+	Content                 string           `json:"content"`
+	Author                  string           `json:"author"`
+	ParentAuthor            string           `json:"parent_author"`
+	ParentPostID            string           `json:"parent_postID"`
+	SourceAuthor            string           `json:"source_author"`
+	SourcePostID            string           `json:"source_postID"`
+	Links                   []IDToURLMapping `json:"links"`
+	CreatedAt               int64            `json:"created_at"`
+	LastUpdatedAt           int64            `json:"last_updated_at"`
+	LastActivityAt          int64            `json:"last_activity_at"`
+	AllowReplies            bool             `json:"allow_replies"`
+	IsDeleted               bool             `json:"is_deleted"`
+	TotalLikeCount          int64            `json:"total_like_count"`
+	TotalDonateCount        int64            `json:"total_donate_count"`
+	TotalLikeWeight         int64            `json:"total_like_weight"`
+	TotalDislikeWeight      int64            `json:"total_dislike_weight"`
+	TotalReportStake        Coin             `json:"total_report_stake"`
+	TotalUpvoteStake        Coin             `json:"total_upvote_stake"`
+	TotalViewCount          int64            `json:"total_view_count"`
+	TotalReward             Coin             `json:"reward"`
+	RedistributionSplitRate string           `json:"redistribution_split_rate"`
+}
+
 type Like struct {
 	Username  string `json:"username"`
 	Weight    int64  `json:"weight"`

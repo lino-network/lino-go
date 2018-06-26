@@ -138,12 +138,20 @@ func getGrantUserKey(me string, pubKey crypto.PubKey) []byte {
 //
 // post related
 //
+func getPostKey(author string, postID string) string {
+	return string(author + "#" + postID)
+}
+
+func getUserPostInfoPrefix(me string) []byte {
+	return append(postInfoSubStore, me...)
+}
+
 func getPostInfoKey(postKey string) []byte {
 	return append(postInfoSubStore, postKey...)
 }
 
-func getPostKey(author string, postID string) string {
-	return string(author + "#" + postID)
+func getUserPostMetaPrefix(me string) []byte {
+	return append(postMetaSubStore, me...)
 }
 
 func getPostMetaKey(postKey string) []byte {
@@ -156,6 +164,10 @@ func getPostLikePrefix(postKey string) []byte {
 
 func getPostLikeKey(postKey string, likeUser string) []byte {
 	return append(getPostLikePrefix(postKey), likeUser...)
+}
+
+func getUserReportOrUpvotePrefix(me string) []byte {
+	return append(append(postReportOrUpvoteSubStore, me...), KeySeparator...)
 }
 
 func getPostReportOrUpvotePrefix(postKey string) []byte {
@@ -180,6 +192,10 @@ func getPostCommentPrefix(postKey string) []byte {
 
 func getPostCommentKey(postKey string, commentPostKey string) []byte {
 	return append(getPostCommentPrefix(postKey), commentPostKey...)
+}
+
+func getUserDonationPrefix(me string) []byte {
+	return append(append(postDonationsSubStore, me...), KeySeparator...)
 }
 
 func getPostDonationPrefix(postKey string) []byte {
