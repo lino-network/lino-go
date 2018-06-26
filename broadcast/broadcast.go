@@ -20,27 +20,32 @@ func NewBroadcast(transport *transport.Transport) *Broadcast {
 //
 // Account related tx
 //
-func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubKeyHex, transactionPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubKeyHex, transactionPubKeyHex, micropaymentPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
 	masterPubKey, err := transport.GetPubKeyFromHex(masterPubKeyHex)
 	if err != nil {
-		return err
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get Master pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(transactionPubKeyHex)
 	if err != nil {
-		return err
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
+	}
+	micropaymentPubKey, err := transport.GetPubKeyFromHex(micropaymentPubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get Micropayment pub key").AddCause(err)
 	}
 	postPubKey, err := transport.GetPubKeyFromHex(postPubKeyHex)
 	if err != nil {
-		return err
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get Post pub key").AddCause(err)
 	}
 
 	msg := model.RegisterMsg{
-		Referrer:             referrer,
-		RegisterFee:          registerFee,
-		NewUser:              username,
-		NewMasterPubKey:      masterPubKey,
-		NewTransactionPubKey: txPubKey,
-		NewPostPubKey:        postPubKey,
+		Referrer:              referrer,
+		RegisterFee:           registerFee,
+		NewUser:               username,
+		NewMasterPubKey:       masterPubKey,
+		NewTransactionPubKey:  txPubKey,
+		NewMicropaymentPubKey: micropaymentPubKey,
+		NewPostPubKey:         postPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, referrerPrivKeyHex, seq)
 }
@@ -86,25 +91,30 @@ func (broadcast *Broadcast) UpdateAccount(username, jsonMeta, privKeyHex string,
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newPostPubKeyHex, newTransactionPubKeyHex, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newTransactionPubKeyHex, newMicropaymentPubKeyHex, newPostPubKeyHex, privKeyHex string, seq int64) error {
 	masterPubKey, err := transport.GetPubKeyFromHex(newMasterPubKeyHex)
 	if err != nil {
-		return nil
-	}
-	postPubKey, err := transport.GetPubKeyFromHex(newPostPubKeyHex)
-	if err != nil {
-		return nil
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Master pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(newTransactionPubKeyHex)
 	if err != nil {
-		return err
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Tx pub key").AddCause(err)
+	}
+	micropaymentPubKey, err := transport.GetPubKeyFromHex(newMicropaymentPubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Micropayment pub key").AddCause(err)
+	}
+	postPubKey, err := transport.GetPubKeyFromHex(newPostPubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Post pub key").AddCause(err)
 	}
 
 	msg := model.RecoverMsg{
-		Username:             username,
-		NewMasterPubKey:      masterPubKey,
-		NewPostPubKey:        postPubKey,
-		NewTransactionPubKey: txPubKey,
+		Username:              username,
+		NewMasterPubKey:       masterPubKey,
+		NewTransactionPubKey:  txPubKey,
+		NewMicropaymentPubKey: micropaymentPubKey,
+		NewPostPubKey:         postPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
@@ -148,14 +158,15 @@ func (broadcast *Broadcast) Like(username, author string, weight int64, postID, 
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) Donate(username, author, amount, postID, fromApp, memo, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Donate(username, author, amount, postID, fromApp, memo string, isMicroPayment bool, privKeyHex string, seq int64) error {
 	msg := model.DonateMsg{
-		Username: username,
-		Amount:   amount,
-		Author:   author,
-		PostID:   postID,
-		FromApp:  fromApp,
-		Memo:     memo,
+		Username:       username,
+		Amount:         amount,
+		Author:         author,
+		PostID:         postID,
+		FromApp:        fromApp,
+		Memo:           memo,
+		IsMicroPayment: isMicroPayment,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
@@ -214,7 +225,7 @@ func (broadcast *Broadcast) UpdatePost(author, title, postID, content, redistrib
 func (broadcast *Broadcast) ValidatorDeposit(username, deposit, validatorPubKey, link, privKeyHex string, seq int64) error {
 	valPubKey, err := transport.GetPubKeyFromHex(validatorPubKey)
 	if err != nil {
-		return err
+		return errors.FailedToGetPubKeyFromHexf("ValidatorDeposit: failed to get Val pub key").AddCause(err)
 	}
 	msg := model.ValidatorDepositMsg{
 		Username:  username,
@@ -310,12 +321,27 @@ func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) GrantDeveloper(username, authenticateApp string, validityPeriod int64, grantLevel int, privKeyHex string, seq int64) error {
-	msg := model.GrantDeveloperMsg{
+func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, validityPeriod int64, grantLevel int, times int64, privKeyHex string, seq int64) error {
+	msg := model.GrantPermissionMsg{
 		Username:        username,
 		AuthenticateApp: authenticateApp,
 		ValidityPeriod:  validityPeriod,
 		GrantLevel:      grantLevel,
+		Times:           times,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+}
+
+func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string, grantLevel int, privKeyHex string, seq int64) error {
+	pubKey, err := transport.GetPubKeyFromHex(pubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get pub key").AddCause(err)
+	}
+
+	msg := model.RevokePermissionMsg{
+		Username:   username,
+		PubKey:     pubKey,
+		GrantLevel: grantLevel,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
@@ -415,6 +441,14 @@ func (broadcast *Broadcast) ChangeAccountParam(creator string, parameter model.A
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+func (broadcast *Broadcast) ChangePostParam(creator string, parameter model.PostParam, privKeyHex string, seq int64) error {
+	msg := model.ChangePostParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+}
+
 func (broadcast *Broadcast) DeletePostContent(creator, postAuthor, postID, reason, privKeyHex string, seq int64) error {
 	permLink := string(string(postAuthor) + "#" + postID)
 	msg := model.DeletePostContentMsg{
@@ -437,21 +471,21 @@ func (broadcast *Broadcast) VoteProposal(voter, proposalID string, result bool, 
 //
 // internal helper functions
 //
-func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex string, seq int64) errors.Error {
+func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex string, seq int64) error {
 	res, err := broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq)
 	if err != nil {
-		return errors.FailedToBroadcastf("failed to broadcast msg: %v, with privKey: %s and seq: %v", msg, privKeyHex, seq).TraceCause(err, "")
+		return errors.FailedToBroadcastf("failed to broadcast msg: %v, got err: %v", msg, err)
 	}
 
 	if err == nil && res.CheckTx.Code == types.InvalidSeqErrCode {
-		return errors.InvalidSeqNumberf("invalid seq [%v] for msg %v", seq, msg)
+		return errors.InvalidArg("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
 	}
 
 	if res.CheckTx.Code != uint32(0) {
-		return errors.CheckTxFailf("CheckTx failed! (%d) %s", res.CheckTx.Code, res.CheckTx.Log)
+		return errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
 	}
 	if res.DeliverTx.Code != uint32(0) {
-		return errors.DeliverTxFailf("DeliverTx failed! (%d) %s", res.DeliverTx.Code, res.DeliverTx.Log)
+		return errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
 	}
 	return nil
 }

@@ -1,8 +1,12 @@
 package model
 
 import (
+	"encoding/json"
+	"math/big"
+
 	"github.com/cznic/mathutil"
 	"github.com/tendermint/go-crypto"
+
 	ttypes "github.com/tendermint/tendermint/types"
 )
 
@@ -10,11 +14,12 @@ import (
 // account related
 //
 type AccountInfo struct {
-	Username       string        `json:"username"`
-	CreatedAt      int64         `json:"created_at"`
-	MasterKey      crypto.PubKey `json:"master_key"`
-	TransactionKey crypto.PubKey `json:"transaction_key"`
-	PostKey        crypto.PubKey `json:"post_key"`
+	Username        string        `json:"username"`
+	CreatedAt       int64         `json:"created_at"`
+	MasterKey       crypto.PubKey `json:"master_key"`
+	TransactionKey  crypto.PubKey `json:"transaction_key"`
+	MicropaymentKey crypto.PubKey `json:"micropayment_key"`
+	PostKey         crypto.PubKey `json:"post_key"`
 }
 
 type AccountBank struct {
@@ -31,14 +36,12 @@ type FrozenMoney struct {
 	Interval int64 `json:"interval"`
 }
 
-type GrantKeyList struct {
-	GrantPubKeyList []GrantPubKey `json:"grant_public_key_list"`
-}
-
-type GrantPubKey struct {
-	Username  string        `json:"username"`
-	PubKey    crypto.PubKey `json:"public_key"`
-	ExpiresAt int64         `json:"expires_at"`
+type GrantUser struct {
+	Username   string `json:"username"`
+	Permission int    `json:"permission"`
+	LeftTimes  int64  `json:"left_times"`
+	CreatedAt  int64  `json:"created_at"`
+	ExpiresAt  int64  `json:"expires_at"`
 }
 
 type AccountMeta struct {
@@ -102,20 +105,57 @@ type PostInfo struct {
 	Links        []IDToURLMapping `json:"links"`
 }
 
+// PostMeta stores tiny and frequently updated fields.
 type PostMeta struct {
-	CreatedAt               int64 `json:"created_at"`
-	LastUpdatedAt           int64 `json:"last_updated_at"`
-	LastActivityAt          int64 `json:"last_activity_at"`
-	AllowReplies            bool  `json:"allow_replies"`
-	TotalLikeCount          int64 `json:"total_like_count"`
-	TotalDonateCount        int64 `json:"total_donate_count"`
-	TotalLikeWeight         int64 `json:"total_like_weight"`
-	TotalDislikeWeight      int64 `json:"total_dislike_weight"`
-	TotalReportStake        Coin  `json:"total_report_stake"`
-	TotalUpvoteStake        Coin  `json:"total_upvote_stake"`
-	TotalViewCount          int64 `json:"total_view_count"`
-	TotalReward             Coin  `json:"reward"`
-	RedistributionSplitRate Rat   `json:"redistribution_split_rate"`
+	CreatedAt               int64  `json:"created_at"`
+	LastUpdatedAt           int64  `json:"last_updated_at"`
+	LastActivityAt          int64  `json:"last_activity_at"`
+	AllowReplies            bool   `json:"allow_replies"`
+	IsDeleted               bool   `json:"is_deleted"`
+	TotalLikeCount          int64  `json:"total_like_count"`
+	TotalDonateCount        int64  `json:"total_donate_count"`
+	TotalLikeWeight         int64  `json:"total_like_weight"`
+	TotalDislikeWeight      int64  `json:"total_dislike_weight"`
+	TotalReportStake        Coin   `json:"total_report_stake"`
+	TotalUpvoteStake        Coin   `json:"total_upvote_stake"`
+	TotalViewCount          int64  `json:"total_view_count"`
+	TotalReward             Coin   `json:"reward"`
+	RedistributionSplitRate string `json:"redistribution_split_rate"`
+}
+
+func (pm PostMeta) Marshal() (string, error) {
+	bz, err := json.Marshal(pm)
+	return string(bz), err
+}
+
+func (pm *PostMeta) Unmarshal(text string) (err error) {
+	return json.Unmarshal([]byte(text), pm)
+}
+
+type Post struct {
+	PostID                  string           `json:"post_id"`
+	Title                   string           `json:"title"`
+	Content                 string           `json:"content"`
+	Author                  string           `json:"author"`
+	ParentAuthor            string           `json:"parent_author"`
+	ParentPostID            string           `json:"parent_postID"`
+	SourceAuthor            string           `json:"source_author"`
+	SourcePostID            string           `json:"source_postID"`
+	Links                   []IDToURLMapping `json:"links"`
+	CreatedAt               int64            `json:"created_at"`
+	LastUpdatedAt           int64            `json:"last_updated_at"`
+	LastActivityAt          int64            `json:"last_activity_at"`
+	AllowReplies            bool             `json:"allow_replies"`
+	IsDeleted               bool             `json:"is_deleted"`
+	TotalLikeCount          int64            `json:"total_like_count"`
+	TotalDonateCount        int64            `json:"total_donate_count"`
+	TotalLikeWeight         int64            `json:"total_like_weight"`
+	TotalDislikeWeight      int64            `json:"total_dislike_weight"`
+	TotalReportStake        Coin             `json:"total_report_stake"`
+	TotalUpvoteStake        Coin             `json:"total_upvote_stake"`
+	TotalViewCount          int64            `json:"total_view_count"`
+	TotalReward             Coin             `json:"reward"`
+	RedistributionSplitRate string           `json:"redistribution_split_rate"`
 }
 
 type Like struct {
@@ -157,18 +197,29 @@ type Donations struct {
 //
 // validator related struct
 //
+// type ABCIValidator struct {
+// 	PubKey []byte `protobuf:"bytes,1,opt,name=pub_key,json=pubKey,proto3" json:"pub_key,omitempty"`
+// 	Power  int64  `protobuf:"varint,2,opt,name=power,proto3" json:"power,omitempty"`
+// }
+type PubKey struct {
+	Type string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Data []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+}
+
 type ABCIValidator struct {
-	PubKey []byte `protobuf:"bytes,1,opt,name=pub_key,json=pubKey,proto3" json:"pub_key,omitempty"`
-	Power  int64  `protobuf:"varint,2,opt,name=power,proto3" json:"power,omitempty"`
+	Address []byte `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	PubKey  PubKey `protobuf:"bytes,2,opt,name=pub_key,json=pubKey" json:"pub_key"`
+	Power   int64  `protobuf:"varint,3,opt,name=power,proto3" json:"power,omitempty"`
 }
 
 type Validator struct {
 	ABCIValidator
-	Username       string `json:"username"`
-	Deposit        Coin   `json:"deposit"`
-	AbsentCommit   int    `json:"absent_commit"`
-	ProducedBlocks int64  `json:"produced_blocks"`
-	Link           string `json:"link"`
+	Username        string `json:"username"`
+	Deposit         Coin   `json:"deposit"`
+	AbsentCommit    int64  `json:"absent_commit"`
+	ByzantineCommit int64  `json:"byzantine_commit"`
+	ProducedBlocks  int64  `json:"produced_blocks"`
+	Link            string `json:"link"`
 }
 
 type ValidatorList struct {
@@ -271,9 +322,32 @@ type Coin struct {
 	Amount mathutil.Int128 `json:"amount"`
 }
 
+type SDKCoin struct {
+	Denom  string `json:"denom"`
+	Amount int64  `json:"amount"`
+}
+
+type SDKCoins []SDKCoin
+
 type Rat struct {
-	Num   int64 `json:"num"`
-	Denom int64 `json:"denom"`
+	big.Rat `json:"rat"`
+}
+
+//Wraps r.MarshalText().
+func (r Rat) MarshalAmino() (string, error) {
+	bz, err := (&(r.Rat)).MarshalText()
+	return string(bz), err
+}
+
+// Requires a valid JSON string - strings quotes and calls UnmarshalText
+func (r *Rat) UnmarshalAmino(text string) (err error) {
+	tempRat := big.NewRat(0, 1)
+	err = tempRat.UnmarshalText([]byte(text))
+	if err != nil {
+		return err
+	}
+	r.Rat = *tempRat
+	return nil
 }
 
 type Block struct {

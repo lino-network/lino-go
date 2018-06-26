@@ -6,16 +6,19 @@ import (
 
 type Msg interface{}
 
+type Tx interface{}
+
 //
 // Account related messages
 //
 type RegisterMsg struct {
-	Referrer             string        `json:"referrer"`
-	RegisterFee          string        `json:"register_fee"`
-	NewUser              string        `json:"new_username"`
-	NewMasterPubKey      crypto.PubKey `json:"new_master_public_key"`
-	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
-	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
+	Referrer              string        `json:"referrer"`
+	RegisterFee           string        `json:"register_fee"`
+	NewUser               string        `json:"new_username"`
+	NewMasterPubKey       crypto.PubKey `json:"new_master_public_key"`
+	NewTransactionPubKey  crypto.PubKey `json:"new_transaction_public_key"`
+	NewMicropaymentPubKey crypto.PubKey `json:"new_micropayment_public_key"`
+	NewPostPubKey         crypto.PubKey `json:"new_post_public_key"`
 }
 
 type FollowMsg struct {
@@ -33,10 +36,11 @@ type ClaimMsg struct {
 }
 
 type RecoverMsg struct {
-	Username             string        `json:"username"`
-	NewMasterPubKey      crypto.PubKey `json:"new_master_public_key"`
-	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
-	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
+	Username              string        `json:"username"`
+	NewMasterPubKey       crypto.PubKey `json:"new_master_public_key"`
+	NewTransactionPubKey  crypto.PubKey `json:"new_transaction_public_key"`
+	NewMicropaymentPubKey crypto.PubKey `json:"new_micropayment_public_key"`
+	NewPostPubKey         crypto.PubKey `json:"new_post_public_key"`
 }
 
 type TransferMsg struct {
@@ -94,12 +98,13 @@ type LikeMsg struct {
 }
 
 type DonateMsg struct {
-	Username string `json:"username"`
-	Amount   string `json:"amount"`
-	Author   string `json:"author"`
-	PostID   string `json:"post_id"`
-	FromApp  string `json:"from_app"`
-	Memo     string `json:"memo"`
+	Username       string `json:"username"`
+	Amount         string `json:"amount"`
+	Author         string `json:"author"`
+	PostID         string `json:"post_id"`
+	FromApp        string `json:"from_app"`
+	Memo           string `json:"memo"`
+	IsMicroPayment bool   `json:"is_micropayment"`
 }
 
 type ViewMsg struct {
@@ -181,11 +186,18 @@ type DeveloperRevokeMsg struct {
 	Username string `json:"username"`
 }
 
-type GrantDeveloperMsg struct {
+type GrantPermissionMsg struct {
 	Username        string `json:"username"`
 	AuthenticateApp string `json:"authenticate_app"`
 	ValidityPeriod  int64  `json:"validity_period"`
 	GrantLevel      int    `json:"grant_level"`
+	Times           int64  `json:"times"`
+}
+
+type RevokePermissionMsg struct {
+	Username   string        `json:"username"`
+	PubKey     crypto.PubKey `json:"public_key"`
+	GrantLevel int           `json:"grant_level"`
 }
 
 //
@@ -264,4 +276,9 @@ type ChangeBandwidthParamMsg struct {
 type ChangeAccountParamMsg struct {
 	Creator   string       `json:"creator"`
 	Parameter AccountParam `json:"parameter"`
+}
+
+type ChangePostParamMsg struct {
+	Creator   string    `json:"creator"`
+	Parameter PostParam `json:"parameter"`
 }

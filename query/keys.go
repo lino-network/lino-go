@@ -2,6 +2,8 @@ package query
 
 import (
 	"strconv"
+
+	crypto "github.com/tendermint/go-crypto"
 )
 
 const (
@@ -30,6 +32,7 @@ var (
 	accountRelationshipSubstore      = []byte{0x07}
 	accountGrantListSubstore         = []byte{0x08}
 	accountBalanceHistorySubstore    = []byte{0x09}
+	AccountGrantUserSubstore         = []byte{0x10}
 
 	postInfoSubStore           = []byte{0x00} // SubStore for all post info
 	postMetaSubStore           = []byte{0x01} // SubStore for all post mata info
@@ -67,6 +70,7 @@ var (
 	coinDayParamSubStore                 = []byte{0x07} // Substore for coin day param
 	bandwidthParamSubStore               = []byte{0x08} // Substore for bandwidth param
 	accountParamSubstore                 = []byte{0x09} // Substore for account param
+	postParamSubStore                    = []byte{0x10} // Substore for evaluate of content value
 )
 
 //
@@ -116,10 +120,6 @@ func getPendingStakeQueueKey(accKey string) []byte {
 	return append(accountPendingStakeQueueSubstore, accKey...)
 }
 
-func getGrantKeyListKey(accKey string) []byte {
-	return append(accountGrantListSubstore, accKey...)
-}
-
 func getBalanceHistoryPrefix(me string) []byte {
 	return append(append(accountBalanceHistorySubstore, me...), KeySeparator...)
 }
@@ -127,15 +127,31 @@ func getBalanceHistoryKey(me string, bucketSlot int64) []byte {
 	return strconv.AppendInt(getBalanceHistoryPrefix(me), bucketSlot, 10)
 }
 
+func getGrantUserPrefix(me string) []byte {
+	return append(append(AccountGrantUserSubstore, me...), KeySeparator...)
+}
+
+func getGrantUserKey(me string, pubKey crypto.PubKey) []byte {
+	return append(getGrantUserPrefix(me), pubKey.Bytes()...)
+}
+
 //
 // post related
 //
+func getPostKey(author string, postID string) string {
+	return string(author + "#" + postID)
+}
+
+func getUserPostInfoPrefix(me string) []byte {
+	return append(postInfoSubStore, me...)
+}
+
 func getPostInfoKey(postKey string) []byte {
 	return append(postInfoSubStore, postKey...)
 }
 
-func getPostKey(author string, postID string) string {
-	return string(string(author) + "#" + postID)
+func getUserPostMetaPrefix(me string) []byte {
+	return append(postMetaSubStore, me...)
 }
 
 func getPostMetaKey(postKey string) []byte {
@@ -148,6 +164,10 @@ func getPostLikePrefix(postKey string) []byte {
 
 func getPostLikeKey(postKey string, likeUser string) []byte {
 	return append(getPostLikePrefix(postKey), likeUser...)
+}
+
+func getUserReportOrUpvotePrefix(me string) []byte {
+	return append(append(postReportOrUpvoteSubStore, me...), KeySeparator...)
 }
 
 func getPostReportOrUpvotePrefix(postKey string) []byte {
@@ -172,6 +192,10 @@ func getPostCommentPrefix(postKey string) []byte {
 
 func getPostCommentKey(postKey string, commentPostKey string) []byte {
 	return append(getPostCommentPrefix(postKey), commentPostKey...)
+}
+
+func getUserDonationPrefix(me string) []byte {
+	return append(append(postDonationsSubStore, me...), KeySeparator...)
 }
 
 func getPostDonationPrefix(postKey string) []byte {
@@ -298,4 +322,8 @@ func getBandwidthParamKey() []byte {
 
 func getAccountParamKey() []byte {
 	return accountParamSubstore
+}
+
+func GetPostParamKey() []byte {
+	return postParamSubStore
 }
