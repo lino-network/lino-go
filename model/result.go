@@ -51,11 +51,6 @@ type AccountMeta struct {
 	JSONMeta            string `json:"json_meta"`
 }
 
-type AccountInfraConsumption struct {
-	Storage   int64 `json:"storage"`
-	Bandwidth int64 `json:"bandwidth"`
-}
-
 type FollowerMeta struct {
 	CreatedAt    int64  `json:"created_at"`
 	FollowerName string `json:"follower_name"`
