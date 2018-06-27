@@ -51,6 +51,20 @@ func (query *Query) DoesUsernameMatchTxPrivKey(username, txPrivKeyHex string) (b
 	return accInfo.TransactionKey.Equals(txPrivKey.PubKey()), nil
 }
 
+func (query *Query) DoesUsernameMatchMicropaymentPrivKey(username, micropaymentPrivKeyHex string) (bool, error) {
+	accInfo, err := query.GetAccountInfo(username)
+	if err != nil {
+		return false, err
+	}
+
+	txPrivKey, e := transport.GetPrivKeyFromHex(micropaymentPrivKeyHex)
+	if e != nil {
+		return false, e
+	}
+
+	return accInfo.MicropaymentKey.Equals(txPrivKey.PubKey()), nil
+}
+
 func (query *Query) DoesUsernameMatchPostPrivKey(username, postPrivKeyHex string) (bool, error) {
 	accInfo, err := query.GetAccountInfo(username)
 	if err != nil {
@@ -305,72 +319,73 @@ func (query *Query) GetFollowingMeta(me, myFollowing string) (*model.FollowingMe
 //
 // Range Query
 //
-func (query *Query) GetAllGrantPubKeys(username string) ([]*model.GrantPubKey, error) {
+
+func (query *Query) GetAllGrantPubKeys(username string) (map[string]*model.GrantPubKey, error) {
 	resKVs, err := query.transport.QuerySubspace(getGrantPubKeyPrefix(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
-	var grantPubKeys []*model.GrantPubKey
+	var pubKeyToGrantPubKeyMap = make(map[string]*model.GrantPubKey)
 	for _, KV := range resKVs {
 		grantPubKey := new(model.GrantPubKey)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, grantPubKey); err != nil {
 			return nil, err
 		}
-		grantPubKeys = append(grantPubKeys, grantPubKey)
+		pubKeyToGrantPubKeyMap[getHexSubstringAfterKeySeparator(KV.Key)] = grantPubKey
 	}
 
-	return grantPubKeys, nil
+	return pubKeyToGrantPubKeyMap, nil
 }
 
-func (query *Query) GetAllRelationships(username string) ([]*model.Relationship, error) {
+func (query *Query) GetAllRelationships(username string) (map[string]*model.Relationship, error) {
 	resKVs, err := query.transport.QuerySubspace(getRelationshipPrefix(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
-	var relationships []*model.Relationship
+	var userToRelationshipMap = make(map[string]*model.Relationship)
 	for _, KV := range resKVs {
 		relationship := new(model.Relationship)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, relationship); err != nil {
 			return nil, err
 		}
-		relationships = append(relationships, relationship)
+		userToRelationshipMap[getSubstringAfterKeySeparator(KV.Key)] = relationship
 	}
 
-	return relationships, nil
+	return userToRelationshipMap, nil
 }
 
-func (query *Query) GetAllFollowerMeta(username string) ([]*model.FollowerMeta, error) {
+func (query *Query) GetAllFollowerMeta(username string) (map[string]*model.FollowerMeta, error) {
 	resKVs, err := query.transport.QuerySubspace(getFollowerPrefix(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
-	var followerMetas []*model.FollowerMeta
+	var followerToMetaMap = make(map[string]*model.FollowerMeta)
 	for _, KV := range resKVs {
 		followerMeta := new(model.FollowerMeta)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, followerMeta); err != nil {
 			return nil, err
 		}
-		followerMetas = append(followerMetas, followerMeta)
+		followerToMetaMap[getSubstringAfterKeySeparator(KV.Key)] = followerMeta
 	}
 
-	return followerMetas, nil
+	return followerToMetaMap, nil
 }
 
-func (query *Query) GetAllFollowingMeta(username string) ([]*model.FollowingMeta, error) {
+func (query *Query) GetAllFollowingMeta(username string) (map[string]*model.FollowingMeta, error) {
 	resKVs, err := query.transport.QuerySubspace(getFollowingPrefix(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
-	var followingMetas []*model.FollowingMeta
+	var followingMetas = make(map[string]*model.FollowingMeta)
 	for _, KV := range resKVs {
 		followingMeta := new(model.FollowingMeta)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, followingMeta); err != nil {
 			return nil, err
 		}
-		followingMetas = append(followingMetas, followingMeta)
+		followingMetas[getSubstringAfterKeySeparator(KV.Key)] = followingMeta
 	}
 
 	return followingMetas, nil

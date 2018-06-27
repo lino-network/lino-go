@@ -60,7 +60,7 @@ func main() {
 	// output, _ = json.Marshal(res6)
 	// fmt.Println(string(output))
 	//
-	res7, _ := api.Query.GetAccountMeta("Lino")
+	res7, _ := api.Query.GetAccountMeta("lino")
 	output, _ := json.Marshal(res7)
 	fmt.Println(string(output))
 	//
@@ -72,13 +72,13 @@ func main() {
 	// output, _ = json.Marshal(res9)
 	// fmt.Println(string(output))
 	// //
-	res10, _ := api.Query.GetAccountBank("6AD350F6B7F333C99D4FDD9BB633B9ABFE20F987")
+	res10, _ := api.Query.GetAccountBank("lino")
 	output, _ = json.Marshal(res10)
 	fmt.Println(string(output))
 
-	block, err := api.Query.GetBlock(121)
-	fmt.Println(err)
-	fmt.Println(block)
+	// block, err := api.Query.GetBlock(121)
+	// fmt.Println(err)
+	// fmt.Println(block)
 	//
 	// res11, _ := query.GetGrantList("Lino")
 	// output, _ = json.Marshal(res11)
@@ -93,11 +93,24 @@ func main() {
 	// fmt.Println(string(output))
 
 	//broadcast ransaction example
-	// user := "yukai-tu"
+	//broadcast := broadcast.NewBroadcast(transport.NewTransportFromConfig())
+	user := "yukai-tu6"
 	// masterPriv := crypto.GenPrivKeyEd25519()
 	// txPriv := crypto.GenPrivKeyEd25519()
+	// micropaymentPriv := crypto.GenPrivKeyEd25519()
 	// postPriv := crypto.GenPrivKeyEd25519()
 
+	// err := broadcast.Register(
+	// 	"lino", "100000000", user, hex.EncodeToString(masterPriv.PubKey().Bytes()), hex.EncodeToString(txPriv.PubKey().Bytes()),
+	// 	hex.EncodeToString(micropaymentPriv.PubKey().Bytes()), hex.EncodeToString(postPriv.PubKey().Bytes()), "E1B0F79A207610DF4B9AA480C78F06C5B505B6F56A9B57A8CA05DCA868A41A95B664E319C9", 6)
+	// fmt.Println(err)
+
+	// time.Sleep(20 * time.Second)
+	// err = broadcast.GrantPermission(user, "lino", 1000000000, 1, 10, hex.EncodeToString(txPriv.Bytes()), 0)
+	// fmt.Println(err)
+
+	pubKeyToGrantPubKeyMap, _ := api.Query.GetAllGrantPubKeys(user)
+	fmt.Println(pubKeyToGrantPubKeyMap["2feb5ae98221038040b08feadecab2b756fd9c92865a6c24e599fc51ea23b25509499ffcfd107c"])
 	// masterPub := masterPriv.PubKey()
 	// txPub := txPriv.PubKey()
 	// postPub := postPriv.PubKey()

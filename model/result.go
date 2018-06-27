@@ -37,11 +37,11 @@ type FrozenMoney struct {
 }
 
 type GrantPubKey struct {
-	Username   string `json:"username"`
-	Permission int    `json:"permission"`
-	LeftTimes  int64  `json:"left_times"`
-	CreatedAt  int64  `json:"created_at"`
-	ExpiresAt  int64  `json:"expires_at"`
+	Username   string     `json:"username"`
+	Permission Permission `json:"permission"`
+	LeftTimes  int64      `json:"left_times"`
+	CreatedAt  int64      `json:"created_at"`
+	ExpiresAt  int64      `json:"expires_at"`
 }
 
 type AccountMeta struct {
@@ -49,11 +49,6 @@ type AccountMeta struct {
 	LastActivityAt      int64  `json:"last_activity_at"`
 	TransactionCapacity Coin   `json:"transaction_capacity"`
 	JSONMeta            string `json:"json_meta"`
-}
-
-type AccountInfraConsumption struct {
-	Storage   int64 `json:"storage"`
-	Bandwidth int64 `json:"bandwidth"`
 }
 
 type FollowerMeta struct {
@@ -82,12 +77,12 @@ type BalanceHistory struct {
 }
 
 type Detail struct {
-	DetailType int    `json:"detail"`
-	From       string `json:"from"`
-	To         string `json:"to"`
-	Amount     Coin   `json:"amount"`
-	CreatedAt  int64  `json:"created_at"`
-	Memo       string `json:"memo"`
+	DetailType DetailType `json:"detail"`
+	From       string     `json:"from"`
+	To         string     `json:"to"`
+	Amount     Coin       `json:"amount"`
+	CreatedAt  int64      `json:"created_at"`
+	Memo       string     `json:"memo"`
 }
 
 //

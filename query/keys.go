@@ -1,6 +1,8 @@
 package query
 
 import (
+	"bytes"
+	"encoding/hex"
 	"strconv"
 
 	crypto "github.com/tendermint/go-crypto"
@@ -30,9 +32,8 @@ var (
 	accountRewardSubstore            = []byte{0x05}
 	accountPendingStakeQueueSubstore = []byte{0x06}
 	accountRelationshipSubstore      = []byte{0x07}
-	accountGrantListSubstore         = []byte{0x08}
-	accountBalanceHistorySubstore    = []byte{0x09}
-	AccountGrantPubKeySubstore       = []byte{0x10}
+	accountBalanceHistorySubstore    = []byte{0x08}
+	AccountGrantPubKeySubstore       = []byte{0x09}
 
 	postInfoSubStore           = []byte{0x00} // SubStore for all post info
 	postMetaSubStore           = []byte{0x01} // SubStore for all post mata info
@@ -72,6 +73,18 @@ var (
 	accountParamSubstore                 = []byte{0x09} // Substore for account param
 	postParamSubStore                    = []byte{0x10} // Substore for evaluate of content value
 )
+
+func getHexSubstringAfterKeySeparator(key []byte) string {
+	return hex.EncodeToString(key[bytes.Index(key, []byte(KeySeparator)):])
+}
+
+func getSubstringAfterKeySeparator(key []byte) string {
+	return string(key[bytes.Index(key, []byte(KeySeparator)):])
+}
+
+func getSubstringAfterSubstore(key []byte) string {
+	return string(key[1:])
+}
 
 //
 // account related
@@ -138,7 +151,7 @@ func getGrantPubKeyKey(me string, pubKey crypto.PubKey) []byte {
 //
 // post related
 //
-func getPostKey(author string, postID string) string {
+func getPermlink(author string, postID string) string {
 	return string(author + "#" + postID)
 }
 
@@ -166,10 +179,6 @@ func getPostLikeKey(postKey string, likeUser string) []byte {
 	return append(getPostLikePrefix(postKey), likeUser...)
 }
 
-func getUserReportOrUpvotePrefix(me string) []byte {
-	return append(append(postReportOrUpvoteSubStore, me...), KeySeparator...)
-}
-
 func getPostReportOrUpvotePrefix(postKey string) []byte {
 	return append(append(postReportOrUpvoteSubStore, postKey...), KeySeparator...)
 }
@@ -194,16 +203,12 @@ func getPostCommentKey(postKey string, commentPostKey string) []byte {
 	return append(getPostCommentPrefix(postKey), commentPostKey...)
 }
 
-func getUserDonationPrefix(me string) []byte {
-	return append(append(postDonationsSubStore, me...), KeySeparator...)
-}
-
-func getPostDonationPrefix(postKey string) []byte {
+func getPostDonationsPrefix(postKey string) []byte {
 	return append(append(postDonationsSubStore, postKey...), KeySeparator...)
 }
 
 func getPostDonationKey(postKey string, donateUser string) []byte {
-	return append(getPostDonationPrefix(postKey), donateUser...)
+	return append(getPostDonationsPrefix(postKey), donateUser...)
 }
 
 //
