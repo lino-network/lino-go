@@ -232,22 +232,22 @@ func (query *Query) GetBalanceHistory(username string, index int64) (*model.Bala
 	return balanceHistory, nil
 }
 
-func (query *Query) GetGrantUser(username string, pubKeyHex string) (*model.GrantUser, error) {
+func (query *Query) GetGrantPubKey(username string, pubKeyHex string) (*model.GrantPubKey, error) {
 	pubKey, err := transport.GetPubKeyFromHex(pubKeyHex)
 	if err != nil {
-		return nil, errors.FailedToGetPubKeyFromHex("GetGrantUser: failed to get pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHex("GetGrantPubKey: failed to get pub key").AddCause(err)
 	}
 
-	resp, err := query.transport.Query(getGrantUserKey(username, pubKey), AccountKVStoreKey)
+	resp, err := query.transport.Query(getGrantPubKeyKey(username, pubKey), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
-	grantUser := new(model.GrantUser)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, grantUser); err != nil {
-		return grantUser, err
+	grantPubKey := new(model.GrantPubKey)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, grantPubKey); err != nil {
+		return grantPubKey, err
 	}
-	return grantUser, nil
+	return grantPubKey, nil
 }
 
 func (query *Query) GetReward(username string) (*model.Reward, error) {
@@ -305,21 +305,21 @@ func (query *Query) GetFollowingMeta(me, myFollowing string) (*model.FollowingMe
 //
 // Range Query
 //
-func (query *Query) GetAllGrantUsers(username string) ([]*model.GrantUser, error) {
-	resKVs, err := query.transport.QuerySubspace(getGrantUserPrefix(username), AccountKVStoreKey)
+func (query *Query) GetAllGrantPubKeys(username string) ([]*model.GrantPubKey, error) {
+	resKVs, err := query.transport.QuerySubspace(getGrantPubKeyPrefix(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
-	var grantUsers []*model.GrantUser
+	var grantPubKeys []*model.GrantPubKey
 	for _, KV := range resKVs {
-		grantUser := new(model.GrantUser)
-		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, grantUser); err != nil {
+		grantPubKey := new(model.GrantPubKey)
+		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, grantPubKey); err != nil {
 			return nil, err
 		}
-		grantUsers = append(grantUsers, grantUser)
+		grantPubKeys = append(grantPubKeys, grantPubKey)
 	}
 
-	return grantUsers, nil
+	return grantPubKeys, nil
 }
 
 func (query *Query) GetAllRelationships(username string) ([]*model.Relationship, error) {

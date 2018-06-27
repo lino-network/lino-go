@@ -32,7 +32,7 @@ var (
 	accountRelationshipSubstore      = []byte{0x07}
 	accountGrantListSubstore         = []byte{0x08}
 	accountBalanceHistorySubstore    = []byte{0x09}
-	AccountGrantUserSubstore         = []byte{0x10}
+	AccountGrantPubKeySubstore       = []byte{0x10}
 
 	postInfoSubStore           = []byte{0x00} // SubStore for all post info
 	postMetaSubStore           = []byte{0x01} // SubStore for all post mata info
@@ -127,12 +127,12 @@ func getBalanceHistoryKey(me string, bucketSlot int64) []byte {
 	return strconv.AppendInt(getBalanceHistoryPrefix(me), bucketSlot, 10)
 }
 
-func getGrantUserPrefix(me string) []byte {
-	return append(append(AccountGrantUserSubstore, me...), KeySeparator...)
+func getGrantPubKeyPrefix(me string) []byte {
+	return append(append(AccountGrantPubKeySubstore, me...), KeySeparator...)
 }
 
-func getGrantUserKey(me string, pubKey crypto.PubKey) []byte {
-	return append(getGrantUserPrefix(me), pubKey.Bytes()...)
+func getGrantPubKeyKey(me string, pubKey crypto.PubKey) []byte {
+	return append(getGrantPubKeyPrefix(me), pubKey.Bytes()...)
 }
 
 //

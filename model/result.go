@@ -36,7 +36,7 @@ type FrozenMoney struct {
 	Interval int64 `json:"interval"`
 }
 
-type GrantUser struct {
+type GrantPubKey struct {
 	Username   string `json:"username"`
 	Permission int    `json:"permission"`
 	LeftTimes  int64  `json:"left_times"`
