@@ -108,7 +108,7 @@ func (query *Query) GetUserAllPosts(username string) (map[string]*model.Post, er
 		return nil, err
 	}
 
-	var permlinkToPostMap map[string]*model.Post
+	var permlinkToPostMap = make(map[string]*model.Post)
 	for _, KV := range resKVs {
 		postInfo := new(model.PostInfo)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, postInfo); err != nil {
@@ -159,7 +159,7 @@ func (query *Query) GetAllPostComments(author, postID string) (map[string]*model
 		return nil, err
 	}
 
-	var permlinkToCommentMap map[string]*model.Comment
+	var permlinkToCommentMap = make(map[string]*model.Comment)
 	for _, KV := range resKVs {
 		comment := new(model.Comment)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, comment); err != nil {
@@ -178,7 +178,7 @@ func (query *Query) GetAllPostViews(author, postID string) (map[string]*model.Vi
 		return nil, err
 	}
 
-	var userToViewMap map[string]*model.View
+	var userToViewMap = make(map[string]*model.View)
 	for _, KV := range resKVs {
 		view := new(model.View)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, view); err != nil {
@@ -197,7 +197,7 @@ func (query *Query) GetAllPostDonations(author, postID string) (map[string]*mode
 		return nil, err
 	}
 
-	var userToDonationMap map[string]*model.Donations
+	var userToDonationMap = make(map[string]*model.Donations)
 	for _, KV := range resKVs {
 		donations := new(model.Donations)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, donations); err != nil {
@@ -235,7 +235,7 @@ func (query *Query) GetAllPostReportOrUpvotes(author, postID string) (map[string
 		return nil, err
 	}
 
-	var userToReportOrUpvotesMap map[string]*model.ReportOrUpvote
+	var userToReportOrUpvotesMap = make(map[string]*model.ReportOrUpvote)
 	for _, KV := range resKVs {
 		reportOrUpvote := new(model.ReportOrUpvote)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, reportOrUpvote); err != nil {
@@ -273,7 +273,7 @@ func (query *Query) GetAllPostLikes(author, postID string) (map[string]*model.Li
 		return nil, err
 	}
 
-	var userToLikeMap map[string]*model.Like
+	var userToLikeMap = make(map[string]*model.Like)
 	for _, KV := range resKVs {
 		like := new(model.Like)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, like); err != nil {

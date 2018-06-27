@@ -2,6 +2,7 @@ package query
 
 import (
 	"bytes"
+	"encoding/hex"
 	"strconv"
 
 	crypto "github.com/tendermint/go-crypto"
@@ -72,6 +73,10 @@ var (
 	accountParamSubstore                 = []byte{0x09} // Substore for account param
 	postParamSubStore                    = []byte{0x10} // Substore for evaluate of content value
 )
+
+func getHexSubstringAfterKeySeparator(key []byte) string {
+	return hex.EncodeToString(key[bytes.Index(key, []byte(KeySeparator)):])
+}
 
 func getSubstringAfterKeySeparator(key []byte) string {
 	return string(key[bytes.Index(key, []byte(KeySeparator)):])

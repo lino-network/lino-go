@@ -321,7 +321,7 @@ func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, validityPeriod int64, grantLevel int, times int64, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, validityPeriod int64, grantLevel model.Permission, times int64, privKeyHex string, seq int64) error {
 	msg := model.GrantPermissionMsg{
 		Username:        username,
 		AuthenticateApp: authenticateApp,
@@ -332,7 +332,7 @@ func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, va
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string, grantLevel int, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string, grantLevel model.Permission, privKeyHex string, seq int64) error {
 	pubKey, err := transport.GetPubKeyFromHex(pubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHex("Register: failed to get pub key").AddCause(err)
