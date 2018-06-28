@@ -109,7 +109,7 @@ func (query *Query) GetUserAllPosts(username string) (map[string]*model.Post, er
 		return nil, err
 	}
 
-	var permlinkToPostMap = make(map[string]*model.Post)
+	permlinkToPostMap := make(map[string]*model.Post)
 	for _, KV := range resKVs {
 		postInfo := new(model.PostInfo)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, postInfo); err != nil {
@@ -153,23 +153,42 @@ func (query *Query) GetUserAllPosts(username string) (map[string]*model.Post, er
 	return permlinkToPostMap, nil
 }
 
-func (query *Query) GetPostAllComments(author, postID string) (map[string]*model.Comment, error) {
+func (query *Query) GetPostAllComments(author, postID string) (map[string]*model.CommentPost, error) {
 	permlink := getPermlink(author, postID)
 	resKVs, err := query.transport.QuerySubspace(getPostCommentPrefix(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
-	var permlinkToCommentMap = make(map[string]*model.Comment)
+	var permlinkToCommentsMap = make(map[string]*model.CommentPost)
 	for _, KV := range resKVs {
 		comment := new(model.Comment)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, comment); err != nil {
 			return nil, err
 		}
-		permlinkToCommentMap[getSubstringAfterKeySeparator(KV.Key)] = comment
+
+		pi, err := query.GetPostInfo(comment.Author, comment.PostID)
+		if err != nil {
+			return nil, err
+		}
+
+		commentPost := &model.CommentPost{
+			Author:       comment.Author,
+			PostID:       comment.PostID,
+			CreatedAt:    comment.CreatedAt,
+			Title:        pi.Title,
+			Content:      pi.Content,
+			ParentAuthor: pi.ParentAuthor,
+			ParentPostID: pi.ParentPostID,
+			SourceAuthor: pi.SourceAuthor,
+			SourcePostID: pi.SourcePostID,
+			Links:        pi.Links,
+		}
+
+		permlinkToCommentsMap[getSubstringAfterKeySeparator(KV.Key)] = commentPost
 	}
 
-	return permlinkToCommentMap, nil
+	return permlinkToCommentsMap, nil
 }
 
 func (query *Query) GetPostAllViews(author, postID string) (map[string]*model.View, error) {
@@ -179,7 +198,7 @@ func (query *Query) GetPostAllViews(author, postID string) (map[string]*model.Vi
 		return nil, err
 	}
 
-	var userToViewMap = make(map[string]*model.View)
+	userToViewMap := make(map[string]*model.View)
 	for _, KV := range resKVs {
 		view := new(model.View)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, view); err != nil {
@@ -198,7 +217,7 @@ func (query *Query) GetPostAllDonations(author, postID string) (map[string]*mode
 		return nil, err
 	}
 
-	var userToDonationsMap = make(map[string]*model.Donations)
+	userToDonationsMap := make(map[string]*model.Donations)
 	for _, KV := range resKVs {
 		donations := new(model.Donations)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, donations); err != nil {
@@ -217,7 +236,7 @@ func (query *Query) GetPostAllReportOrUpvotes(author, postID string) (map[string
 		return nil, err
 	}
 
-	var userToReportOrUpvotesMap = make(map[string]*model.ReportOrUpvote)
+	userToReportOrUpvotesMap := make(map[string]*model.ReportOrUpvote)
 	for _, KV := range resKVs {
 		reportOrUpvote := new(model.ReportOrUpvote)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, reportOrUpvote); err != nil {
@@ -236,7 +255,7 @@ func (query *Query) GetPostAllLikes(author, postID string) (map[string]*model.Li
 		return nil, err
 	}
 
-	var userToLikeMap = make(map[string]*model.Like)
+	userToLikeMap := make(map[string]*model.Like)
 	for _, KV := range resKVs {
 		like := new(model.Like)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, like); err != nil {

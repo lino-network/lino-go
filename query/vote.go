@@ -84,23 +84,22 @@ func (query *Query) GetProposalAllVotes(prposalID string) ([]*model.Vote, error)
 	return votes, nil
 }
 
-func (query *Query) GetDelegatorAllDelegation(delegatorName string) ([]*model.Delegation, error) {
+func (query *Query) GetDelegatorAllDelegation(delegatorName string) (map[string]*model.Delegation, error) {
 	resKVs, err := query.transport.QuerySubspace(GetDelegateePrefix(delegatorName), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
-	var delegations []*model.Delegation
+	delegateeToDelegations := make(map[string]*model.Delegation)
 	for _, KV := range resKVs {
 		delegation := new(model.Delegation)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, delegation); err != nil {
 			return nil, err
 		}
-		delegations = append(delegations, delegation)
+		delegateeToDelegations[getSubstringAfterKeySeparator(KV.Key)] = delegation
 	}
 
-	// TODO: add delegatee name in the return slice.
-	return delegations, nil
+	return delegateeToDelegations, nil
 }
 
 // TODO: Get all votes by voter.
