@@ -8,13 +8,19 @@
   revision = "86fed781132ac890ee03e906e4ecd5d6fa180c64"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/btcsuite/btcutil"
+  packages = ["bech32"]
+  revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
+
+[[projects]]
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "types",
     "wire"
   ]
-  revision = "cf46be225b7f3853e36af0feac04e29188cd4c95"
-  version = "v0.17.5"
+  revision = "300a360714ffc5aff5864431076a43ec0e78d812"
+  version = "v0.19.1-rc0"
 
 [[projects]]
   branch = "master"
@@ -208,7 +214,7 @@
     "leveldb/table",
     "leveldb/util"
   ]
-  revision = "e2150783cd35f5b607daca48afd8c57ec54cc995"
+  revision = "0d5a0ceb10cf9ab89fdd744cc8c50a83134f6697"
 
 [[projects]]
   name = "github.com/tendermint/abci"
@@ -218,8 +224,8 @@
     "example/kvstore",
     "types"
   ]
-  revision = "78a8905690ef54f9d57e3b2b0ee7ad3a04ef3f1f"
-  version = "v0.10.3"
+  revision = "198dccf0ddfd1bb176f87657e3286a05a6ed9540"
+  version = "v0.12.0"
 
 [[projects]]
   branch = "master"
@@ -277,22 +283,24 @@
     "types",
     "version"
   ]
-  revision = "057e076ca914e25933a7517af64d7f86c8abdf97"
-  version = "v0.19.9"
+  revision = "46369a1ab76f274ab47179c4176221842b8207b4"
+  version = "v0.21.0"
 
 [[projects]]
   name = "github.com/tendermint/tmlibs"
   packages = [
     "autofile",
+    "bech32",
     "clist",
     "common",
     "db",
     "flowrate",
     "log",
-    "merkle"
+    "merkle",
+    "merkle/tmhash"
   ]
-  revision = "692f1d86a6e2c0efa698fd1e4541b68c74ffaf38"
-  version = "v0.8.4"
+  revision = "49596e0a1f48866603813df843c9409fc19805c6"
+  version = "v0.9.0"
 
 [[projects]]
   branch = "master"
@@ -308,7 +316,7 @@
     "ripemd160",
     "salsa20/salsa"
   ]
-  revision = "a8fb68e7206f8c78be19b432c58eb52a6aa34462"
+  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
 
 [[projects]]
   branch = "master"
@@ -322,13 +330,13 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "db08ff08e8622530d9ed3a0e8ac279f6d4c02196"
+  revision = "e514e69ffb8bc3c76a71ae40de0118d794855992"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "6c888cc515d3ed83fc103cf1d84468aad274b0a7"
+  revision = "7138fd3d9dc8335c567ca206f4333fb75eb05d56"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -389,6 +397,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2b0fcd42a5af01c0195e7621434f554b0ddcd7ce7f7504c6f663af3fbcb7dff4"
+  inputs-digest = "4ed7f3a3610d83eeca3161af4f671f5aeee82ff3e3d009562a2158b72cb4cae4"
   solver-name = "gps-cdcl"
   solver-version = 1
