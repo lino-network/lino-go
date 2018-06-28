@@ -2,6 +2,7 @@ package model
 
 // parameters can be changed by proposal
 type Parameter interface{}
+
 type EvaluateOfContentValueParam struct {
 	ConsumptionTimeAdjustBase      int64 `json:"consumption_time_adjust_base"`
 	ConsumptionTimeAdjustOffset    int64 `json:"consumption_time_adjust_offset"`

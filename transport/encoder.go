@@ -11,11 +11,13 @@ import (
 	crypto "github.com/tendermint/go-crypto"
 )
 
+// ZeroFee is used in building a standard transaction.
 var ZeroFee = model.Fee{
 	Amount: model.SDKCoins{},
 	Gas:    0,
 }
 
+// MakeCodec returns all interface and messages to Tendermint.
 func MakeCodec() *wire.Codec {
 	cdc := wire.NewCodec()
 
@@ -100,6 +102,7 @@ func MakeCodec() *wire.Codec {
 	return cdc
 }
 
+// EncodeTx encodes a message to the standard transaction.
 func EncodeTx(cdc *wire.Codec, msg interface{}, pubKey crypto.PubKey,
 	sig crypto.Signature, seq int64) ([]byte, error) {
 	stdSig := model.Signature{
@@ -116,6 +119,7 @@ func EncodeTx(cdc *wire.Codec, msg interface{}, pubKey crypto.PubKey,
 	return cdc.MarshalJSON(stdTx)
 }
 
+// EncodeSignMsg encodes the message to the standard signed message.
 func EncodeSignMsg(cdc *wire.Codec, msg interface{}, chainId string, seq int64) ([]byte, error) {
 	feeBytes, err := cdc.MarshalJSON(ZeroFee)
 	if err != nil {
@@ -125,7 +129,6 @@ func EncodeSignMsg(cdc *wire.Codec, msg interface{}, chainId string, seq int64) 
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println("++++msg: ", string(msgBytes))
 	stdSignMsg := model.SignMsg{
 		ChainID:        chainId,
 		AccountNumbers: []int64{},
@@ -136,6 +139,7 @@ func EncodeSignMsg(cdc *wire.Codec, msg interface{}, chainId string, seq int64) 
 	return json.Marshal(stdSignMsg)
 }
 
+// GetPrivKeyFromHex gets private key from private key hex.
 func GetPrivKeyFromHex(privHex string) (crypto.PrivKey, error) {
 	keyBytes, err := hex.DecodeString(privHex)
 	if err != nil {
@@ -144,6 +148,7 @@ func GetPrivKeyFromHex(privHex string) (crypto.PrivKey, error) {
 	return crypto.PrivKeyFromBytes(keyBytes)
 }
 
+// GetPubKeyFromHex gets public key from public key hex.
 func GetPubKeyFromHex(pubHex string) (crypto.PubKey, error) {
 	keyBytes, err := hex.DecodeString(pubHex)
 	if err != nil {

@@ -127,6 +127,7 @@ func (pm *PostMeta) Unmarshal(text string) (err error) {
 	return json.Unmarshal([]byte(text), pm)
 }
 
+// Post is the combination of PostInfo and PostMeta.
 type Post struct {
 	PostID                  string           `json:"post_id"`
 	Title                   string           `json:"title"`
@@ -192,10 +193,6 @@ type Donations struct {
 //
 // validator related struct
 //
-// type ABCIValidator struct {
-// 	PubKey []byte `protobuf:"bytes,1,opt,name=pub_key,json=pubKey,proto3" json:"pub_key,omitempty"`
-// 	Power  int64  `protobuf:"varint,2,opt,name=power,proto3" json:"power,omitempty"`
-// }
 type PubKey struct {
 	Type string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
 	Data []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
@@ -309,10 +306,13 @@ type ProposalList struct {
 //
 // others
 //
+
+// Coin is the same struct used in Lino blockchain.
 type Coin struct {
 	Amount mathutil.Int128 `json:"amount"`
 }
 
+// SDKCoin is the same struct used in cosmos-sdk.
 type SDKCoin struct {
 	Denom  string `json:"denom"`
 	Amount int64  `json:"amount"`
@@ -324,13 +324,13 @@ type Rat struct {
 	big.Rat `json:"rat"`
 }
 
-//Wraps r.MarshalText().
+// MarshalAmino wraps r.MarshalText().
 func (r Rat) MarshalAmino() (string, error) {
 	bz, err := (&(r.Rat)).MarshalText()
 	return string(bz), err
 }
 
-// Requires a valid JSON string - strings quotes and calls UnmarshalText
+// UnmarshalAmino requires a valid JSON string - strings quotes and calls UnmarshalText
 func (r *Rat) UnmarshalAmino(text string) (err error) {
 	tempRat := big.NewRat(0, 1)
 	err = tempRat.UnmarshalText([]byte(text))
