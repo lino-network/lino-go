@@ -9,7 +9,7 @@ import (
 var (
 	chainID = "lino-test"
 	// nodeURL = "http://18.188.188.164:46657/"
-	nodeURL = "http://localhost:46657"
+	nodeURL = "http://localhost:26657"
 
 	referrer          = "lino"
 	registerFee       = "1000000"
