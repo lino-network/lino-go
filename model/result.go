@@ -245,10 +245,6 @@ type Delegation struct {
 	Amount    Coin   `json:"amount"`
 }
 
-type DelegateeList struct {
-	DelegateeList []string `json:"delegatee_list"`
-}
-
 //
 // developer related
 //

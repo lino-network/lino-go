@@ -325,7 +325,7 @@ func (query *Query) GetAllGrantPubKeys(username string) (map[string]*model.Grant
 	if err != nil {
 		return nil, err
 	}
-	var pubKeyToGrantPubKeyMap = make(map[string]*model.GrantPubKey)
+	pubKeyToGrantPubKeyMap := make(map[string]*model.GrantPubKey)
 	for _, KV := range resKVs {
 		grantPubKey := new(model.GrantPubKey)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, grantPubKey); err != nil {
@@ -343,7 +343,7 @@ func (query *Query) GetAllRelationships(username string) (map[string]*model.Rela
 		return nil, err
 	}
 
-	var userToRelationshipMap = make(map[string]*model.Relationship)
+	userToRelationshipMap := make(map[string]*model.Relationship)
 	for _, KV := range resKVs {
 		relationship := new(model.Relationship)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, relationship); err != nil {
@@ -361,7 +361,7 @@ func (query *Query) GetAllFollowerMeta(username string) (map[string]*model.Follo
 		return nil, err
 	}
 
-	var followerToMetaMap = make(map[string]*model.FollowerMeta)
+	followerToMetaMap := make(map[string]*model.FollowerMeta)
 	for _, KV := range resKVs {
 		followerMeta := new(model.FollowerMeta)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, followerMeta); err != nil {
@@ -379,7 +379,7 @@ func (query *Query) GetAllFollowingMeta(username string) (map[string]*model.Foll
 		return nil, err
 	}
 
-	var followingMetas = make(map[string]*model.FollowingMeta)
+	followingMetas := make(map[string]*model.FollowingMeta)
 	for _, KV := range resKVs {
 		followingMeta := new(model.FollowingMeta)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, followingMeta); err != nil {
