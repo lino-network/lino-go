@@ -187,17 +187,17 @@ type DeveloperRevokeMsg struct {
 }
 
 type GrantPermissionMsg struct {
-	Username        string `json:"username"`
-	AuthenticateApp string `json:"authenticate_app"`
-	ValidityPeriod  int64  `json:"validity_period"`
-	GrantLevel      int    `json:"grant_level"`
-	Times           int64  `json:"times"`
+	Username        string     `json:"username"`
+	AuthenticateApp string     `json:"authenticate_app"`
+	ValidityPeriod  int64      `json:"validity_period"`
+	GrantLevel      Permission `json:"grant_level"`
+	Times           int64      `json:"times"`
 }
 
 type RevokePermissionMsg struct {
 	Username   string        `json:"username"`
 	PubKey     crypto.PubKey `json:"public_key"`
-	GrantLevel int           `json:"grant_level"`
+	GrantLevel Permission    `json:"grant_level"`
 }
 
 //

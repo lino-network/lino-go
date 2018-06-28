@@ -1,6 +1,8 @@
 package query
 
 import (
+	"bytes"
+	"encoding/hex"
 	"strconv"
 
 	crypto "github.com/tendermint/go-crypto"
@@ -31,7 +33,7 @@ var (
 	accountPendingStakeQueueSubstore = []byte{0x06}
 	accountRelationshipSubstore      = []byte{0x07}
 	accountBalanceHistorySubstore    = []byte{0x08}
-	AccountGrantPubKeySubstore       = []byte{0x09}
+	accountGrantPubKeySubstore       = []byte{0x09}
 
 	postInfoSubStore           = []byte{0x00} // SubStore for all post info
 	postMetaSubStore           = []byte{0x01} // SubStore for all post mata info
@@ -71,6 +73,18 @@ var (
 	accountParamSubstore                 = []byte{0x09} // Substore for account param
 	postParamSubStore                    = []byte{0x10} // Substore for evaluate of content value
 )
+
+func getHexSubstringAfterKeySeparator(key []byte) string {
+	return hex.EncodeToString(key[bytes.Index(key, []byte(KeySeparator)):])
+}
+
+func getSubstringAfterKeySeparator(key []byte) string {
+	return string(key[bytes.Index(key, []byte(KeySeparator)):])
+}
+
+func getSubstringAfterSubstore(key []byte) string {
+	return string(key[1:])
+}
 
 //
 // account related
@@ -127,7 +141,7 @@ func getBalanceHistoryKey(me string, bucketSlot int64) []byte {
 }
 
 func getGrantPubKeyPrefix(me string) []byte {
-	return append(append(AccountGrantPubKeySubstore, me...), KeySeparator...)
+	return append(append(accountGrantPubKeySubstore, me...), KeySeparator...)
 }
 
 func getGrantPubKeyKey(me string, pubKey crypto.PubKey) []byte {
@@ -165,10 +179,6 @@ func getPostLikeKey(permlink string, likeUser string) []byte {
 	return append(getPostLikePrefix(permlink), likeUser...)
 }
 
-func getUserReportOrUpvotePrefix(me string) []byte {
-	return append(append(postReportOrUpvoteSubStore, me...), KeySeparator...)
-}
-
 func getPostReportOrUpvotePrefix(permlink string) []byte {
 	return append(append(postReportOrUpvoteSubStore, permlink...), KeySeparator...)
 }
@@ -193,16 +203,12 @@ func getPostCommentKey(permlink string, commentPermlink string) []byte {
 	return append(getPostCommentPrefix(permlink), commentPermlink...)
 }
 
-func getUserDonationPrefix(me string) []byte {
-	return append(append(postDonationsSubStore, me...), KeySeparator...)
-}
-
-func getPostDonationPrefix(permlink string) []byte {
+func getPostDonationsPrefix(permlink string) []byte {
 	return append(append(postDonationsSubStore, permlink...), KeySeparator...)
 }
 
-func getPostDonationKey(permlink string, donateUser string) []byte {
-	return append(getPostDonationPrefix(permlink), donateUser...)
+func getPostDonationsKey(permlink string, donateUser string) []byte {
+	return append(getPostDonationsPrefix(permlink), donateUser...)
 }
 
 //
