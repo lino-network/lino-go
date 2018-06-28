@@ -30,9 +30,8 @@ var (
 	accountRewardSubstore            = []byte{0x05}
 	accountPendingStakeQueueSubstore = []byte{0x06}
 	accountRelationshipSubstore      = []byte{0x07}
-	accountGrantListSubstore         = []byte{0x08}
-	accountBalanceHistorySubstore    = []byte{0x09}
-	AccountGrantPubKeySubstore       = []byte{0x10}
+	accountBalanceHistorySubstore    = []byte{0x08}
+	AccountGrantPubKeySubstore       = []byte{0x09}
 
 	postInfoSubStore           = []byte{0x00} // SubStore for all post info
 	postMetaSubStore           = []byte{0x01} // SubStore for all post mata info
@@ -49,7 +48,7 @@ var (
 	voterSubstore         = []byte{0x01}
 	voteSubstore          = []byte{0x02}
 	referenceListSubStore = []byte{0x03}
-	delegateeListSubStore = []byte{0x04}
+	delegateeSubStore     = []byte{0x04}
 
 	developerSubstore     = []byte{0x00}
 	developerListSubstore = []byte{0x01}
@@ -138,7 +137,7 @@ func getGrantPubKeyKey(me string, pubKey crypto.PubKey) []byte {
 //
 // post related
 //
-func getPostKey(author string, postID string) string {
+func getPermlink(author string, postID string) string {
 	return string(author + "#" + postID)
 }
 
@@ -146,64 +145,64 @@ func getUserPostInfoPrefix(me string) []byte {
 	return append(postInfoSubStore, me...)
 }
 
-func getPostInfoKey(postKey string) []byte {
-	return append(postInfoSubStore, postKey...)
+func getPostInfoKey(permlink string) []byte {
+	return append(postInfoSubStore, permlink...)
 }
 
 func getUserPostMetaPrefix(me string) []byte {
 	return append(postMetaSubStore, me...)
 }
 
-func getPostMetaKey(postKey string) []byte {
-	return append(postMetaSubStore, postKey...)
+func getPostMetaKey(permlink string) []byte {
+	return append(postMetaSubStore, permlink...)
 }
 
-func getPostLikePrefix(postKey string) []byte {
-	return append(append(postLikeSubStore, postKey...), KeySeparator...)
+func getPostLikePrefix(permlink string) []byte {
+	return append(append(postLikeSubStore, permlink...), KeySeparator...)
 }
 
-func getPostLikeKey(postKey string, likeUser string) []byte {
-	return append(getPostLikePrefix(postKey), likeUser...)
+func getPostLikeKey(permlink string, likeUser string) []byte {
+	return append(getPostLikePrefix(permlink), likeUser...)
 }
 
 func getUserReportOrUpvotePrefix(me string) []byte {
 	return append(append(postReportOrUpvoteSubStore, me...), KeySeparator...)
 }
 
-func getPostReportOrUpvotePrefix(postKey string) []byte {
-	return append(append(postReportOrUpvoteSubStore, postKey...), KeySeparator...)
+func getPostReportOrUpvotePrefix(permlink string) []byte {
+	return append(append(postReportOrUpvoteSubStore, permlink...), KeySeparator...)
 }
 
-func getPostReportOrUpvoteKey(postKey string, user string) []byte {
-	return append(getPostReportOrUpvotePrefix(postKey), user...)
+func getPostReportOrUpvoteKey(permlink string, user string) []byte {
+	return append(getPostReportOrUpvotePrefix(permlink), user...)
 }
 
-func getPostViewPrefix(postKey string) []byte {
-	return append(append(postViewsSubStore, postKey...), KeySeparator...)
+func getPostViewPrefix(permlink string) []byte {
+	return append(append(postViewsSubStore, permlink...), KeySeparator...)
 }
 
-func getPostViewKey(postKey string, viewUser string) []byte {
-	return append(getPostViewPrefix(postKey), viewUser...)
+func getPostViewKey(permlink string, viewUser string) []byte {
+	return append(getPostViewPrefix(permlink), viewUser...)
 }
 
-func getPostCommentPrefix(postKey string) []byte {
-	return append(append(postCommentSubStore, postKey...), KeySeparator...)
+func getPostCommentPrefix(permlink string) []byte {
+	return append(append(postCommentSubStore, permlink...), KeySeparator...)
 }
 
-func getPostCommentKey(postKey string, commentPostKey string) []byte {
-	return append(getPostCommentPrefix(postKey), commentPostKey...)
+func getPostCommentKey(permlink string, commentPermlink string) []byte {
+	return append(getPostCommentPrefix(permlink), commentPermlink...)
 }
 
 func getUserDonationPrefix(me string) []byte {
 	return append(append(postDonationsSubStore, me...), KeySeparator...)
 }
 
-func getPostDonationPrefix(postKey string) []byte {
-	return append(append(postDonationsSubStore, postKey...), KeySeparator...)
+func getPostDonationPrefix(permlink string) []byte {
+	return append(append(postDonationsSubStore, permlink...), KeySeparator...)
 }
 
-func getPostDonationKey(postKey string, donateUser string) []byte {
-	return append(getPostDonationPrefix(postKey), donateUser...)
+func getPostDonationKey(permlink string, donateUser string) []byte {
+	return append(getPostDonationPrefix(permlink), donateUser...)
 }
 
 //
@@ -244,8 +243,12 @@ func GetReferenceListKey() []byte {
 	return referenceListSubStore
 }
 
-func GetDelegateeListKey(me string) []byte {
-	return append(delegateeListSubStore, me...)
+func GetDelegateePrefix(me string) []byte {
+	return append(append(delegateeSubStore, me...), KeySeparator...)
+}
+
+func GetDelegateeKey(me, delegatee string) []byte {
+	return append(GetDelegateePrefix(me), delegatee...)
 }
 
 //

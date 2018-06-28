@@ -8,8 +8,8 @@ import (
 // Post related query
 //
 func (query *Query) GetPostInfo(author, postID string) (*model.PostInfo, error) {
-	postKey := getPostKey(author, postID)
-	resp, err := query.transport.Query(getPostInfoKey(postKey), PostKVStoreKey)
+	permlink := getPermlink(author, postID)
+	resp, err := query.transport.Query(getPostInfoKey(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -21,8 +21,8 @@ func (query *Query) GetPostInfo(author, postID string) (*model.PostInfo, error) 
 }
 
 func (query *Query) GetPostMeta(author, postID string) (*model.PostMeta, error) {
-	postKey := getPostKey(author, postID)
-	resp, err := query.transport.Query(getPostMetaKey(postKey), PostKVStoreKey)
+	permlink := getPermlink(author, postID)
+	resp, err := query.transport.Query(getPostMetaKey(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -33,9 +33,9 @@ func (query *Query) GetPostMeta(author, postID string) (*model.PostMeta, error) 
 	return postMeta, nil
 }
 
-func (query *Query) GetPostComment(author, postID, commentPostKey string) (*model.Comment, error) {
-	postKey := getPostKey(author, postID)
-	resp, err := query.transport.Query(getPostCommentKey(postKey, commentPostKey), PostKVStoreKey)
+func (query *Query) GetPostComment(author, postID, commentPermlink string) (*model.Comment, error) {
+	permlink := getPermlink(author, postID)
+	resp, err := query.transport.Query(getPostCommentKey(permlink, commentPermlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -47,8 +47,8 @@ func (query *Query) GetPostComment(author, postID, commentPostKey string) (*mode
 }
 
 func (query *Query) GetPostView(author, postID, viewUser string) (*model.View, error) {
-	postKey := getPostKey(author, postID)
-	resp, err := query.transport.Query(getPostViewKey(postKey, viewUser), PostKVStoreKey)
+	permlink := getPermlink(author, postID)
+	resp, err := query.transport.Query(getPostViewKey(permlink, viewUser), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -59,22 +59,22 @@ func (query *Query) GetPostView(author, postID, viewUser string) (*model.View, e
 	return view, nil
 }
 
-func (query *Query) GetPostDonation(author, postID, donateUser string) (*model.Donation, error) {
-	postKey := getPostKey(author, postID)
-	resp, err := query.transport.Query(getPostDonationKey(postKey, donateUser), PostKVStoreKey)
+func (query *Query) GetPostDonations(author, postID, donateUser string) (*model.Donations, error) {
+	permlink := getPermlink(author, postID)
+	resp, err := query.transport.Query(getPostDonationKey(permlink, donateUser), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
-	donation := new(model.Donation)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, donation); err != nil {
+	donations := new(model.Donations)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, donations); err != nil {
 		return nil, err
 	}
-	return donation, nil
+	return donations, nil
 }
 
 func (query *Query) GetPostReportOrUpvote(author, postID, user string) (*model.ReportOrUpvote, error) {
-	postKey := getPostKey(author, postID)
-	resp, err := query.transport.Query(getPostReportOrUpvoteKey(postKey, user), PostKVStoreKey)
+	permlink := getPermlink(author, postID)
+	resp, err := query.transport.Query(getPostReportOrUpvoteKey(permlink, user), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -86,8 +86,8 @@ func (query *Query) GetPostReportOrUpvote(author, postID, user string) (*model.R
 }
 
 func (query *Query) GetPostLike(author, postID, likeUser string) (*model.Like, error) {
-	postKey := getPostKey(author, postID)
-	resp, err := query.transport.Query(getPostLikeKey(postKey, likeUser), PostKVStoreKey)
+	permlink := getPermlink(author, postID)
+	resp, err := query.transport.Query(getPostLikeKey(permlink, likeUser), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -152,9 +152,9 @@ func (query *Query) GetUserAllPosts(username string) ([]*model.Post, error) {
 	return posts, nil
 }
 
-func (query *Query) GetAllPostComments(author, postID string) ([]*model.Comment, error) {
-	postKey := getPostKey(author, postID)
-	resKVs, err := query.transport.QuerySubspace(getPostCommentPrefix(postKey), PostKVStoreKey)
+func (query *Query) GetPostAllComments(author, postID string) ([]*model.Comment, error) {
+	permlink := getPermlink(author, postID)
+	resKVs, err := query.transport.QuerySubspace(getPostCommentPrefix(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -171,9 +171,9 @@ func (query *Query) GetAllPostComments(author, postID string) ([]*model.Comment,
 	return comments, nil
 }
 
-func (query *Query) GetAllPostViews(author, postID string) ([]*model.View, error) {
-	postKey := getPostKey(author, postID)
-	resKVs, err := query.transport.QuerySubspace(getPostViewPrefix(postKey), PostKVStoreKey)
+func (query *Query) GetPostAllViews(author, postID string) ([]*model.View, error) {
+	permlink := getPermlink(author, postID)
+	resKVs, err := query.transport.QuerySubspace(getPostViewPrefix(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -190,47 +190,28 @@ func (query *Query) GetAllPostViews(author, postID string) ([]*model.View, error
 	return views, nil
 }
 
-func (query *Query) GetAllPostDonations(author, postID string) ([]*model.Donation, error) {
-	postKey := getPostKey(author, postID)
-	resKVs, err := query.transport.QuerySubspace(getPostDonationPrefix(postKey), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-
-	var donations []*model.Donation
-	for _, KV := range resKVs {
-		donation := new(model.Donation)
-		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, donation); err != nil {
-			return nil, err
-		}
-		donations = append(donations, donation)
-	}
-
-	return donations, nil
-}
-
 // TODO: how to know the postID?
-func (query *Query) GetAllUserDonations(username string) ([]*model.Donation, error) {
+func (query *Query) GetUserAllDonations(username string) ([]*model.Donations, error) {
 	resKVs, err := query.transport.QuerySubspace(getUserDonationPrefix(username), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
-	var donations []*model.Donation
+	var donationsList []*model.Donations
 	for _, KV := range resKVs {
-		donation := new(model.Donation)
-		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, donation); err != nil {
+		donations := new(model.Donations)
+		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, donations); err != nil {
 			return nil, err
 		}
-		donations = append(donations, donation)
+		donationsList = append(donationsList, donations)
 	}
 
-	return donations, nil
+	return donationsList, nil
 }
 
-func (query *Query) GetAllPostReportOrUpvotes(author, postID string) ([]*model.ReportOrUpvote, error) {
-	postKey := getPostKey(author, postID)
-	resKVs, err := query.transport.QuerySubspace(getPostReportOrUpvotePrefix(postKey), PostKVStoreKey)
+func (query *Query) GetPostAllReportOrUpvotes(author, postID string) ([]*model.ReportOrUpvote, error) {
+	permlink := getPermlink(author, postID)
+	resKVs, err := query.transport.QuerySubspace(getPostReportOrUpvotePrefix(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -248,7 +229,7 @@ func (query *Query) GetAllPostReportOrUpvotes(author, postID string) ([]*model.R
 }
 
 // TODO: how to know the postID?
-func (query *Query) GetAllUserReportOrUpvotes(username string) ([]*model.ReportOrUpvote, error) {
+func (query *Query) GetUserAllReportOrUpvotes(username string) ([]*model.ReportOrUpvote, error) {
 	resKVs, err := query.transport.QuerySubspace(getUserReportOrUpvotePrefix(username), PostKVStoreKey)
 	if err != nil {
 		return nil, err
@@ -266,9 +247,9 @@ func (query *Query) GetAllUserReportOrUpvotes(username string) ([]*model.ReportO
 	return reportOrUpvotes, nil
 }
 
-func (query *Query) GetAllPostLikes(author, postID string) ([]*model.Like, error) {
-	postKey := getPostKey(author, postID)
-	resKVs, err := query.transport.QuerySubspace(getPostLikePrefix(postKey), PostKVStoreKey)
+func (query *Query) GetPostAllLikes(author, postID string) ([]*model.Like, error) {
+	permlink := getPermlink(author, postID)
+	resKVs, err := query.transport.QuerySubspace(getPostLikePrefix(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}

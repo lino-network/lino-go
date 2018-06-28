@@ -51,11 +51,6 @@ type AccountMeta struct {
 	JSONMeta            string `json:"json_meta"`
 }
 
-type AccountInfraConsumption struct {
-	Storage   int64 `json:"storage"`
-	Bandwidth int64 `json:"bandwidth"`
-}
-
 type FollowerMeta struct {
 	CreatedAt    int64  `json:"created_at"`
 	FollowerName string `json:"follower_name"`
@@ -248,10 +243,6 @@ type Vote struct {
 type Delegation struct {
 	Delegator string `json:"delegator"`
 	Amount    Coin   `json:"amount"`
-}
-
-type DelegateeList struct {
-	DelegateeList []string `json:"delegatee_list"`
 }
 
 //

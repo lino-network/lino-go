@@ -32,18 +32,6 @@ func (query *Query) GetVoter(voterName string) (*model.Voter, error) {
 	return voter, nil
 }
 
-func (query *Query) GetDelegateeList(delegatorName string) (*model.DelegateeList, error) {
-	resp, err := query.transport.Query(GetDelegateeListKey(delegatorName), VoteKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-	delegateeList := new(model.DelegateeList)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, delegateeList); err != nil {
-		return nil, err
-	}
-	return delegateeList, nil
-}
-
 func (query *Query) GetVote(proposalID, voter string) (*model.Vote, error) {
 	resp, err := query.transport.Query(getVoteKey(proposalID, voter), VoteKVStoreKey)
 	if err != nil {
@@ -96,22 +84,22 @@ func (query *Query) GetProposalAllVotes(prposalID string) ([]*model.Vote, error)
 	return votes, nil
 }
 
-func (query *Query) GetAllDelegationByDelegator(delegatorName string) ([]*model.Delegation, error) {
-	list, err := query.GetDelegateeList(delegatorName)
+func (query *Query) GetDelegatorAllDelegation(delegatorName string) ([]*model.Delegation, error) {
+	resKVs, err := query.transport.QuerySubspace(GetDelegateePrefix(delegatorName), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var delegations []*model.Delegation
-	for _, delegatee := range list.DelegateeList {
-		d, err := query.GetDelegation(delegatee, delegatorName)
-		if err != nil {
+	for _, KV := range resKVs {
+		delegation := new(model.Delegation)
+		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, delegation); err != nil {
 			return nil, err
 		}
-
-		delegations = append(delegations, d)
+		delegations = append(delegations, delegation)
 	}
 
+	// TODO: add delegatee name in the return slice.
 	return delegations, nil
 }
 
