@@ -172,19 +172,6 @@ type Comment struct {
 	CreatedAt int64  `json:"created_at"`
 }
 
-type CommentPost struct {
-	Author       string           `json:"author"`
-	PostID       string           `json:"post_key"`
-	CreatedAt    int64            `json:"created_at"`
-	Title        string           `json:"title"`
-	Content      string           `json:"content"`
-	ParentAuthor string           `json:"parent_author"`
-	ParentPostID string           `json:"parent_postID"`
-	SourceAuthor string           `json:"source_author"`
-	SourcePostID string           `json:"source_postID"`
-	Links        []IDToURLMapping `json:"links"`
-}
-
 type View struct {
 	Username   string `json:"username"`
 	LastViewAt int64  `json:"last_view_at"`

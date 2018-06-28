@@ -153,39 +153,21 @@ func (query *Query) GetUserAllPosts(username string) (map[string]*model.Post, er
 	return permlinkToPostMap, nil
 }
 
-func (query *Query) GetPostAllComments(author, postID string) (map[string]*model.CommentPost, error) {
+func (query *Query) GetPostAllComments(author, postID string) (map[string]*model.Comment, error) {
 	permlink := getPermlink(author, postID)
 	resKVs, err := query.transport.QuerySubspace(getPostCommentPrefix(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
 
-	var permlinkToCommentsMap = make(map[string]*model.CommentPost)
+	var permlinkToCommentsMap = make(map[string]*model.Comment)
 	for _, KV := range resKVs {
 		comment := new(model.Comment)
 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, comment); err != nil {
 			return nil, err
 		}
 
-		pi, err := query.GetPostInfo(comment.Author, comment.PostID)
-		if err != nil {
-			return nil, err
-		}
-
-		commentPost := &model.CommentPost{
-			Author:       comment.Author,
-			PostID:       comment.PostID,
-			CreatedAt:    comment.CreatedAt,
-			Title:        pi.Title,
-			Content:      pi.Content,
-			ParentAuthor: pi.ParentAuthor,
-			ParentPostID: pi.ParentPostID,
-			SourceAuthor: pi.SourceAuthor,
-			SourcePostID: pi.SourcePostID,
-			Links:        pi.Links,
-		}
-
-		permlinkToCommentsMap[getSubstringAfterKeySeparator(KV.Key)] = commentPost
+		permlinkToCommentsMap[getSubstringAfterKeySeparator(KV.Key)] = comment
 	}
 
 	return permlinkToCommentsMap, nil
