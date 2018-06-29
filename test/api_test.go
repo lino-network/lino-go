@@ -9,7 +9,7 @@ import (
 var (
 	chainID = "lino-test"
 	// nodeURL = "http://18.188.188.164:26657/"
-	nodeURL = "http://localhost:46657"
+	nodeURL = "http://localhost:26657"
 
 	referrer          = "lino"
 	registerFee       = "1000000"
@@ -239,11 +239,10 @@ func TestPost(t *testing.T) {
 		t.Errorf("TestPost: failed to get post info: %v", err)
 	}
 
-	pm, err := testAPI.GetPostMeta(myUser, post1)
+	_, err = testAPI.GetPostMeta(myUser, post1)
 	if err != nil {
 		t.Errorf("TestPost: failed to get post meta: %v", err)
 	}
-	t.Errorf("----pm: %v", pm)
 
 	seq, err := testAPI.GetSeqNumber(myUser)
 	if err != nil {

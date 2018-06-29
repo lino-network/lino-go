@@ -117,15 +117,6 @@ type PostMeta struct {
 	RedistributionSplitRate string `json:"redistribution_split_rate"`
 }
 
-// func (pm PostMeta) Marshal() (string, error) {
-// 	bz, err := json.Marshal(pm)
-// 	return string(bz), err
-// }
-
-// func (pm *PostMeta) Unmarshal(text string) (err error) {
-// 	return json.Unmarshal([]byte(text), pm)
-// }
-
 // Post is the combination of PostInfo and PostMeta.
 type Post struct {
 	PostID                  string           `json:"post_id"`
