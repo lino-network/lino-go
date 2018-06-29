@@ -144,3 +144,17 @@ func (query *Query) GetAccountParam() (*model.AccountParam, error) {
 	}
 	return param, nil
 }
+
+// GetPostParam returns the PostParam.
+func (query *Query) GetPostParam() (*model.PostParam, error) {
+	resp, err := query.transport.Query(getPostParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.PostParam)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}

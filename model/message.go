@@ -214,7 +214,7 @@ type ProviderReportMsg struct {
 //
 type DeletePostContentMsg struct {
 	Creator  string `json:"creator"`
-	PermLink string `json:"permLink"`
+	Permlink string `json:"permlink"`
 	Reason   string `json:"reason"`
 }
 

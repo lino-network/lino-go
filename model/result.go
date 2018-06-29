@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"math/big"
 
 	"github.com/cznic/mathutil"
@@ -114,18 +113,18 @@ type PostMeta struct {
 	TotalReportStake        Coin   `json:"total_report_stake"`
 	TotalUpvoteStake        Coin   `json:"total_upvote_stake"`
 	TotalViewCount          int64  `json:"total_view_count"`
-	TotalReward             Coin   `json:"reward"`
+	TotalReward             Coin   `json:"total_reward"`
 	RedistributionSplitRate string `json:"redistribution_split_rate"`
 }
 
-func (pm PostMeta) Marshal() (string, error) {
-	bz, err := json.Marshal(pm)
-	return string(bz), err
-}
+// func (pm PostMeta) Marshal() (string, error) {
+// 	bz, err := json.Marshal(pm)
+// 	return string(bz), err
+// }
 
-func (pm *PostMeta) Unmarshal(text string) (err error) {
-	return json.Unmarshal([]byte(text), pm)
-}
+// func (pm *PostMeta) Unmarshal(text string) (err error) {
+// 	return json.Unmarshal([]byte(text), pm)
+// }
 
 // Post is the combination of PostInfo and PostMeta.
 type Post struct {

@@ -556,10 +556,10 @@ func (broadcast *Broadcast) ChangePostParam(creator string, parameter model.Post
 // for content censorship.
 // It composes DeletePostContentMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) DeletePostContent(creator, postAuthor, postID, reason, privKeyHex string, seq int64) error {
-	permLink := string(string(postAuthor) + "#" + postID)
+	permlink := string(string(postAuthor) + "#" + postID)
 	msg := model.DeletePostContentMsg{
 		Creator:  creator,
-		PermLink: permLink,
+		Permlink: permlink,
 		Reason:   reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
