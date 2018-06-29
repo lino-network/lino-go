@@ -11,20 +11,22 @@ type Transaction struct {
 }
 
 type Signature struct {
-	PubKey   crypto.PubKey    `json:"pub_key"`
-	Sig      crypto.Signature `json:"signature"`
-	Sequence int64            `json:"sequence"`
+	PubKey        crypto.PubKey    `json:"pub_key"`
+	Sig           crypto.Signature `json:"signature"`
+	AccountNumber int64            `json:"account_number"`
+	Sequence      int64            `json:"sequence"`
 }
 
 type SignMsg struct {
-	ChainID   string  `json:"chain_id"`
-	Sequences []int64 `json:"sequences"`
-	FeeBytes  []byte  `json:"fee_bytes"`
-	MsgBytes  []byte  `json:"msg_bytes"`
-	AltBytes  []byte  `json:"alt_bytes"`
+	ChainID        string  `json:"chain_id"`
+	AccountNumbers []int64 `json:"account_numbers"`
+	Sequences      []int64 `json:"sequences"`
+	FeeBytes       []byte  `json:"fee_bytes"`
+	MsgBytes       []byte  `json:"msg_bytes"`
+	AltBytes       []byte  `json:"alt_bytes"`
 }
 
 type Fee struct {
-	Amount []int64 `json"amount"`
-	Gas    int64   `json"gas"`
+	Amount SDKCoins `json:"amount"`
+	Gas    int64    `json:"gas"`
 }

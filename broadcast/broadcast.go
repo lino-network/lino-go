@@ -1,16 +1,19 @@
+// Pacakge broadcast includes the functionalities to broadcast
+// all kinds of transactions to blockchain.
 package broadcast
 
 import (
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
-	"github.com/lino-network/lino-go/types"
 )
 
+// Broadcast is a wrapper of broadcasting transactions to blockchain.
 type Broadcast struct {
 	transport *transport.Transport
 }
 
+// NewBroadcast returns an instance of Broadcast.
 func NewBroadcast(transport *transport.Transport) *Broadcast {
 	return &Broadcast{
 		transport: transport,
@@ -20,31 +23,42 @@ func NewBroadcast(transport *transport.Transport) *Broadcast {
 //
 // Account related tx
 //
-func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubKeyHex, transactionPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
+
+// Register registers a new user on blockchain.
+// It composes RegisterMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubKeyHex,
+	transactionPubKeyHex, micropaymentPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
 	masterPubKey, err := transport.GetPubKeyFromHex(masterPubKeyHex)
 	if err != nil {
-		return err
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get Master pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(transactionPubKeyHex)
 	if err != nil {
-		return err
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
+	}
+	micropaymentPubKey, err := transport.GetPubKeyFromHex(micropaymentPubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get Micropayment pub key").AddCause(err)
 	}
 	postPubKey, err := transport.GetPubKeyFromHex(postPubKeyHex)
 	if err != nil {
-		return err
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get Post pub key").AddCause(err)
 	}
 
 	msg := model.RegisterMsg{
-		Referrer:             referrer,
-		RegisterFee:          registerFee,
-		NewUser:              username,
-		NewMasterPubKey:      masterPubKey,
-		NewTransactionPubKey: txPubKey,
-		NewPostPubKey:        postPubKey,
+		Referrer:              referrer,
+		RegisterFee:           registerFee,
+		NewUser:               username,
+		NewMasterPubKey:       masterPubKey,
+		NewTransactionPubKey:  txPubKey,
+		NewMicropaymentPubKey: micropaymentPubKey,
+		NewPostPubKey:         postPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, referrerPrivKeyHex, seq)
 }
 
+// Transfer sends a certain amount of LINO token from the sender to the receiver.
+// It composes TransferMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Transfer(sender, receiver, amount, memo, privKeyHex string, seq int64) error {
 	msg := model.TransferMsg{
 		Sender:   sender,
@@ -55,6 +69,8 @@ func (broadcast *Broadcast) Transfer(sender, receiver, amount, memo, privKeyHex 
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// Follow creates a social relationship between follower and followee.
+// It composes FollowMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Follow(follower, followee, privKeyHex string, seq int64) error {
 	msg := model.FollowMsg{
 		Follower: follower,
@@ -63,6 +79,8 @@ func (broadcast *Broadcast) Follow(follower, followee, privKeyHex string, seq in
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// Unfollow revokes the social relationship between follower and followee.
+// It composes UnfollowMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Unfollow(follower, followee, privKeyHex string, seq int64) error {
 	msg := model.UnfollowMsg{
 		Follower: follower,
@@ -71,6 +89,8 @@ func (broadcast *Broadcast) Unfollow(follower, followee, privKeyHex string, seq 
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// Claim claims rewards of a certain user.
+// It composes ClaimMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Claim(username, privKeyHex string, seq int64) error {
 	msg := model.ClaimMsg{
 		Username: username,
@@ -78,6 +98,9 @@ func (broadcast *Broadcast) Claim(username, privKeyHex string, seq int64) error 
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// UpdateAccount updates account related info in jsonMeta which are not
+// included in AccountInfo or AccountBank.
+// It composes UpdateAccountMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) UpdateAccount(username, jsonMeta, privKeyHex string, seq int64) error {
 	msg := model.UpdateAccountMsg{
 		Username: username,
@@ -86,25 +109,32 @@ func (broadcast *Broadcast) UpdateAccount(username, jsonMeta, privKeyHex string,
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newPostPubKeyHex, newTransactionPubKeyHex, privKeyHex string, seq int64) error {
+// Recover resets all keys of a user in case of losing or compromising.
+// It composes RecoverMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newTransactionPubKeyHex, newMicropaymentPubKeyHex, newPostPubKeyHex, privKeyHex string, seq int64) error {
 	masterPubKey, err := transport.GetPubKeyFromHex(newMasterPubKeyHex)
 	if err != nil {
-		return nil
-	}
-	postPubKey, err := transport.GetPubKeyFromHex(newPostPubKeyHex)
-	if err != nil {
-		return nil
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Master pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(newTransactionPubKeyHex)
 	if err != nil {
-		return err
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Tx pub key").AddCause(err)
+	}
+	micropaymentPubKey, err := transport.GetPubKeyFromHex(newMicropaymentPubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Micropayment pub key").AddCause(err)
+	}
+	postPubKey, err := transport.GetPubKeyFromHex(newPostPubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Post pub key").AddCause(err)
 	}
 
 	msg := model.RecoverMsg{
-		Username:             username,
-		NewMasterPubKey:      masterPubKey,
-		NewPostPubKey:        postPubKey,
-		NewTransactionPubKey: txPubKey,
+		Username:              username,
+		NewMasterPubKey:       masterPubKey,
+		NewTransactionPubKey:  txPubKey,
+		NewMicropaymentPubKey: micropaymentPubKey,
+		NewPostPubKey:         postPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
@@ -112,6 +142,9 @@ func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newPostPubKeyH
 //
 // Post related tx
 //
+
+// CreatePost creates a new post on blockchain.
+// It composes CreatePostMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) CreatePost(author, postID, title, content, parentAuthor, parentPostID,
 	sourceAuthor, sourcePostID, redistributionSplitRate string, links map[string]string, privKeyHex string, seq int64) error {
 	var mLinks []model.IDToURLMapping
@@ -138,6 +171,8 @@ func (broadcast *Broadcast) CreatePost(author, postID, title, content, parentAut
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// Like adds a weighted-like to a post that is performed by a user.
+// It composes LikeMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Like(username, author string, weight int64, postID, privKeyHex string, seq int64) error {
 	msg := model.LikeMsg{
 		Username: username,
@@ -148,18 +183,23 @@ func (broadcast *Broadcast) Like(username, author string, weight int64, postID, 
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) Donate(username, author, amount, postID, fromApp, memo, privKeyHex string, seq int64) error {
+// Donate adds a money donation to a post by a user.
+// It composes DonateMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) Donate(username, author, amount, postID, fromApp, memo string, isMicroPayment bool, privKeyHex string, seq int64) error {
 	msg := model.DonateMsg{
-		Username: username,
-		Amount:   amount,
-		Author:   author,
-		PostID:   postID,
-		FromApp:  fromApp,
-		Memo:     memo,
+		Username:       username,
+		Amount:         amount,
+		Author:         author,
+		PostID:         postID,
+		FromApp:        fromApp,
+		Memo:           memo,
+		IsMicroPayment: isMicroPayment,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ReportOrUpvote adds a report or upvote action to a post.
+// It composes ReportOrUpvoteMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ReportOrUpvote(username, author, postID string, isReport bool, privKeyHex string, seq int64) error {
 	msg := model.ReportOrUpvoteMsg{
 		Username: username,
@@ -170,6 +210,10 @@ func (broadcast *Broadcast) ReportOrUpvote(username, author, postID string, isRe
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// DeletePost deletes a post from the blockchain. It doesn't actually
+// remove the post from the blockchain, instead it sets IsDeleted to true
+// and clears all the other data.
+// It composes DeletePostMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) DeletePost(author, postID, privKeyHex string, seq int64) error {
 	msg := model.DeletePostMsg{
 		Author: author,
@@ -178,6 +222,8 @@ func (broadcast *Broadcast) DeletePost(author, postID, privKeyHex string, seq in
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// View increases the view count of a post by one.
+// It composes ViewMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) View(username, author, postID, privKeyHex string, seq int64) error {
 	msg := model.ViewMsg{
 		Username: username,
@@ -187,6 +233,8 @@ func (broadcast *Broadcast) View(username, author, postID, privKeyHex string, se
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// UpdatePost updates post info with new data.
+// It composes UpdatePostMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) UpdatePost(author, title, postID, content, redistributionSplitRate string, links map[string]string, privKeyHex string, seq int64) error {
 	var mLinks []model.IDToURLMapping
 	if links == nil || len(links) == 0 {
@@ -211,10 +259,15 @@ func (broadcast *Broadcast) UpdatePost(author, title, postID, content, redistrib
 //
 // Validator related tx
 //
+
+// ValidatorDeposit deposits a certain amount of LINO token for a user
+// in order to become a validator. Before becoming a validator, the user
+// has to be a voter.
+// It composes ValidatorDepositMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ValidatorDeposit(username, deposit, validatorPubKey, link, privKeyHex string, seq int64) error {
 	valPubKey, err := transport.GetPubKeyFromHex(validatorPubKey)
 	if err != nil {
-		return err
+		return errors.FailedToGetPubKeyFromHexf("ValidatorDeposit: failed to get Val pub key").AddCause(err)
 	}
 	msg := model.ValidatorDepositMsg{
 		Username:  username,
@@ -225,6 +278,9 @@ func (broadcast *Broadcast) ValidatorDeposit(username, deposit, validatorPubKey,
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ValidatorWithdraw withdraws part of LINO token from a validator's deposit,
+// while still keep being a validator.
+// It composes ValidatorDepositMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ValidatorWithdraw(username, amount, privKeyHex string, seq int64) error {
 	msg := model.ValidatorWithdrawMsg{
 		Username: username,
@@ -233,6 +289,9 @@ func (broadcast *Broadcast) ValidatorWithdraw(username, amount, privKeyHex strin
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ValidatorRevoke revokes all deposited LINO token of a validator
+// so that the user will not be a validator anymore.
+// It composes ValidatorRevokeMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ValidatorRevoke(username, privKeyHex string, seq int64) error {
 	msg := model.ValidatorRevokeMsg{
 		Username: username,
@@ -243,6 +302,10 @@ func (broadcast *Broadcast) ValidatorRevoke(username, privKeyHex string, seq int
 //
 // Vote related tx
 //
+
+// VoterDeposit deposits a certain amount of LINO token for a user
+// in order to become a voter.
+// It composes VoterDepositMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) VoterDeposit(username, deposit, privKeyHex string, seq int64) error {
 	msg := model.VoterDepositMsg{
 		Username: username,
@@ -251,6 +314,9 @@ func (broadcast *Broadcast) VoterDeposit(username, deposit, privKeyHex string, s
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// VoterWithdraw withdraws part of LINO token from a voter's deposit,
+// while still keep being a voter.
+// It composes VoterWithdrawMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) VoterWithdraw(username, amount, privKeyHex string, seq int64) error {
 	msg := model.VoterWithdrawMsg{
 		Username: username,
@@ -259,6 +325,9 @@ func (broadcast *Broadcast) VoterWithdraw(username, amount, privKeyHex string, s
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// VoterRevoke reovkes all deposited LINO token of a voter
+// so the user will not be a voter anymore.
+// It composes VoterRevokeMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) VoterRevoke(username, privKeyHex string, seq int64) error {
 	msg := model.VoterRevokeMsg{
 		Username: username,
@@ -266,6 +335,9 @@ func (broadcast *Broadcast) VoterRevoke(username, privKeyHex string, seq int64) 
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// Delegate delegates a certain amount of LINO token of delegator to a voter, so
+// the voter will have more voting power.
+// It composes DelegateMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Delegate(delegator, voter, amount, privKeyHex string, seq int64) error {
 	msg := model.DelegateMsg{
 		Delegator: delegator,
@@ -275,6 +347,9 @@ func (broadcast *Broadcast) Delegate(delegator, voter, amount, privKeyHex string
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// DelegatorWithdraw withdraws part of delegated LINO token of a delegator
+// to a voter, while the delegation still exists.
+// It composes DelegatorWithdrawMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) DelegatorWithdraw(delegator, voter, amount, privKeyHex string, seq int64) error {
 	msg := model.DelegatorWithdrawMsg{
 		Delegator: delegator,
@@ -284,6 +359,9 @@ func (broadcast *Broadcast) DelegatorWithdraw(delegator, voter, amount, privKeyH
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// RevokeDelegation reovkes all delegated LINO token of a delegator to a voter
+// so there is no delegation between the two users.
+// It composes RevokeDelegationMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) RevokeDelegation(delegator, voter, privKeyHex string, seq int64) error {
 	msg := model.RevokeDelegationMsg{
 		Delegator: delegator,
@@ -295,6 +373,9 @@ func (broadcast *Broadcast) RevokeDelegation(delegator, voter, privKeyHex string
 //
 // Developer related tx
 //
+
+// DeveloperRegsiter registers a developer with a certain amount of LINO token on blockchain.
+// It composes DeveloperRegisterMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) DeveloperRegister(username, deposit, privKeyHex string, seq int64) error {
 	msg := model.DeveloperRegisterMsg{
 		Username: username,
@@ -303,19 +384,42 @@ func (broadcast *Broadcast) DeveloperRegister(username, deposit, privKeyHex stri
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// DeveloperRevoke reovkes all deposited LINO token of a developer
+// so the user will not be a developer anymore.
+// It composes DeveloperRevokeMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int64) error {
-	msg := model.DeveloperRegisterMsg{
+	msg := model.DeveloperRevokeMsg{
 		Username: username,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-func (broadcast *Broadcast) GrantDeveloper(username, authenticateApp string, validityPeriod int64, grantLevel int, privKeyHex string, seq int64) error {
-	msg := model.GrantDeveloperMsg{
+// GrantPermission grants a certain (e.g. Post or Micropayment) permission to
+// an authenticated app with a certain period of time.
+// It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, validityPeriod int64, grantLevel model.Permission, times int64, privKeyHex string, seq int64) error {
+	msg := model.GrantPermissionMsg{
 		Username:        username,
 		AuthenticateApp: authenticateApp,
 		ValidityPeriod:  validityPeriod,
 		GrantLevel:      grantLevel,
+		Times:           times,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+}
+
+// RevokePermission revokes the permission given previously to a app.
+// It composes RevokePermissionMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string, grantLevel model.Permission, privKeyHex string, seq int64) error {
+	pubKey, err := transport.GetPubKeyFromHex(pubKeyHex)
+	if err != nil {
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get pub key").AddCause(err)
+	}
+
+	msg := model.RevokePermissionMsg{
+		Username:   username,
+		PubKey:     pubKey,
+		GrantLevel: grantLevel,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
@@ -323,6 +427,9 @@ func (broadcast *Broadcast) GrantDeveloper(username, authenticateApp string, val
 //
 // infra related tx
 //
+
+// ProviderReport reports infra usage of a infra provider in order to get infra inflation.
+// It composes ProviderReportMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ProviderReport(username string, usage int64, privKeyHex string, seq int64) error {
 	msg := model.ProviderReportMsg{
 		Username: username,
@@ -335,6 +442,8 @@ func (broadcast *Broadcast) ProviderReport(username string, usage int64, privKey
 // proposal related tx
 //
 
+// ChangeEvaluateOfContentValueParam changes EvaluateOfContentValueParam with new value.
+// It composes ChangeEvaluateOfContentValueParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(creator string, parameter model.EvaluateOfContentValueParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeEvaluateOfContentValueParamMsg{
 		Creator:   creator,
@@ -343,6 +452,8 @@ func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(creator string, pa
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ChangeGlobalAllocationParam changes GlobalAllocationParam with new value.
+// It composes ChangeGlobalAllocationParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeGlobalAllocationParam(creator string, parameter model.GlobalAllocationParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeGlobalAllocationParamMsg{
 		Creator:   creator,
@@ -351,6 +462,8 @@ func (broadcast *Broadcast) ChangeGlobalAllocationParam(creator string, paramete
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ChangeInfraInternalAllocationParam changes InfraInternalAllocationParam with new value.
+// It composes ChangeInfraInternalAllocationParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeInfraInternalAllocationParam(creator string, parameter model.InfraInternalAllocationParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeInfraInternalAllocationParamMsg{
 		Creator:   creator,
@@ -359,6 +472,8 @@ func (broadcast *Broadcast) ChangeInfraInternalAllocationParam(creator string, p
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ChangeVoteParam changes VoteParam with new value.
+// It composes ChangeVoteParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeVoteParam(creator string, parameter model.VoteParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeVoteParamMsg{
 		Creator:   creator,
@@ -367,6 +482,8 @@ func (broadcast *Broadcast) ChangeVoteParam(creator string, parameter model.Vote
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ChangeProposalParam changes ProposalParam with new value.
+// It composes ChangeProposalParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeProposalParam(creator string, parameter model.ProposalParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeProposalParamMsg{
 		Creator:   creator,
@@ -375,6 +492,8 @@ func (broadcast *Broadcast) ChangeProposalParam(creator string, parameter model.
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ChangeDeveloperParam changes DeveloperParam with new value.
+// It composes ChangeDeveloperParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeDeveloperParam(creator string, parameter model.DeveloperParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeDeveloperParamMsg{
 		Creator:   creator,
@@ -383,6 +502,8 @@ func (broadcast *Broadcast) ChangeDeveloperParam(creator string, parameter model
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ChangeValidatorParam changes ValidatorParam with new value.
+// It composes ChangeValidatorParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeValidatorParam(creator string, parameter model.ValidatorParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeValidatorParamMsg{
 		Creator:   creator,
@@ -391,6 +512,8 @@ func (broadcast *Broadcast) ChangeValidatorParam(creator string, parameter model
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ChangeCoinDayParam changes CoinDayParam with new value.
+// It composes ChangeCoinDayParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeCoinDayParam(creator string, parameter model.CoinDayParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeCoinDayParamMsg{
 		Creator:   creator,
@@ -399,6 +522,8 @@ func (broadcast *Broadcast) ChangeCoinDayParam(creator string, parameter model.C
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ChangeBandwidthParam changes BandwidthParam with new value.
+// It composes ChangeBandwidthParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeBandwidthParam(creator string, parameter model.BandwidthParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeBandwidthParamMsg{
 		Creator:   creator,
@@ -407,6 +532,8 @@ func (broadcast *Broadcast) ChangeBandwidthParam(creator string, parameter model
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ChangeAccountParam changes AccountParam with new value.
+// It composes ChangeAccountParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeAccountParam(creator string, parameter model.AccountParam, privKeyHex string, seq int64) error {
 	msg := model.ChangeAccountParamMsg{
 		Creator:   creator,
@@ -415,16 +542,31 @@ func (broadcast *Broadcast) ChangeAccountParam(creator string, parameter model.A
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// ChangePostParam changes PostParam with new value.
+// It composes ChangePostParamMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) ChangePostParam(creator string, parameter model.PostParam, privKeyHex string, seq int64) error {
+	msg := model.ChangePostParamMsg{
+		Creator:   creator,
+		Parameter: parameter,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+}
+
+// DeletePostContent deletes the content of a post on blockchain, which is used
+// for content censorship.
+// It composes DeletePostContentMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) DeletePostContent(creator, postAuthor, postID, reason, privKeyHex string, seq int64) error {
-	permLink := string(string(postAuthor) + "#" + postID)
+	permlink := string(string(postAuthor) + "#" + postID)
 	msg := model.DeletePostContentMsg{
 		Creator:  creator,
-		PermLink: permLink,
+		Permlink: permlink,
 		Reason:   reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
+// VoteProposal adds a vote to a certain proposal with agree/disagree.
+// It composes VoteProposalMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) VoteProposal(voter, proposalID string, result bool, privKeyHex string, seq int64) error {
 	msg := model.VoteProposalMsg{
 		Voter:      voter,
@@ -437,21 +579,21 @@ func (broadcast *Broadcast) VoteProposal(voter, proposalID string, result bool, 
 //
 // internal helper functions
 //
-func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex string, seq int64) errors.Error {
+func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex string, seq int64) error {
 	res, err := broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq)
 	if err != nil {
-		return errors.FailedToBroadcastf("failed to broadcast msg: %v, with privKey: %s and seq: %v", msg, privKeyHex, seq).TraceCause(err, "")
+		return errors.FailedToBroadcastf("failed to broadcast msg: %v, got err: %v", msg, err)
 	}
 
-	if err == nil && res.CheckTx.Code == types.InvalidSeqErrCode {
-		return errors.InvalidSeqNumberf("invalid seq [%v] for msg %v", seq, msg)
+	if err == nil && res.CheckTx.Code == model.InvalidSeqErrCode {
+		return errors.InvalidArg("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
 	}
 
 	if res.CheckTx.Code != uint32(0) {
-		return errors.CheckTxFailf("CheckTx failed! (%d) %s", res.CheckTx.Code, res.CheckTx.Log)
+		return errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
 	}
 	if res.DeliverTx.Code != uint32(0) {
-		return errors.DeliverTxFailf("DeliverTx failed! (%d) %s", res.DeliverTx.Code, res.DeliverTx.Log)
+		return errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
 	}
 	return nil
 }

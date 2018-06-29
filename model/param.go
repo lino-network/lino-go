@@ -2,6 +2,7 @@ package model
 
 // parameters can be changed by proposal
 type Parameter interface{}
+
 type EvaluateOfContentValueParam struct {
 	ConsumptionTimeAdjustBase      int64 `json:"consumption_time_adjust_base"`
 	ConsumptionTimeAdjustOffset    int64 `json:"consumption_time_adjust_offset"`
@@ -79,7 +80,12 @@ type BandwidthParam struct {
 }
 
 type AccountParam struct {
-	MinimumBalance             Coin  `json:"minimum_balance"`
-	RegisterFee                Coin  `json:"register_fee"`
-	BalanceHistoryIntervalTime int64 `json:"BalanceHistoryIntervalTimes"`
+	MinimumBalance                Coin  `json:"minimum_balance"`
+	RegisterFee                   Coin  `json:"register_fee"`
+	BalanceHistoryBundleSize      int64 `json:"balance_history_bundle_size"`
+	MaximumMicropaymentGrantTimes int64 `json:"maximum_micropayment_grant_times"`
+}
+
+type PostParam struct {
+	MicropaymentLimitation Coin `json:"micropayment_limitation"`
 }

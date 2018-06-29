@@ -1,9 +1,8 @@
-// Package errors deals with all types of error encountered in the backend.
+// Package errors deals with all types of error encountered.
 package errors
 
 import (
 	"fmt"
-	"runtime"
 )
 
 // CodeType represents the type of the error.
@@ -14,14 +13,15 @@ func (code CodeType) IsOK() bool {
 	return code == CodeOK
 }
 
-// Error interface for all DLive errors
+// Error interface for all errors
 type Error interface {
 	Error() string
-	VerboseError() string
 	CodeType() CodeType
-	Trace(msg string) Error
-	Tracef(msg string, args ...interface{}) Error
-	TraceCause(cause error, msg string) Error
+	AddBlockChainCode(bcCode uint32) Error
+	AddBlockChainLog(bcLog string) Error
+	BlockChainCode() uint32
+	BlockChainLog() string
+	AddCause(cause error) Error
 	Cause() error
 }
 
@@ -30,22 +30,12 @@ func NewError(code CodeType, msg string) Error {
 	return newError(code, msg)
 }
 
-type traceItem struct {
-	msg      string
-	filename string
-	lineno   int
-}
-
-func (ti traceItem) String() string {
-	return fmt.Sprintf("%v:%v %v", ti.filename, ti.lineno, ti.msg)
-}
-
-// serverError is the customized Error used in the backend.
 type serverError struct {
-	code   CodeType
-	msg    string
-	cause  error
-	traces []traceItem
+	code           CodeType
+	msg            string
+	blockChainCode uint32
+	blockChainLog  string
+	cause          error
 }
 
 func newError(code CodeType, msg string) *serverError {
@@ -53,25 +43,14 @@ func newError(code CodeType, msg string) *serverError {
 		msg = CodeToDefaultMsg(code)
 	}
 	return &serverError{
-		code:   code,
-		msg:    msg,
-		cause:  nil,
-		traces: nil,
+		code: code,
+		msg:  msg,
 	}
 }
 
 // Error returns error details.
 func (err *serverError) Error() string {
-	return fmt.Sprintf("%d:%s", err.code, err.msg)
-}
-
-// VerboseError returns all error stacks and traces
-func (err *serverError) VerboseError() string {
-	traceLog := ""
-	for _, ti := range err.traces {
-		traceLog += ti.String() + "\n"
-	}
-	return fmt.Sprintf("Error{%d:%s\nCause:%+v\ntrace:\n%v}", err.code, err.msg, err.cause, traceLog)
+	return fmt.Sprintf("%d:%s, bcCode:%v, bcLog:%s", err.code, err.msg, err.blockChainCode, err.blockChainLog)
 }
 
 // CodeType returns the code of error.
@@ -79,39 +58,31 @@ func (err *serverError) CodeType() CodeType {
 	return err.code
 }
 
-// Trace adds tracing information with msg.
-func (err *serverError) Trace(msg string) Error {
-	return err.doTrace(msg, 2)
+// BlockChainCode returns the code of blockchain error.
+func (err *serverError) AddBlockChainCode(bcCode uint32) Error {
+	err.blockChainCode = bcCode
+	return err
 }
 
-// Tracef adds tracing information with formatted msg.
-func (err *serverError) Tracef(format string, arg ...interface{}) Error {
-	msg := fmt.Sprintf(format, arg...)
-	return err.doTrace(msg, 2)
+// BlockChainLog returns the log of blockchain error.
+func (err *serverError) AddBlockChainLog(bcLog string) Error {
+	err.blockChainLog = bcLog
+	return err
 }
 
-// TraceCause adds tracing information with cause and msg.
-func (err *serverError) TraceCause(cause error, msg string) Error {
+// BlockChainCode returns the code of blockchain error.
+func (err *serverError) BlockChainCode() uint32 {
+	return err.blockChainCode
+}
+
+// BlockChainLog returns the log of blockchain error.
+func (err *serverError) BlockChainLog() string {
+	return err.blockChainLog
+}
+
+// TraceCause adds cause error.
+func (err *serverError) AddCause(cause error) Error {
 	err.cause = cause
-	return err.doTrace(msg, 2)
-}
-
-func (err *serverError) doTrace(msg string, depth int) Error {
-	_, fileName, line, ok := runtime.Caller(depth)
-	if !ok {
-		if fileName == "" {
-			fileName = "<unknown>"
-		}
-		if line <= 0 {
-			line = -1
-		}
-	}
-	// Do not include the whole stack trace.
-	err.traces = append(err.traces, traceItem{
-		filename: fileName,
-		lineno:   line,
-		msg:      msg,
-	})
 	return err
 }
 
