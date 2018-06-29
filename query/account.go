@@ -3,6 +3,7 @@ package query
 import (
 	"encoding/hex"
 	"math"
+	"strings"
 
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
@@ -32,7 +33,7 @@ func (query *Query) GetTransactionPubKey(username string) (string, error) {
 	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
 		return "", err
 	}
-	return hex.EncodeToString(info.TransactionKey.Bytes()), nil
+	return strings.ToUpper(hex.EncodeToString(info.TransactionKey.Bytes())), nil
 }
 
 // GetMicropaymentPubKey returns string format micropayment public key.
@@ -45,7 +46,7 @@ func (query *Query) GetMicropaymentPubKey(username string) (string, error) {
 	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
 		return "", err
 	}
-	return hex.EncodeToString(info.MicropaymentKey.Bytes()), nil
+	return strings.ToUpper(hex.EncodeToString(info.MicropaymentKey.Bytes())), nil
 }
 
 // GetPostPubKey returns string format post public key.
@@ -58,7 +59,7 @@ func (query *Query) GetPostPubKey(username string) (string, error) {
 	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
 		return "", err
 	}
-	return hex.EncodeToString(info.PostKey.Bytes()), nil
+	return strings.ToUpper(hex.EncodeToString(info.PostKey.Bytes())), nil
 }
 
 // DoesUsernameMatchMasterPrivKey returns true if a user has the master private key.
