@@ -1,6 +1,7 @@
 package query
 
 import (
+	"encoding/hex"
 	"math"
 
 	"github.com/lino-network/lino-go/errors"
@@ -19,6 +20,45 @@ func (query *Query) GetAccountInfo(username string) (*model.AccountInfo, error) 
 		return nil, err
 	}
 	return info, nil
+}
+
+// GetTransactionPubKey returns string format transaction public key.
+func (query *Query) GetTransactionPubKey(username string) (string, error) {
+	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+	if err != nil {
+		return "", err
+	}
+	info := new(model.AccountInfo)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(info.TransactionKey.Bytes()), nil
+}
+
+// GetMicropaymentPubKey returns string format micropayment public key.
+func (query *Query) GetMicropaymentPubKey(username string) (string, error) {
+	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+	if err != nil {
+		return "", err
+	}
+	info := new(model.AccountInfo)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(info.MicropaymentKey.Bytes()), nil
+}
+
+// GetPostPubKey returns string format post public key.
+func (query *Query) GetPostPubKey(username string) (string, error) {
+	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+	if err != nil {
+		return "", err
+	}
+	info := new(model.AccountInfo)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(info.PostKey.Bytes()), nil
 }
 
 // DoesUsernameMatchMasterPrivKey returns true if a user has the master private key.
