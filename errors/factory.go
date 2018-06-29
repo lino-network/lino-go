@@ -2,6 +2,7 @@ package errors
 
 import "fmt"
 
+// CodeToDefaultMsg returns the default message based on different error code.
 func CodeToDefaultMsg(code CodeType) string {
 	switch code {
 	case CodeQueryFail:

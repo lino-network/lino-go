@@ -1,3 +1,5 @@
+// Package model includes all message, params, storage struct,
+// standard transactions and consts same as on Lino blockchain.
 package model
 
 import (
@@ -142,7 +144,6 @@ type ValidatorRevokeMsg struct {
 //
 // Vote related messages
 //
-
 type VoterDepositMsg struct {
 	Username string `json:"username"`
 	Deposit  string `json:"deposit"`
@@ -213,7 +214,7 @@ type ProviderReportMsg struct {
 //
 type DeletePostContentMsg struct {
 	Creator  string `json:"creator"`
-	PermLink string `json:"permLink"`
+	Permlink string `json:"permlink"`
 	Reason   string `json:"reason"`
 }
 

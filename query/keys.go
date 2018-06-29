@@ -8,6 +8,7 @@ import (
 	crypto "github.com/tendermint/go-crypto"
 )
 
+// Different KV store name
 const (
 	MainKVStoreKey      = "main"
 	AccountKVStoreKey   = "account"
@@ -22,8 +23,10 @@ const (
 )
 
 var (
+	// KeySeparator is the separator of substore key
 	KeySeparator = "/"
 
+	// account substore
 	accountInfoSubstore              = []byte{0x00}
 	accountBankSubstore              = []byte{0x01}
 	accountMetaSubstore              = []byte{0x02}
@@ -35,43 +38,50 @@ var (
 	accountBalanceHistorySubstore    = []byte{0x08}
 	accountGrantPubKeySubstore       = []byte{0x09}
 
-	postInfoSubStore           = []byte{0x00} // SubStore for all post info
-	postMetaSubStore           = []byte{0x01} // SubStore for all post mata info
-	postLikeSubStore           = []byte{0x02} // SubStore for all like to post
-	postReportOrUpvoteSubStore = []byte{0x03} // SubStore for all like to post
-	postCommentSubStore        = []byte{0x04} // SubStore for all comments
-	postViewsSubStore          = []byte{0x05} // SubStore for all views
-	postDonationsSubStore      = []byte{0x06} // SubStore for all donations
+	// post substore
+	postInfoSubStore           = []byte{0x00}
+	postMetaSubStore           = []byte{0x01}
+	postLikeSubStore           = []byte{0x02}
+	postReportOrUpvoteSubStore = []byte{0x03}
+	postCommentSubStore        = []byte{0x04}
+	postViewsSubStore          = []byte{0x05}
+	postDonationsSubStore      = []byte{0x06}
 
+	// validator substore
 	validatorSubstore     = []byte{0x00}
 	validatorListSubstore = []byte{0x01}
 
+	// vote substore
 	delegationSubstore    = []byte{0x00}
 	voterSubstore         = []byte{0x01}
 	voteSubstore          = []byte{0x02}
 	referenceListSubStore = []byte{0x03}
 	delegateeSubStore     = []byte{0x04}
 
+	// developer substore
 	developerSubstore     = []byte{0x00}
 	developerListSubstore = []byte{0x01}
 
+	// infra provider substore
 	infraProviderSubstore     = []byte{0x00}
 	infraProviderListSubstore = []byte{0x01}
 
+	// proposal substore
 	proposalSubstore     = []byte{0x00}
 	proposalListSubStore = []byte{0x01}
 
-	allocationParamSubStore              = []byte{0x00} // SubStore for allocation
-	infraInternalAllocationParamSubStore = []byte{0x01} // SubStore for infrat internal allocation
-	evaluateOfContentValueParamSubStore  = []byte{0x02} // Substore for evaluate of content value
-	developerParamSubStore               = []byte{0x03} // Substore for developer param
-	voteParamSubStore                    = []byte{0x04} // Substore for vote param
-	proposalParamSubStore                = []byte{0x05} // Substore for proposal param
-	validatorParamSubStore               = []byte{0x06} // Substore for validator param
-	coinDayParamSubStore                 = []byte{0x07} // Substore for coin day param
-	bandwidthParamSubStore               = []byte{0x08} // Substore for bandwidth param
-	accountParamSubstore                 = []byte{0x09} // Substore for account param
-	postParamSubStore                    = []byte{0x10} // Substore for evaluate of content value
+	// param substore
+	allocationParamSubStore              = []byte{0x00}
+	infraInternalAllocationParamSubStore = []byte{0x01}
+	evaluateOfContentValueParamSubStore  = []byte{0x02}
+	developerParamSubStore               = []byte{0x03}
+	voteParamSubStore                    = []byte{0x04}
+	proposalParamSubStore                = []byte{0x05}
+	validatorParamSubStore               = []byte{0x06}
+	coinDayParamSubStore                 = []byte{0x07}
+	bandwidthParamSubStore               = []byte{0x08}
+	accountParamSubstore                 = []byte{0x09}
+	postParamSubStore                    = []byte{0x10}
 )
 
 func getHexSubstringAfterKeySeparator(key []byte) string {
@@ -245,16 +255,16 @@ func getVoterKey(me string) []byte {
 	return append(voterSubstore, me...)
 }
 
-func GetReferenceListKey() []byte {
+func getReferenceListKey() []byte {
 	return referenceListSubStore
 }
 
-func GetDelegateePrefix(me string) []byte {
+func getDelegateePrefix(me string) []byte {
 	return append(append(delegateeSubStore, me...), KeySeparator...)
 }
 
-func GetDelegateeKey(me, delegatee string) []byte {
-	return append(GetDelegateePrefix(me), delegatee...)
+func getDelegateeKey(me, delegatee string) []byte {
+	return append(getDelegateePrefix(me), delegatee...)
 }
 
 //
@@ -333,6 +343,6 @@ func getAccountParamKey() []byte {
 	return accountParamSubstore
 }
 
-func GetPostParamKey() []byte {
+func getPostParamKey() []byte {
 	return postParamSubStore
 }

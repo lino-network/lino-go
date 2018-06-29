@@ -4,9 +4,7 @@ import (
 	"github.com/lino-network/lino-go/model"
 )
 
-//
-// Validator related query
-//
+// GetValidator returns validator info given a validator name from blockchain.
 func (query *Query) GetValidator(username string) (*model.Validator, error) {
 	resp, err := query.transport.Query(getValidatorKey(username), ValidatorKVStoreKey)
 	if err != nil {
@@ -19,6 +17,7 @@ func (query *Query) GetValidator(username string) (*model.Validator, error) {
 	return validator, nil
 }
 
+// GetAllValidators returns all oncall validators from blockchain.
 func (query *Query) GetAllValidators() (*model.ValidatorList, error) {
 	resp, err := query.transport.Query(getValidatorListKey(), ValidatorKVStoreKey)
 	if err != nil {

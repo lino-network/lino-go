@@ -1,3 +1,5 @@
+// Package transport implements the functionalities that
+// directly interact with the blockchain to query data or broadcast transaction.
 package transport
 
 import (
@@ -13,6 +15,7 @@ import (
 	cmn "github.com/tendermint/tmlibs/common"
 )
 
+// Transport is a wrapper of tendermint rpc client and codec.
 type Transport struct {
 	chainId string
 	nodeUrl string
@@ -20,6 +23,7 @@ type Transport struct {
 	Cdc     *wire.Codec
 }
 
+// NewTransportFromConfig initiates an instance of Transport from config files.
 func NewTransportFromConfig() *Transport {
 	v := viper.New()
 	viper.SetConfigType("json")
@@ -41,6 +45,7 @@ func NewTransportFromConfig() *Transport {
 	}
 }
 
+// NewTransportFromArgs initiates an instance of Transport from parameters passed in.
 func NewTransportFromArgs(chainID, nodeUrl string) *Transport {
 	if nodeUrl == "" {
 		nodeUrl = "localhost:46657"
@@ -92,6 +97,7 @@ func (t Transport) query(key cmn.HexBytes, storeName, endPath string) (res []byt
 	return resp.Value, nil
 }
 
+// QueryBlock queries a block with a certain height from blockchain.
 func (t Transport) QueryBlock(height int64) (res *ctypes.ResultBlock, err error) {
 	node, err := t.GetNode()
 	if err != nil {
@@ -101,6 +107,7 @@ func (t Transport) QueryBlock(height int64) (res *ctypes.ResultBlock, err error)
 	return node.Block(&height)
 }
 
+// BroadcastTx broadcasts a transcation to blockchain.
 func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, error) {
 	node, err := t.GetNode()
 	if err != nil {
@@ -114,6 +121,8 @@ func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, erro
 	return res, err
 }
 
+// SignBuildBroadcast signs msg with private key and then broadcasts
+// the transaction to blockchain.
 func (t Transport) SignBuildBroadcast(msg interface{},
 	privKeyHex string, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
 	privKey, err := GetPrivKeyFromHex(privKeyHex)
@@ -125,7 +134,6 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println("----signMsgBytes: ", string(signMsgBytes))
 	// SignatureFromBytes
 	sig := privKey.Sign(signMsgBytes)
 
@@ -139,6 +147,7 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 	return t.BroadcastTx(txBytes)
 }
 
+// GetNote returns the Tendermint rpc client node.
 func (t Transport) GetNode() (rpcclient.Client, error) {
 	if t.client == nil {
 		return nil, errors.InvalidArg("Must define node URI")

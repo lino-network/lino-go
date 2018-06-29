@@ -4,9 +4,7 @@ import (
 	"github.com/lino-network/lino-go/model"
 )
 
-//
-// Developer related query
-//
+// GetDeveloper returns a specific developer info from blockchain.
 func (query *Query) GetDeveloper(developerName string) (*model.Developer, error) {
 	resp, err := query.transport.Query(getDeveloperKey(developerName), DeveloperKVStoreKey)
 	if err != nil {
@@ -19,6 +17,7 @@ func (query *Query) GetDeveloper(developerName string) (*model.Developer, error)
 	return developer, nil
 }
 
+// GetDevelopers returns a list of all developers.
 func (query *Query) GetDevelopers() (*model.DeveloperList, error) {
 	resp, err := query.transport.Query(getDeveloperListKey(), DeveloperKVStoreKey)
 	if err != nil {

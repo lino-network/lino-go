@@ -4,9 +4,8 @@ import (
 	"github.com/lino-network/lino-go/model"
 )
 
-//
-// proposal related query
-//
+// GetProposalList returns a list of all proposals, including onging
+// proposals and past ones.
 func (query *Query) GetProposalList() (*model.ProposalList, error) {
 	resp, err := query.transport.Query(getProposalListKey(), ProposalKVStoreKey)
 	if err != nil {
@@ -20,6 +19,7 @@ func (query *Query) GetProposalList() (*model.ProposalList, error) {
 	return proposalList, nil
 }
 
+// GetProposal returns proposal info of a specific proposalID.
 func (query *Query) GetProposal(proposalID string) (*model.Proposal, error) {
 	resp, err := query.transport.Query(getProposalKey(proposalID), ProposalKVStoreKey)
 	if err != nil {
@@ -33,6 +33,7 @@ func (query *Query) GetProposal(proposalID string) (*model.Proposal, error) {
 	return proposal, nil
 }
 
+// GetOngoingProposal returns all ongoing proposals.
 func (query *Query) GetOngoingProposal() ([]*model.Proposal, error) {
 	proposalList, err := query.GetProposalList()
 	if err != nil {
@@ -52,6 +53,7 @@ func (query *Query) GetOngoingProposal() ([]*model.Proposal, error) {
 	return ongoingProposals, nil
 }
 
+// GetExpiredProposal returns all past proposals.
 func (query *Query) GetExpiredProposal() ([]*model.Proposal, error) {
 	proposalList, err := query.GetProposalList()
 	if err != nil {
