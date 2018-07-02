@@ -163,29 +163,17 @@ func (query *Query) GetRecentBalanceHistory(username string, numHistory int64) (
 		return allBalanceHistory, nil
 	}
 
-	bucketSlot := (accountBank.NumOfTx - 1) / 100
-
-	for bucketSlot > -1 {
-		balanceHistory, err := query.GetBalanceHistory(username, bucketSlot)
-		if err != nil {
-			return nil, err
-		}
-		for i := len(balanceHistory.Details) - 1; i >= 0 && numHistory > 0; i-- {
-			allBalanceHistory.Details = append(allBalanceHistory.Details, balanceHistory.Details[i])
-			numHistory--
-		}
-
-		if numHistory == 0 {
-			break
-		}
-
-		bucketSlot--
+	from := accountBank.NumOfTx - numHistory
+	if numHistory > accountBank.NumOfTx {
+		from = 0
 	}
 
-	return allBalanceHistory, nil
+	to := accountBank.NumOfTx - 1
+
+	return query.GetBalanceHistoryFromTo(username, from, to)
 }
 
-// GetBalanceHistoryFromTo returns a list of transaction history in the range of [from, to]
+// GetBalanceHistoryFromTo returns a list of transaction history in the range of index [from, to]
 // related to a user's account balance, in reverse-chronological order.
 func (query *Query) GetBalanceHistoryFromTo(username string, from, to int64) (*model.BalanceHistory, error) {
 	if from < 0 || from > math.MaxInt64 || to < 0 || to > math.MaxInt64 || from > to {
@@ -202,21 +190,21 @@ func (query *Query) GetBalanceHistoryFromTo(username string, from, to int64) (*m
 		return allBalanceHistory, nil
 	}
 
-	if from > accountBank.NumOfTx {
+	if from > accountBank.NumOfTx-1 {
 		return allBalanceHistory, errors.InvalidArgf("GetBalanceHistoryFromTo: invalid from [%v] which bigger than total num of tx", from)
 	}
-	if to > accountBank.NumOfTx {
+	if to > accountBank.NumOfTx-1 {
 		to = accountBank.NumOfTx
 	}
 
 	// number of banlance history is wanted
 	numHistory := to - from + 1
 
-	targetBucketOfTo := (to - 1) / 100
+	targetBucketOfTo := to / 100
 	bucketSlot := targetBucketOfTo
 
 	// The index of 'to' in the target bucket
-	indexOfTo := (to - 1) % 100
+	indexOfTo := to % 100
 
 	for bucketSlot > -1 {
 		balanceHistory, err := query.GetBalanceHistory(username, bucketSlot)

@@ -7,12 +7,15 @@ import (
 )
 
 var (
-	chainID = "lino-test"
-	// nodeURL = "http://18.188.188.164:26657/"
-	nodeURL = "http://localhost:26657"
+	// chainID = "lino-test"
+	chainID = "test-chain-BgWrtq"
+	nodeURL = "http://18.188.188.164:26657"
+	// nodeURL = "http://localhost:26657"
+
+	genesisPrivKey = "E1B0F79A20E33A6524AEE7134012E3B54E61F0F784CD7A75D43FF0D312CCC6FBB7BBFE8B4D"
 
 	referrer          = "lino"
-	registerFee       = "1000000"
+	registerFee       = "10000000"
 	referrerTxPrivKey = "E1B0F79A20AECFA4549861801551DB876C3D54A1A729A030CC07BDEEB8935294CD51D6ADE2"
 
 	// myUser
@@ -30,85 +33,93 @@ func setup(t *testing.T) {
 }
 
 // func TestBasic(t *testing.T) {
-// 	testAPI := setup(t)
+// 	setup(t)
 
 // 	masterPriv := crypto.GenPrivKeyEd25519()
 // 	txPriv := crypto.GenPrivKeyEd25519()
+// 	microPriv := crypto.GenPrivKeyEd25519()
 // 	postPriv := crypto.GenPrivKeyEd25519()
 
 // 	masterPub := masterPriv.PubKey()
 // 	txPub := txPriv.PubKey()
+// 	microPub := microPriv.PubKey()
 // 	postPub := postPriv.PubKey()
 
-// 	txPrivHex := hex.EncodeToString(txPriv.Bytes())
+// 	// txPrivHex := hex.EncodeToString(txPriv.Bytes())
 
 // 	masterPubHex := hex.EncodeToString(masterPub.Bytes())
 // 	txPubHex := hex.EncodeToString(txPub.Bytes())
+// 	microPubHex := hex.EncodeToString(microPub.Bytes())
 // 	postPubHex := hex.EncodeToString(postPub.Bytes())
 
-// 	t.Errorf("txPrivHex: %v", txPrivHex)
-// 	t.Errorf("masterPubHex: %v", masterPubHex)
+// 	t.Errorf("masterPriv: %v", strings.ToUpper(hex.EncodeToString(masterPriv.Bytes())))
+// 	t.Errorf("txPriv: %v", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
+// 	t.Errorf("microPriv: %v", strings.ToUpper(hex.EncodeToString(microPriv.Bytes())))
+// 	t.Errorf("postPriv: %v", strings.ToUpper(hex.EncodeToString(postPriv.Bytes())))
 
 // 	seq, err := testAPI.GetSeqNumber("lino")
 // 	if err != nil {
 // 		t.Errorf("failed to get seq: %v", err)
 // 	}
-// 	err = testAPI.Register(referrer, registerFee, myUser, masterPubHex, txPubHex, postPubHex, referrerTxPrivKey, seq)
+// 	err = testAPI.Register(referrer, registerFee, "test3", masterPubHex, txPubHex, microPubHex, postPubHex, genesisPrivKey, seq)
 // 	if err != nil {
 // 		t.Errorf("failed to register: %v", err)
 // 	}
+
+// 	t.Error("err")
 // }
 
-func TestAccount(t *testing.T) {
-	setup(t)
+// func TestAccount(t *testing.T) {
+// 	setup(t)
 
-	_, err := testAPI.GetAccountInfo(myUser)
-	if err != nil {
-		t.Errorf("TestAccount: failed to get account info: %v", err)
-	}
+// 	_, err := testAPI.GetAccountInfo(myUser)
+// 	if err != nil {
+// 		t.Errorf("TestAccount: failed to get account info: %v", err)
+// 	}
 
-	_, err = testAPI.GetAccountBank("lino")
-	if err != nil {
-		t.Errorf("TestAccount: failed to get account bank: %v", err)
-	}
+// 	_, err = testAPI.GetAccountBank("lino")
+// 	if err != nil {
+// 		t.Errorf("TestAccount: failed to get account bank: %v", err)
+// 	}
 
-	_, err = testAPI.GetAccountMeta("lino")
-	if err != nil {
-		t.Errorf("TestAccount: failed to get account meta: %v", err)
-	}
+// 	_, err = testAPI.GetAccountMeta("lino")
+// 	if err != nil {
+// 		t.Errorf("TestAccount: failed to get account meta: %v", err)
+// 	}
 
-	_, err = testAPI.GetReward("lino")
-	if err != nil {
-		t.Errorf("TestAccount: failed to get reward: %v", err)
-	}
+// 	_, err = testAPI.GetReward("lino")
+// 	if err != nil {
+// 		t.Errorf("TestAccount: failed to get reward: %v", err)
+// 	}
 
-	_, err = testAPI.GetAllBalanceHistory(myUser)
-	if err != nil {
-		t.Errorf("TestAccount: failed to get balance history: %v", err)
-	}
+// 	_, err = testAPI.GetAllBalanceHistory(myUser)
+// 	if err != nil {
+// 		t.Errorf("TestAccount: failed to get balance history: %v", err)
+// 	}
 
-	// Tested successfully
-	//
-	// linoSeq, err := testAPI.GetSeqNumber("lino")
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
-	// }
-	// err = testAPI.Transfer("lino", myUser, "100000000", "memo1", referrerTxPrivKey, linoSeq)
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to transfer 0.1B to myUser")
-	// }
+// Tested successfully
+//
+// linoSeq, err := testAPI.GetSeqNumber("lino")
+// if err != nil {
+// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
+// }
+// err = testAPI.Transfer("lino", myUser, "100000000", "memo1", referrerTxPrivKey, linoSeq)
+// if err != nil {
+// 	t.Errorf("TestAccount: failed to transfer 0.1B to myUser")
+// }
 
-	// myUserSeq, err := testAPI.GetSeqNumber(myUser)
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
-	// }
-	// err = testAPI.Claim(myUser, txPrivHex, myUserSeq)
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to broadcast claim msg: %v", err)
-	// }
-}
+// myUserSeq, err := testAPI.GetSeqNumber(myUser)
+// if err != nil {
+// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
+// }
+// err = testAPI.Claim(myUser, txPrivHex, myUserSeq)
+// if err != nil {
+// 	t.Errorf("TestAccount: failed to broadcast claim msg: %v", err)
+// }
+// }
 
 // func TestRecentBalanceHistory(t *testing.T) {
+// 	setup(t)
 // 	// Note: total num of history is 116
 
 // 	// corner case - invalid numHistory
@@ -146,56 +157,56 @@ func TestAccount(t *testing.T) {
 // 	}
 // }
 
-// func TestBalanceHistoryFromTo(t *testing.T) {
-// 	testAPI := setup(t)
-// 	// Note: total num of history is 116
+func TestBalanceHistoryFromTo(t *testing.T) {
+	// setup(t)
+	// Note: total num of history is 116
 
-// 	// corner case - invalid arg
-// 	_, err := testAPI.GetBalanceHistoryFromTo(myUser, -1, -2)
-// 	if err == nil {
-// 		t.Errorf("GetBalanceHistoryFromTo should return InvalidArg err: %v", err)
-// 	}
-// 	_, err = testAPI.GetBalanceHistoryFromTo(myUser, 20, 10)
-// 	if err == nil {
-// 		t.Errorf("GetBalanceHistoryFromTo should return InvalidArg err: %v", err)
-// 	}
-// 	_, err = testAPI.GetBalanceHistoryFromTo(myUser, 120, 10)
-// 	if err == nil {
-// 		t.Errorf("GetBalanceHistoryFromTo should return InvalidArg err: %v", err)
-// 	}
+	// corner case - invalid arg
+	_, err := testAPI.GetBalanceHistoryFromTo(myUser, -1, -2)
+	if err == nil {
+		t.Errorf("GetBalanceHistoryFromTo should return InvalidArg err: %v", err)
+	}
+	_, err = testAPI.GetBalanceHistoryFromTo(myUser, 20, 10)
+	if err == nil {
+		t.Errorf("GetBalanceHistoryFromTo should return InvalidArg err: %v", err)
+	}
+	_, err = testAPI.GetBalanceHistoryFromTo(myUser, 120, 10)
+	if err == nil {
+		t.Errorf("GetBalanceHistoryFromTo should return InvalidArg err: %v", err)
+	}
 
-// 	// normal case
-// 	history, err := testAPI.GetBalanceHistoryFromTo(myUser, 115, 116)
-// 	if err != nil {
-// 		t.Errorf("GetBalanceHistoryFromTo fails, err: %v", err)
-// 	} else if len(history.Details) != 2 {
-// 		t.Errorf("GetBalanceHistoryFromTo got diff resp, got %v, want 2", len(history.Details))
-// 	} else if history.Details[0].Memo != "memo49" || history.Details[1].Memo != "memo48" {
-// 		t.Errorf("GetBalanceHistoryFromTo got non-ordered resp, got %v", history.Details)
-// 	}
+	// normal case
+	history, err := testAPI.GetBalanceHistoryFromTo(myUser, 114, 115)
+	if err != nil {
+		t.Errorf("GetBalanceHistoryFromTo fails, err: %v", err)
+	} else if len(history.Details) != 2 {
+		t.Errorf("GetBalanceHistoryFromTo got diff resp, got %v, want 2", len(history.Details))
+	} else if history.Details[0].Memo != "memo49" || history.Details[1].Memo != "memo48" {
+		t.Errorf("GetBalanceHistoryFromTo got non-ordered resp, got %v", history.Details)
+	}
 
-// 	// normal case - to is larger than total length
-// 	history, err = testAPI.GetBalanceHistoryFromTo(myUser, 115, 120)
-// 	if err != nil {
-// 		t.Errorf("GetBalanceHistoryFromTo fails, err: %v", err)
-// 	} else if len(history.Details) != 2 {
-// 		t.Errorf("GetBalanceHistoryFromTo got diff resp, got %v, want 2", len(history.Details))
-// 	} else if history.Details[0].Memo != "memo49" || history.Details[1].Memo != "memo48" {
-// 		t.Errorf("GetBalanceHistoryFromTo got non-ordered resp, got %v", history.Details)
-// 	}
+	// normal case - to is larger than total length
+	history, err = testAPI.GetBalanceHistoryFromTo(myUser, 114, 120)
+	if err != nil {
+		t.Errorf("GetBalanceHistoryFromTo fails, err: %v", err)
+	} else if len(history.Details) != 2 {
+		t.Errorf("GetBalanceHistoryFromTo got diff resp, got %v, want 2", len(history.Details))
+	} else if history.Details[0].Memo != "memo49" || history.Details[1].Memo != "memo48" {
+		t.Errorf("GetBalanceHistoryFromTo got non-ordered resp, got %v", history.Details)
+	}
 
-// 	// normal case - get from two bucket slots
-// 	history, err = testAPI.GetBalanceHistoryFromTo(myUser, 65, 115)
-// 	if err != nil {
-// 		t.Errorf("GetBalanceHistoryFromTo fails, err: %v", err)
-// 	} else if len(history.Details) != 51 {
-// 		t.Errorf("GetBalanceHistoryFromTo got diff resp, got %v, want 51", len(history.Details))
-// 	} else if history.Details[0].Memo != "memo48" || history.Details[0].From != myUser {
-// 		t.Errorf("GetRecentBalanceHistory got non-ordered resp, got %v", history.Details[0])
-// 	} else if history.Details[50].Memo != "memo58" || history.Details[50].From != "lino" {
-// 		t.Errorf("GetRecentBalanceHistory got non-ordered resp, got %v", history.Details[50])
-// 	}
-// }
+	// normal case - get from two bucket slots
+	history, err = testAPI.GetBalanceHistoryFromTo(myUser, 64, 114)
+	if err != nil {
+		t.Errorf("GetBalanceHistoryFromTo fails, err: %v", err)
+	} else if len(history.Details) != 51 {
+		t.Errorf("GetBalanceHistoryFromTo got diff resp, got %v, want 51", len(history.Details))
+	} else if history.Details[0].Memo != "memo48" || history.Details[0].From != myUser {
+		t.Errorf("GetRecentBalanceHistory got non-ordered resp, got %v", history.Details[0])
+	} else if history.Details[50].Memo != "memo58" || history.Details[50].From != "lino" {
+		t.Errorf("GetRecentBalanceHistory got non-ordered resp, got %v", history.Details[50])
+	}
+}
 
 // func TestTransfer(t *testing.T) {
 // testAPI := setup(t)
@@ -233,6 +244,18 @@ func TestAccount(t *testing.T) {
 // }
 
 func TestPost(t *testing.T) {
+	// setup(t)
+
+	// Tested successfully
+	//
+	// seq, err := testAPI.GetSeqNumber(myUser)
+	// if err != nil {
+	// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
+	// }
+	// err = testAPI.CreatePost(myUser, post1, "mytitle", "mycontent", "", "", "", "", "0.2", links, txPrivHex, seq)
+	// if err != nil {
+	// 	t.Errorf("TestPost: failed to broadcast CreatePost msg: %v", err)
+	// }
 
 	_, err := testAPI.GetPostInfo(myUser, post1)
 	if err != nil {
@@ -267,15 +290,6 @@ func TestPost(t *testing.T) {
 
 	// Tested successfully
 	//
-	// seq, err := testAPI.GetSeqNumber(myUser)
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
-	// }
-	// err = testAPI.CreatePost(myUser, post1, "mytitle", "mycontent", "", "", "", "", "0.2", links, txPrivHex, seq)
-	// if err != nil {
-	// 	t.Errorf("TestPost: failed to broadcast CreatePost msg: %v", err)
-	// }
-
 	// seq++
 	// err = testAPI.DeletePost(myUser, post1, txPrivHex, seq)
 	// if err != nil {
