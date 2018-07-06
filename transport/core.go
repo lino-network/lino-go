@@ -70,7 +70,7 @@ func (t Transport) QuerySubspace(subspace []byte, storeName string) (res []sdk.K
 	if err != nil {
 		return res, err
 	}
-	t.Cdc.MustUnmarshalBinary(resRaw, &res)
+	t.Cdc.UnmarshalJSON(resRaw, &res)
 	return
 }
 

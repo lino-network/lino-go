@@ -2,7 +2,6 @@ package query
 
 import (
 	"bytes"
-	"encoding/hex"
 	"strconv"
 
 	crypto "github.com/tendermint/go-crypto"
@@ -86,7 +85,7 @@ var (
 )
 
 func getHexSubstringAfterKeySeparator(key []byte) string {
-	return hex.EncodeToString(key[bytes.Index(key, []byte(KeySeparator)):])
+	return string(key[bytes.Index(key, []byte(KeySeparator))+1:])
 }
 
 func getSubstringAfterKeySeparator(key []byte) string {

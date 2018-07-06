@@ -152,7 +152,6 @@ func (query *Query) GetUserAllPosts(username string) (map[string]*model.Post, er
 			TotalReward:             pm.TotalReward,
 			RedistributionSplitRate: pm.RedistributionSplitRate,
 		}
-
 		permlinkToPostMap[getSubstringAfterSubstore(KV.Key)] = post
 	}
 
