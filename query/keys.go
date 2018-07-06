@@ -67,8 +67,9 @@ var (
 	infraProviderListSubstore = []byte{0x01}
 
 	// proposal substore
-	proposalSubstore     = []byte{0x00}
-	proposalListSubStore = []byte{0x01}
+	proposalSubstore       = []byte{0x00}
+	proposalListSubStore   = []byte{0x01}
+	nextProposalIDSubstore = []byte{0x02}
 
 	// param substore
 	allocationParamSubStore              = []byte{0x00}
@@ -82,7 +83,6 @@ var (
 	bandwidthParamSubStore               = []byte{0x08}
 	accountParamSubstore                 = []byte{0x09}
 	postParamSubStore                    = []byte{0x0a}
-	proposalIDParamSubStore              = []byte{0x0b}
 )
 
 func getHexSubstringAfterKeySeparator(key []byte) string {
@@ -301,6 +301,10 @@ func getProposalListKey() []byte {
 	return proposalListSubStore
 }
 
+func GetNextProposalIDKey() []byte {
+	return nextProposalIDSubstore
+}
+
 //
 // param related
 //
@@ -330,10 +334,6 @@ func getValidatorParamKey() []byte {
 
 func getProposalParamKey() []byte {
 	return proposalParamSubStore
-}
-
-func getProposalIDParamKey() []byte {
-	return proposalIDParamSubStore
 }
 
 func getCoinDayParamKey() []byte {

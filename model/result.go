@@ -273,6 +273,10 @@ type ProposalInfo struct {
 	ExpiredAt     int64  `json:"expired_at"`
 }
 
+type NextProposalID struct {
+	NextProposalID int64 `json:"next_proposal_id"`
+}
+
 type ChangeParamProposal struct {
 	ProposalInfo
 	Param Parameter `json:"param"`

@@ -88,20 +88,6 @@ func (query *Query) GetProposalParam() (*model.ProposalParam, error) {
 	return param, nil
 }
 
-// GetProposalIDParam returns the ProposalIDParam.
-func (query *Query) GetProposalIDParam() (*model.ProposalIDParam, error) {
-	resp, err := query.transport.Query(getProposalIDParamKey(), ParamKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-
-	param := new(model.ProposalIDParam)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
-		return nil, err
-	}
-	return param, nil
-}
-
 // GetValidatorParam returns the ValidatorParam.
 func (query *Query) GetValidatorParam() (*model.ValidatorParam, error) {
 	resp, err := query.transport.Query(getValidatorParamKey(), ParamKVStoreKey)

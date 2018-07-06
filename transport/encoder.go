@@ -97,7 +97,6 @@ func MakeCodec() *wire.Codec {
 	// cdc.RegisterConcrete(param.BandwidthParam{}, "param/bandwidth", nil)
 	// cdc.RegisterConcrete(param.AccountParam{}, "param/account", nil)
 	// cdc.RegisterConcrete(param.PostParam{}, "param/post", nil)
-	// cdc.RegisterConcrete(param.ProposalIDParam{}, "param/proposalID", nil)
 
 	wire.RegisterCrypto(cdc)
 	return cdc
