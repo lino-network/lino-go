@@ -93,8 +93,8 @@ func main() {
 	// fmt.Println(string(output))
 
 	//broadcast ransaction example
-	//broadcast := broadcast.NewBroadcast(transport.NewTransportFromConfig())
-	user := "yukai-tu6"
+	// broadcast := broadcast.NewBroadcast(transport.NewTransportFromConfig())
+	user := "yukai-tu11"
 	// masterPriv := crypto.GenPrivKeyEd25519()
 	// txPriv := crypto.GenPrivKeyEd25519()
 	// micropaymentPriv := crypto.GenPrivKeyEd25519()
@@ -102,15 +102,25 @@ func main() {
 
 	// err := broadcast.Register(
 	// 	"lino", "100000000", user, hex.EncodeToString(masterPriv.PubKey().Bytes()), hex.EncodeToString(txPriv.PubKey().Bytes()),
-	// 	hex.EncodeToString(micropaymentPriv.PubKey().Bytes()), hex.EncodeToString(postPriv.PubKey().Bytes()), "E1B0F79A207610DF4B9AA480C78F06C5B505B6F56A9B57A8CA05DCA868A41A95B664E319C9", 6)
+	// 	hex.EncodeToString(micropaymentPriv.PubKey().Bytes()), hex.EncodeToString(postPriv.PubKey().Bytes()), "E1B0F79A207610DF4B9AA480C78F06C5B505B6F56A9B57A8CA05DCA868A41A95B664E319C9", 11)
 	// fmt.Println(err)
 
-	// time.Sleep(20 * time.Second)
-	// err = broadcast.GrantPermission(user, "lino", 1000000000, 1, 10, hex.EncodeToString(txPriv.Bytes()), 0)
+	// time.Sleep(3 * time.Second)
+	// err = broadcast.CreatePost(user, "lino", "title", "content", "", "", "", "", "0", nil, strings.ToUpper(hex.EncodeToString(txPriv.Bytes())), 0)
 	// fmt.Println(err)
 
+	// time.Sleep(3 * time.Second)
+	// err = broadcast.GrantPermission(user, "lino", 1000000, model.PostPermission, 10, hex.EncodeToString(txPriv.Bytes()), 1)
+	// fmt.Println(err)
+
+	posts, _ := api.Query.GetUserAllPosts(user)
+	fmt.Println(posts)
+
+	postPub, _ := api.Query.GetPostPubKey("lino")
+	fmt.Println(postPub)
 	pubKeyToGrantPubKeyMap, _ := api.Query.GetAllGrantPubKeys(user)
-	fmt.Println(pubKeyToGrantPubKeyMap["2feb5ae98221038040b08feadecab2b756fd9c92865a6c24e599fc51ea23b25509499ffcfd107c"])
+	fmt.Println(pubKeyToGrantPubKeyMap)
+	fmt.Println(pubKeyToGrantPubKeyMap["65623561653938323231303338303430623038666561646563616232623735366664396339323836356136633234653539396663353165613233623235353039343939666663666431303763"])
 	// masterPub := masterPriv.PubKey()
 	// txPub := txPriv.PubKey()
 	// postPub := postPriv.PubKey()
