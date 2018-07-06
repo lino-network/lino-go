@@ -512,16 +512,6 @@ func (broadcast *Broadcast) ChangeValidatorParam(creator string, parameter model
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }
 
-// ChangeCoinDayParam changes CoinDayParam with new value.
-// It composes ChangeCoinDayParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeCoinDayParam(creator string, parameter model.CoinDayParam, privKeyHex string, seq int64) error {
-	msg := model.ChangeCoinDayParamMsg{
-		Creator:   creator,
-		Parameter: parameter,
-	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
-}
-
 // ChangeBandwidthParam changes BandwidthParam with new value.
 // It composes ChangeBandwidthParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeBandwidthParam(creator string, parameter model.BandwidthParam, privKeyHex string, seq int64) error {

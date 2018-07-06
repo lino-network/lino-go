@@ -34,8 +34,11 @@ type VoteParam struct {
 	DelegatorCoinReturnTimes      int64 `json:"delegator_coin_return_times"`
 }
 
+type ProposalIDParam struct {
+	NextProposalID int64 `json:"next_proposal_id"`
+}
+
 type ProposalParam struct {
-	NextProposalID              int64 `json:"next_proposal_id"`
 	ContentCensorshipDecideHr   int64 `json:"content_censorship_decide_hr"`
 	ContentCensorshipMinDeposit Coin  `json:"content_censorship_min_deposit"`
 	ContentCensorshipPassRatio  Rat   `json:"content_censorship_pass_ratio"`
@@ -87,5 +90,6 @@ type AccountParam struct {
 }
 
 type PostParam struct {
-	MicropaymentLimitation Coin `json:"micropayment_limitation"`
+	MicropaymentLimitation Coin  `json:"micropayment_limitation"`
+	ReportOrUpvoteInterval int64 `json:"report_or_upvote_interval"`
 }

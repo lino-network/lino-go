@@ -81,7 +81,8 @@ var (
 	coinDayParamSubStore                 = []byte{0x07}
 	bandwidthParamSubStore               = []byte{0x08}
 	accountParamSubstore                 = []byte{0x09}
-	postParamSubStore                    = []byte{0x10}
+	postParamSubStore                    = []byte{0x0a}
+	proposalIDParamSubStore              = []byte{0x0b}
 )
 
 func getHexSubstringAfterKeySeparator(key []byte) string {
@@ -329,6 +330,10 @@ func getValidatorParamKey() []byte {
 
 func getProposalParamKey() []byte {
 	return proposalParamSubStore
+}
+
+func getProposalIDParamKey() []byte {
+	return proposalIDParamSubStore
 }
 
 func getCoinDayParamKey() []byte {

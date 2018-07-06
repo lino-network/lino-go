@@ -12,7 +12,6 @@ func (query *Query) GetEvaluateOfContentValueParam() (*model.EvaluateOfContentVa
 	}
 
 	param := new(model.EvaluateOfContentValueParam)
-	// fmt.Println("---paramBytes: ", resp)
 	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
@@ -83,6 +82,20 @@ func (query *Query) GetProposalParam() (*model.ProposalParam, error) {
 	}
 
 	param := new(model.ProposalParam)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+		return nil, err
+	}
+	return param, nil
+}
+
+// GetProposalIDParam returns the ProposalIDParam.
+func (query *Query) GetProposalIDParam() (*model.ProposalIDParam, error) {
+	resp, err := query.transport.Query(getProposalIDParamKey(), ParamKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	param := new(model.ProposalIDParam)
 	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
 		return nil, err
 	}
