@@ -7,7 +7,7 @@ const (
 	CodeFailedToBroadcast
 	CodeCheckTxFail
 	CodeDeliverTxFail
-	CodeFialedToGetPubKeyFromHex
+	CodeFailedToGetPubKeyFromHex
 	CodeFailedToGetPrivKeyFromHex
 	CodeInvalidArg
 	CodeEmptyResponse

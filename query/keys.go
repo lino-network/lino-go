@@ -81,7 +81,7 @@ var (
 	coinDayParamSubStore                 = []byte{0x07}
 	bandwidthParamSubStore               = []byte{0x08}
 	accountParamSubstore                 = []byte{0x09}
-	postParamSubStore                    = []byte{0x0a}
+	postParamSubStore                    = []byte{0x10}
 )
 
 func getHexSubstringAfterKeySeparator(key []byte) string {

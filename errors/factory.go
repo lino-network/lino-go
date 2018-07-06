@@ -13,7 +13,7 @@ func CodeToDefaultMsg(code CodeType) string {
 		return "Check Tx Error"
 	case CodeDeliverTxFail:
 		return "Deliver Tx Error"
-	case CodeFialedToGetPubKeyFromHex:
+	case CodeFailedToGetPubKeyFromHex:
 		return "Failed To Get Pub Key From Hex"
 	case CodeFailedToGetPrivKeyFromHex:
 		return "Failed To Get Priv Key From Hex"
@@ -68,12 +68,12 @@ func DeliverTxFailf(format string, args ...interface{}) Error {
 
 //FailedToGetPubKeyFromHex creates an error with CodeFialedToGetPubKeyFromHex
 func FailedToGetPubKeyFromHex(msg string) Error {
-	return newError(CodeFialedToGetPubKeyFromHex, msg)
+	return newError(CodeFailedToGetPubKeyFromHex, msg)
 }
 
 //FailedToGetPubKeyFromHex creates an error with CodeDeliverTxFail and formatted message
 func FailedToGetPubKeyFromHexf(format string, args ...interface{}) Error {
-	return newError(CodeFialedToGetPubKeyFromHex, fmt.Sprintf(format, args...))
+	return newError(CodeFailedToGetPubKeyFromHex, fmt.Sprintf(format, args...))
 }
 
 //FailedToGetPrivKeyFromHex creates an error with CodeFailedToGetPrivKeyFromHex
