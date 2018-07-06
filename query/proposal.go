@@ -72,3 +72,17 @@ func (query *Query) GetExpiredProposal() ([]*model.Proposal, error) {
 
 	return expiredProposals, nil
 }
+
+// GetProposal returns proposal info of a specific proposalID.
+func (query *Query) GetNextProposalID() (*model.NextProposalID, error) {
+	resp, err := query.transport.Query(GetNextProposalIDKey(), ProposalKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+
+	nextProposalID := new(model.NextProposalID)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, nextProposalID); err != nil {
+		return nil, err
+	}
+	return nextProposalID, nil
+}

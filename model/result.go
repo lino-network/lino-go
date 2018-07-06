@@ -44,10 +44,11 @@ type GrantPubKey struct {
 }
 
 type AccountMeta struct {
-	Sequence            int64  `json:"sequence"`
-	LastActivityAt      int64  `json:"last_activity_at"`
-	TransactionCapacity Coin   `json:"transaction_capacity"`
-	JSONMeta            string `json:"json_meta"`
+	Sequence             int64  `json:"sequence"`
+	LastActivityAt       int64  `json:"last_activity_at"`
+	TransactionCapacity  Coin   `json:"transaction_capacity"`
+	JSONMeta             string `json:"json_meta"`
+	LastReportOrUpvoteAt int64  `json:"last_report_or_upvote_at"`
 }
 
 type FollowerMeta struct {
@@ -270,6 +271,10 @@ type ProposalInfo struct {
 	Result        int    `json:"result"`
 	CreatedAt     int64  `json:"created_at"`
 	ExpiredAt     int64  `json:"expired_at"`
+}
+
+type NextProposalID struct {
+	NextProposalID int64 `json:"next_proposal_id"`
 }
 
 type ChangeParamProposal struct {
