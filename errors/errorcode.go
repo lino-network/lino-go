@@ -9,6 +9,6 @@ const (
 	CodeDeliverTxFail
 	CodeFailedToGetPubKeyFromHex
 	CodeFailedToGetPrivKeyFromHex
-	CodeInvalidArg
+	CodeInvalidSequenceNumber
 	CodeEmptyResponse
 )
