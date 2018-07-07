@@ -9,6 +9,7 @@ const (
 	CodeDeliverTxFail
 	CodeFailedToGetPubKeyFromHex
 	CodeFailedToGetPrivKeyFromHex
+	CodeInvalidNodeURL
 	CodeInvalidSequenceNumber
 	CodeEmptyResponse
 )

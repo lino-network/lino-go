@@ -34,7 +34,7 @@ func NewTransportFromConfig() *Transport {
 
 	nodeUrl := v.GetString("node_url")
 	if nodeUrl == "" {
-		nodeUrl = "localhost:46657"
+		nodeUrl = "localhost:26657"
 	}
 	rpc := rpcclient.NewHTTP(nodeUrl, "/websocket")
 	return &Transport{
@@ -150,7 +150,7 @@ func (t Transport) SignBuildBroadcast(msg interface{},
 // GetNote returns the Tendermint rpc client node.
 func (t Transport) GetNode() (rpcclient.Client, error) {
 	if t.client == nil {
-		return nil, errors.InvalidArg("Must define node URI")
+		return nil, errors.InvalidNodeURL("Must define node URL")
 	}
 	return t.client, nil
 }
