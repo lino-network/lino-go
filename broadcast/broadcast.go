@@ -576,7 +576,7 @@ func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex str
 	}
 
 	if err == nil && res.CheckTx.Code == model.InvalidSeqErrCode {
-		return errors.InvalidArg("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
+		return errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
 	}
 
 	if res.CheckTx.Code != uint32(0) {

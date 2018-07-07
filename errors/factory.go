@@ -17,8 +17,8 @@ func CodeToDefaultMsg(code CodeType) string {
 		return "Failed To Get Pub Key From Hex"
 	case CodeFailedToGetPrivKeyFromHex:
 		return "Failed To Get Priv Key From Hex"
-	case CodeInvalidArg:
-		return "Invalid argument"
+	case CodeInvalidSequenceNumber:
+		return "Invalid sequence number"
 	case CodeEmptyResponse:
 		return "Empty Response"
 	default:
@@ -87,13 +87,13 @@ func FailedToGetPrivKeyFromHexf(format string, args ...interface{}) Error {
 }
 
 //InvalidArg creates an error with CodeInvalidArg
-func InvalidArg(msg string) Error {
-	return newError(CodeInvalidArg, msg)
+func InvalidSequenceNumber(msg string) Error {
+	return newError(CodeInvalidSequenceNumber, msg)
 }
 
 //InvalidArgf creates an error with CodeInvalidArg and formatted message
-func InvalidArgf(format string, args ...interface{}) Error {
-	return newError(CodeInvalidArg, fmt.Sprintf(format, args...))
+func InvalidSequenceNumberf(format string, args ...interface{}) Error {
+	return newError(CodeInvalidSequenceNumber, fmt.Sprintf(format, args...))
 }
 
 //EmptyResponse creates an error with CodeEmptyResponse
