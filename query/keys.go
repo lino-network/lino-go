@@ -2,6 +2,7 @@ package query
 
 import (
 	"bytes"
+	"encoding/hex"
 	"strconv"
 
 	crypto "github.com/tendermint/go-crypto"
@@ -155,7 +156,7 @@ func getGrantPubKeyPrefix(me string) []byte {
 }
 
 func getGrantPubKeyKey(me string, pubKey crypto.PubKey) []byte {
-	return append(getGrantPubKeyPrefix(me), pubKey.Bytes()...)
+	return append(getGrantPubKeyPrefix(me), hex.EncodeToString(pubKey.Bytes())...)
 }
 
 //
