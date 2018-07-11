@@ -235,7 +235,7 @@ func (query *Query) GetBalanceHistoryFromTo(username string, from, to int64) (*m
 		return allBalanceHistory, errors.InvalidArgf("GetBalanceHistoryFromTo: invalid from [%v] which bigger than total num of tx", from)
 	}
 	if to > accountBank.NumOfTx-1 {
-		to = accountBank.NumOfTx
+		to = accountBank.NumOfTx - 1
 	}
 
 	// number of banlance history is wanted
@@ -399,7 +399,7 @@ func (query *Query) GetRewardHistoryFromTo(username string, from, to int64) (*mo
 		return allRewardHistory, errors.InvalidArgf("GetRewardHistoryFromTo: invalid from [%v] which is bigger than total num of reward", from)
 	}
 	if to > accountBank.NumOfReward-1 {
-		to = accountBank.NumOfReward
+		to = accountBank.NumOfReward - 1
 	}
 
 	// number of reward history is wanted
