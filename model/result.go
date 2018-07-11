@@ -26,6 +26,7 @@ type AccountBank struct {
 	Stake           Coin          `json:"stake"`
 	FrozenMoneyList []FrozenMoney `json:"frozen_money_list"`
 	NumOfTx         int64         `json:"number_of_transaction"`
+	NumOfReward     int64         `json:"number_of_reward"`
 }
 
 type FrozenMoney struct {
@@ -66,6 +67,19 @@ type Reward struct {
 	FrictionIncome Coin `json:"friction_income"`
 	ActualReward   Coin `json:"actual_reward"`
 	UnclaimReward  Coin `json:"unclaim_reward"`
+}
+
+type RewardDetail struct {
+	OriginalIncome Coin   `json:"original_income"`
+	FrictionIncome Coin   `json:"friction_income"`
+	ActualReward   Coin   `json:"actual_reward"`
+	Consumer       string `json:"consumer"`
+	PostAuthor     string `json:"post_author"`
+	PostID         string `json:"post_id`
+}
+
+type RewardHistory struct {
+	Details []RewardDetail `json:"details"`
 }
 
 type Relationship struct {
@@ -240,6 +254,9 @@ type Developer struct {
 	Username       string `json:"username"`
 	Deposit        Coin   `json:"deposit"`
 	AppConsumption Coin   `json:"app_consumption"`
+	Website        string `json:"website"`
+	Description    string `json:"description"`
+	AppMetaData    string `json:"app_meta_data"`
 }
 
 type DeveloperList struct {

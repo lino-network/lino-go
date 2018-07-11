@@ -179,8 +179,11 @@ type RevokeDelegationMsg struct {
 // developer related messages
 //
 type DeveloperRegisterMsg struct {
-	Username string `json:"username"`
-	Deposit  string `json:"deposit"`
+	Username    string `json:"username"`
+	Deposit     string `json:"deposit"`
+	Website     string `json:"website"`
+	Description string `json:"description"`
+	AppMetaData string `json:"app_meta_data"`
 }
 
 type DeveloperRevokeMsg struct {

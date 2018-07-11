@@ -37,6 +37,7 @@ var (
 	accountRelationshipSubstore      = []byte{0x07}
 	accountBalanceHistorySubstore    = []byte{0x08}
 	accountGrantPubKeySubstore       = []byte{0x09}
+	accountRewardHistorySubstore     = []byte{0x0a}
 
 	// post substore
 	postInfoSubStore           = []byte{0x00}
@@ -130,6 +131,14 @@ func getFollowingPrefix(me string) []byte {
 
 func getRewardKey(accKey string) []byte {
 	return append(accountRewardSubstore, accKey...)
+}
+
+func getRewardHistoryPrefix(me string) []byte {
+	return append(append(accountRewardHistorySubstore, me...), KeySeparator...)
+}
+
+func getRewardHistoryKey(me string, bucketSlot int64) []byte {
+	return strconv.AppendInt(getRewardHistoryPrefix(me), bucketSlot, 10)
 }
 
 func getRelationshipKey(me string, other string) []byte {
