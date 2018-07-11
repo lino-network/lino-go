@@ -376,10 +376,14 @@ func (broadcast *Broadcast) RevokeDelegation(delegator, voter, privKeyHex string
 
 // DeveloperRegsiter registers a developer with a certain amount of LINO token on blockchain.
 // It composes DeveloperRegisterMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) DeveloperRegister(username, deposit, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) DeveloperRegister(username, deposit, website,
+	description, appMetaData, privKeyHex string, seq int64) error {
 	msg := model.DeveloperRegisterMsg{
-		Username: username,
-		Deposit:  deposit,
+		Username:    username,
+		Deposit:     deposit,
+		Website:     website,
+		Description: description,
+		AppMetaData: appMetaData,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
 }

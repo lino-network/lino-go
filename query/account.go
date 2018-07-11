@@ -235,7 +235,7 @@ func (query *Query) GetBalanceHistoryFromTo(username string, from, to int64) (*m
 		return allBalanceHistory, errors.InvalidArgf("GetBalanceHistoryFromTo: invalid from [%v] which bigger than total num of tx", from)
 	}
 	if to > accountBank.NumOfTx-1 {
-		to = accountBank.NumOfTx
+		to = accountBank.NumOfTx - 1
 	}
 
 	// number of banlance history is wanted
@@ -320,6 +320,136 @@ func (query *Query) GetReward(username string) (*model.Reward, error) {
 		return reward, err
 	}
 	return reward, nil
+}
+
+// GetAllRewardHistory returns all reward history related to
+// a user's posts reward, in reverse-chronological order.
+func (query *Query) GetAllRewardHistory(username string) (*model.RewardHistory, error) {
+	accountBank, err := query.GetAccountBank(username)
+	if err != nil {
+		return nil, err
+	}
+
+	allRewardHistory := new(model.RewardHistory)
+	if accountBank.NumOfReward == 0 {
+		return allRewardHistory, nil
+	}
+
+	bucketSlot := (accountBank.NumOfReward - 1) / 100
+
+	for i := bucketSlot; i >= 0; i-- {
+		rewardHistory, err := query.GetRewardHistory(username, i)
+		if err != nil {
+			return nil, err
+		}
+
+		for index := len(rewardHistory.Details) - 1; index >= 0; index-- {
+			allRewardHistory.Details = append(allRewardHistory.Details, rewardHistory.Details[index])
+		}
+	}
+
+	return allRewardHistory, nil
+}
+
+// GetRecentRewardHistory returns a certain number of recent reward history
+// related to a user's posts reward, in reverse-chronological order.
+func (query *Query) GetRecentRewardHistory(username string, numReward int64) (*model.RewardHistory, error) {
+	if numReward <= 0 || numReward > math.MaxInt64 {
+		return nil, errors.InvalidArgf("GetRecentRewardHistory: numReward is invalid: %v", numReward)
+	}
+
+	accountBank, err := query.GetAccountBank(username)
+	if err != nil {
+		return nil, err
+	}
+
+	allRewardHistory := new(model.RewardHistory)
+	if accountBank.NumOfReward == 0 {
+		return allRewardHistory, nil
+	}
+
+	from := accountBank.NumOfReward - numReward
+	if numReward > accountBank.NumOfReward {
+		from = 0
+	}
+
+	to := accountBank.NumOfReward - 1
+
+	return query.GetRewardHistoryFromTo(username, from, to)
+}
+
+// GetRewardHistoryFromTo returns a list of reward history in the range of index [from, to]
+// related to a user's posts reward, in reverse-chronological order.
+func (query *Query) GetRewardHistoryFromTo(username string, from, to int64) (*model.RewardHistory, error) {
+	if from < 0 || from > math.MaxInt64 || to < 0 || to > math.MaxInt64 || from > to {
+		return nil, errors.InvalidArgf("GetRewardHistoryFromTo: from [%v] or to [%v] is invalid", from, to)
+	}
+
+	accountBank, err := query.GetAccountBank(username)
+	if err != nil {
+		return nil, err
+	}
+
+	allRewardHistory := new(model.RewardHistory)
+	if accountBank.NumOfReward == 0 {
+		return allRewardHistory, nil
+	}
+
+	if from > accountBank.NumOfReward-1 {
+		return allRewardHistory, errors.InvalidArgf("GetRewardHistoryFromTo: invalid from [%v] which is bigger than total num of reward", from)
+	}
+	if to > accountBank.NumOfReward-1 {
+		to = accountBank.NumOfReward - 1
+	}
+
+	// number of reward history is wanted
+	numReward := to - from + 1
+
+	targetBucketOfTo := to / 100
+	bucketSlot := targetBucketOfTo
+
+	// The index of 'to' in the target bucket
+	indexOfTo := to % 100
+
+	for bucketSlot > -1 {
+		rewardHistory, err := query.GetRewardHistory(username, bucketSlot)
+		if err != nil {
+			return nil, err
+		}
+
+		var startIndex int64
+		if bucketSlot == targetBucketOfTo {
+			startIndex = indexOfTo
+		} else {
+			startIndex = int64(len(rewardHistory.Details) - 1)
+		}
+
+		for i := startIndex; i >= 0 && numReward > 0; i-- {
+			allRewardHistory.Details = append(allRewardHistory.Details, rewardHistory.Details[i])
+			numReward--
+		}
+
+		if numReward == 0 {
+			break
+		}
+
+		bucketSlot--
+	}
+
+	return allRewardHistory, nil
+}
+
+// GetRewardHistory returns all reward history in a certain bucket
+func (query *Query) GetRewardHistory(username string, index int64) (*model.RewardHistory, error) {
+	resp, err := query.transport.Query(getRewardHistoryKey(username, index), AccountKVStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	rewardHistory := new(model.RewardHistory)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, rewardHistory); err != nil {
+		return nil, err
+	}
+	return rewardHistory, nil
 }
 
 // GetRelationship returns the donation times of two users.
