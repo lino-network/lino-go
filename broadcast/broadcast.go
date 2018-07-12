@@ -579,7 +579,8 @@ func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex str
 		return errors.FailedToBroadcastf("failed to broadcast msg: %v, got err: %v", msg, err)
 	}
 
-	if err == nil && res.CheckTx.Code == model.InvalidSeqErrCode {
+	code := retrieveCodeFromBlockChainCode(res.CheckTx.Code)
+	if err == nil && code == model.InvalidSeqErrCode {
 		return errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
 	}
 
@@ -590,4 +591,8 @@ func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex str
 		return errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
 	}
 	return nil
+}
+
+func retrieveCodeFromBlockChainCode(bcCode uint32) uint32 {
+	return bcCode & 0xff
 }
