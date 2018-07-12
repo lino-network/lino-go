@@ -7,10 +7,10 @@ const (
 	CodeFailedToBroadcast
 	CodeCheckTxFail
 	CodeDeliverTxFail
-	CodeFailedToGetPubKeyFromHex
+	CodeFailedToGetPubKeyFromHex // 5
 	CodeFailedToGetPrivKeyFromHex
 	CodeInvalidArg
 	CodeInvalidNodeURL
 	CodeInvalidSequenceNumber
-	CodeEmptyResponse
+	CodeEmptyResponse // 10
 )
