@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"strconv"
 
-	crypto "github.com/tendermint/go-crypto"
+	crypto "github.com/tendermint/tendermint/crypto"
 )
 
 // Different KV store name
@@ -83,7 +83,7 @@ var (
 	coinDayParamSubStore                 = []byte{0x07}
 	bandwidthParamSubStore               = []byte{0x08}
 	accountParamSubstore                 = []byte{0x09}
-	postParamSubStore                    = []byte{0x10}
+	postParamSubStore                    = []byte{0x0a}
 )
 
 func getHexSubstringAfterKeySeparator(key []byte) string {

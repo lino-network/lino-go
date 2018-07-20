@@ -3,7 +3,7 @@
 package model
 
 import (
-	crypto "github.com/tendermint/go-crypto"
+	crypto "github.com/tendermint/tendermint/crypto"
 )
 
 type Msg interface{}

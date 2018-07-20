@@ -26,26 +26,15 @@
 
 [[constraint]]
   name = "github.com/cosmos/cosmos-sdk"
-  version = "v0.19.1-rc0"
+  version = "=0.22.0"
 
 [[override]]
   name = "github.com/tendermint/tendermint"
-  version = "=0.21.0"
+  version = "=0.22.2"
 
 [[override]]
-  name = "github.com/tendermint/tmlibs"
-  version = "=v0.9.0"
-
-[[override]]
-  name = "github.com/tendermint/go-crypto"
-  version = "=0.6.2"
-
-# this got updated and broke, so locked to an old working commit ...
-[[override]]
-  name = "google.golang.org/genproto"
-  revision = "7fd901a49ba6a7f87732eb344f6e3c5b19d1b200"
-
-
+  name = "github.com/golang/protobuf"
+  version = "=1.1.0"
 
 [prune]
   go-tests = true
