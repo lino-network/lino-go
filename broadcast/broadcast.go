@@ -26,11 +26,11 @@ func NewBroadcast(transport *transport.Transport) *Broadcast {
 
 // Register registers a new user on blockchain.
 // It composes RegisterMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubKeyHex,
+func (broadcast *Broadcast) Register(referrer, registerFee, username, resetPubKeyHex,
 	transactionPubKeyHex, micropaymentPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
-	masterPubKey, err := transport.GetPubKeyFromHex(masterPubKeyHex)
+	resetPubKey, err := transport.GetPubKeyFromHex(resetPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get Master pub key").AddCause(err)
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get Reset pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(transactionPubKeyHex)
 	if err != nil {
@@ -49,7 +49,7 @@ func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubK
 		Referrer:              referrer,
 		RegisterFee:           registerFee,
 		NewUser:               username,
-		NewMasterPubKey:       masterPubKey,
+		NewResetPubKey:        resetPubKey,
 		NewTransactionPubKey:  txPubKey,
 		NewMicropaymentPubKey: micropaymentPubKey,
 		NewPostPubKey:         postPubKey,
@@ -111,10 +111,10 @@ func (broadcast *Broadcast) UpdateAccount(username, jsonMeta, privKeyHex string,
 
 // Recover resets all keys of a user in case of losing or compromising.
 // It composes RecoverMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newTransactionPubKeyHex, newMicropaymentPubKeyHex, newPostPubKeyHex, privKeyHex string, seq int64) error {
-	masterPubKey, err := transport.GetPubKeyFromHex(newMasterPubKeyHex)
+func (broadcast *Broadcast) Recover(username, newResetPubKeyHex, newTransactionPubKeyHex, newMicropaymentPubKeyHex, newPostPubKeyHex, privKeyHex string, seq int64) error {
+	resetPubKey, err := transport.GetPubKeyFromHex(newResetPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Master pub key").AddCause(err)
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Reset pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(newTransactionPubKeyHex)
 	if err != nil {
@@ -131,7 +131,7 @@ func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newTransaction
 
 	msg := model.RecoverMsg{
 		Username:              username,
-		NewMasterPubKey:       masterPubKey,
+		NewResetPubKey:        resetPubKey,
 		NewTransactionPubKey:  txPubKey,
 		NewMicropaymentPubKey: micropaymentPubKey,
 		NewPostPubKey:         postPubKey,
