@@ -36,19 +36,6 @@ func (query *Query) GetTransactionPubKey(username string) (string, error) {
 	return strings.ToUpper(hex.EncodeToString(info.TransactionKey.Bytes())), nil
 }
 
-// GetMicropaymentPubKey returns string format micropayment public key.
-func (query *Query) GetMicropaymentPubKey(username string) (string, error) {
-	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
-	if err != nil {
-		return "", err
-	}
-	info := new(model.AccountInfo)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
-		return "", err
-	}
-	return strings.ToUpper(hex.EncodeToString(info.MicropaymentKey.Bytes())), nil
-}
-
 // GetPostPubKey returns string format post public key.
 func (query *Query) GetPostPubKey(username string) (string, error) {
 	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
@@ -62,19 +49,19 @@ func (query *Query) GetPostPubKey(username string) (string, error) {
 	return strings.ToUpper(hex.EncodeToString(info.PostKey.Bytes())), nil
 }
 
-// DoesUsernameMatchRecoveryPrivKey returns true if a user has the recovery private key.
-func (query *Query) DoesUsernameMatchRecoveryPrivKey(username, recoveryPrivKeyHex string) (bool, error) {
+// DoesUsernameMatchResetPrivKey returns true if a user has the reset private key.
+func (query *Query) DoesUsernameMatchResetPrivKey(username, resetPrivKeyHex string) (bool, error) {
 	accInfo, err := query.GetAccountInfo(username)
 	if err != nil {
 		return false, err
 	}
 
-	recoveryPrivKey, e := transport.GetPrivKeyFromHex(recoveryPrivKeyHex)
+	resetPrivKey, e := transport.GetPrivKeyFromHex(resetPrivKeyHex)
 	if e != nil {
 		return false, e
 	}
 
-	return accInfo.RecoveryKey.Equals(recoveryPrivKey.PubKey()), nil
+	return accInfo.ResetKey.Equals(resetPrivKey.PubKey()), nil
 }
 
 // DoesUsernameMatchTxPrivKey returns true if a user has the transaction private key.
@@ -90,21 +77,6 @@ func (query *Query) DoesUsernameMatchTxPrivKey(username, txPrivKeyHex string) (b
 	}
 
 	return accInfo.TransactionKey.Equals(txPrivKey.PubKey()), nil
-}
-
-// DoesUsernameMatchMicropaymentPrivKey returns true if a user has the micropayment private key.
-func (query *Query) DoesUsernameMatchMicropaymentPrivKey(username, micropaymentPrivKeyHex string) (bool, error) {
-	accInfo, err := query.GetAccountInfo(username)
-	if err != nil {
-		return false, err
-	}
-
-	txPrivKey, e := transport.GetPrivKeyFromHex(micropaymentPrivKeyHex)
-	if e != nil {
-		return false, e
-	}
-
-	return accInfo.MicropaymentKey.Equals(txPrivKey.PubKey()), nil
 }
 
 // DoesUsernameMatchPostPrivKey returns true if a user has the post private key.

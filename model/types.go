@@ -7,13 +7,11 @@ const (
 	InvalidSeqErrCode = 3
 
 	// Different permission levels
-	UnknownPermission           = Permission(0)
-	PostPermission              = Permission(1)
-	MicropaymentPermission      = Permission(2)
-	TransactionPermission       = Permission(3)
-	RecoveryPermission          = Permission(4)
-	GrantPostPermission         = Permission(5)
-	GrantMicropaymentPermission = Permission(6)
+	UnknownPermission     = Permission(0)
+	PostPermission        = Permission(1)
+	TransactionPermission = Permission(2)
+	ResetPermission       = Permission(3)
+	GrantPostPermission   = Permission(4)
 
 	// Different possible incomes
 	TransferIn           = DetailType(0)
