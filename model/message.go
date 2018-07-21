@@ -17,7 +17,7 @@ type RegisterMsg struct {
 	Referrer              string        `json:"referrer"`
 	RegisterFee           string        `json:"register_fee"`
 	NewUser               string        `json:"new_username"`
-	NewResetPubKey        crypto.PubKey `json:"new_reset_public_key"`
+	NewRecoveryPubKey     crypto.PubKey `json:"new_recovery_public_key"`
 	NewTransactionPubKey  crypto.PubKey `json:"new_transaction_public_key"`
 	NewMicropaymentPubKey crypto.PubKey `json:"new_micropayment_public_key"`
 	NewPostPubKey         crypto.PubKey `json:"new_post_public_key"`
@@ -39,7 +39,7 @@ type ClaimMsg struct {
 
 type RecoverMsg struct {
 	Username              string        `json:"username"`
-	NewResetPubKey        crypto.PubKey `json:"new_reset_public_key"`
+	NewRecoveryPubKey     crypto.PubKey `json:"new_recovery_public_key"`
 	NewTransactionPubKey  crypto.PubKey `json:"new_transaction_public_key"`
 	NewMicropaymentPubKey crypto.PubKey `json:"new_micropayment_public_key"`
 	NewPostPubKey         crypto.PubKey `json:"new_post_public_key"`

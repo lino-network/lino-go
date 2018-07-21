@@ -62,19 +62,19 @@ func (query *Query) GetPostPubKey(username string) (string, error) {
 	return strings.ToUpper(hex.EncodeToString(info.PostKey.Bytes())), nil
 }
 
-// DoesUsernameMatchResetPrivKey returns true if a user has the reset private key.
-func (query *Query) DoesUsernameMatchResetPrivKey(username, resetPrivKeyHex string) (bool, error) {
+// DoesUsernameMatchRecoveryPrivKey returns true if a user has the recovery private key.
+func (query *Query) DoesUsernameMatchRecoveryPrivKey(username, recoveryPrivKeyHex string) (bool, error) {
 	accInfo, err := query.GetAccountInfo(username)
 	if err != nil {
 		return false, err
 	}
 
-	resetPrivKey, e := transport.GetPrivKeyFromHex(resetPrivKeyHex)
+	recoveryPrivKey, e := transport.GetPrivKeyFromHex(recoveryPrivKeyHex)
 	if e != nil {
 		return false, e
 	}
 
-	return accInfo.ResetKey.Equals(resetPrivKey.PubKey()), nil
+	return accInfo.RecoveryKey.Equals(recoveryPrivKey.PubKey()), nil
 }
 
 // DoesUsernameMatchTxPrivKey returns true if a user has the transaction private key.

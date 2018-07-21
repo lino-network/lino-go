@@ -95,14 +95,14 @@ func main() {
 	//broadcast ransaction example
 	// broadcast := broadcast.NewBroadcast(transport.NewTransportFromConfig())
 	// user := "yukai-tu13"
-	// resetPriv := crypto.GenPrivKeyEd25519()
+	// recoveryPriv := crypto.GenPrivKeyEd25519()
 	// txPriv := crypto.GenPrivKeyEd25519()
 	// fmt.Println("tx priv:", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
 	// micropaymentPriv := crypto.GenPrivKeyEd25519()
 	// postPriv := crypto.GenPrivKeyEd25519()
 
 	// err := broadcast.Register(
-	// 	"lino", "100000000", user, hex.EncodeToString(resetPriv.PubKey().Bytes()), hex.EncodeToString(txPriv.PubKey().Bytes()),
+	// 	"lino", "100000000", user, hex.EncodeToString(recoveryPriv.PubKey().Bytes()), hex.EncodeToString(txPriv.PubKey().Bytes()),
 	// 	hex.EncodeToString(micropaymentPriv.PubKey().Bytes()), hex.EncodeToString(postPriv.PubKey().Bytes()), "E1B0F79A207610DF4B9AA480C78F06C5B505B6F56A9B57A8CA05DCA868A41A95B664E319C9", 22)
 	// fmt.Println(err)
 
@@ -122,7 +122,7 @@ func main() {
 	// pubKeyToGrantPubKeyMap, _ := api.Query.GetAllGrantPubKeys(user)
 	// fmt.Println(pubKeyToGrantPubKeyMap)
 	// fmt.Println(pubKeyToGrantPubKeyMap["65623561653938323231303338303430623038666561646563616232623735366664396339323836356136633234653539396663353165613233623235353039343939666663666431303763"])
-	// resetPub := resetPriv.PubKey()
+	// recoveryPub := recoveryPriv.PubKey()
 	// txPub := txPriv.PubKey()
 	// postPub := postPriv.PubKey()
 	api := api.NewLinoAPIFromArgs("test-chain-BgWrtq", "http://18.188.188.164:26657")
@@ -135,11 +135,11 @@ func main() {
 	fmt.Println(pub)
 	info, _ := api.GetGrantPubKey("test1", "EB5AE98221037BB974CF968EFD294714D01BDF9D848981147BF7FE7432AED3219AA63E307144")
 	fmt.Printf("%+v\n", info)
-	// addr := resetPub.Address()
+	// addr := recoveryPub.Address()
 
 	// addrHex := strings.ToUpper(hex.EncodeToString(addr))
-	// resetPrivHex := hex.EncodeToString(resetPriv.Bytes())
-	// resetPubHex := hex.EncodeToString(resetPub.Bytes())
+	// recoveryPrivHex := hex.EncodeToString(recoveryPriv.Bytes())
+	// recoveryPubHex := hex.EncodeToString(recoveryPub.Bytes())
 	// txPubHex := hex.EncodeToString(txPub.Bytes())
 	// postPubHex := hex.EncodeToString(postPub.Bytes())
 
@@ -155,7 +155,7 @@ func main() {
 	// if err != nil {
 	// 	panic(err)
 	// }
-	// err = broadcast.Register(user, resetPubHex, postPubHex, txPubHex, resetPrivHex)
+	// err = broadcast.Register(user, recoveryPubHex, postPubHex, txPubHex, recoveryPrivHex)
 	// if err != nil {
 	// 	panic(err)
 	// }
