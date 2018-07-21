@@ -14,7 +14,7 @@ import (
 type AccountInfo struct {
 	Username        string        `json:"username"`
 	CreatedAt       int64         `json:"created_at"`
-	MasterKey       crypto.PubKey `json:"master_key"`
+	ResetKey        crypto.PubKey `json:"reset_key"`
 	TransactionKey  crypto.PubKey `json:"transaction_key"`
 	MicropaymentKey crypto.PubKey `json:"micropayment_key"`
 	PostKey         crypto.PubKey `json:"post_key"`
