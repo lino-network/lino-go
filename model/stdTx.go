@@ -1,13 +1,16 @@
 package model
 
 import (
-	"github.com/tendermint/go-crypto"
+	"encoding/json"
+
+	crypto "github.com/tendermint/tendermint/crypto"
 )
 
 type Transaction struct {
-	Msg  Msg         `json:"msg"`
-	Fee  Fee         `json:"fee"`
-	Sigs []Signature `json:"signatures"`
+	Msgs       []Msg       `json:"msg"`
+	Fee        Fee         `json:"fee"`
+	Signatures []Signature `json:"signatures"`
+	Memo       string      `json:"memo"`
 }
 
 type Signature struct {
@@ -18,12 +21,12 @@ type Signature struct {
 }
 
 type SignMsg struct {
-	ChainID        string  `json:"chain_id"`
-	AccountNumbers []int64 `json:"account_numbers"`
-	Sequences      []int64 `json:"sequences"`
-	FeeBytes       []byte  `json:"fee_bytes"`
-	MsgBytes       []byte  `json:"msg_bytes"`
-	AltBytes       []byte  `json:"alt_bytes"`
+	AccountNumber int64             `json:"account_number"`
+	ChainID       string            `json:"chain_id"`
+	Fee           json.RawMessage   `json:"fee"`
+	Memo          string            `json:"memo"`
+	Msgs          []json.RawMessage `json:"msgs"`
+	Sequence      int64             `json:"sequence"`
 }
 
 type Fee struct {

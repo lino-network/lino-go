@@ -7,17 +7,21 @@ import (
 )
 
 var (
-	// chainID = "lino-test"
-	chainID = "test-chain-BgWrtq"
-	nodeURL = "http://18.188.188.164:26657"
+	chainID = "test-chain-q8lMWR"
+	nodeURL = "http://localhost:26657"
+	// chainID = "test-chain-BgWrtq"
+	// nodeURL = "http://fullnode.linovalidator.io:80"
 
 	referrer          = "lino"
 	registerFee       = "10000000"
-	referrerTxPrivKey = "E1B0F79A20E33A6524AEE7134012E3B54E61F0F784CD7A75D43FF0D312CCC6FBB7BBFE8B4D"
+	referrerTxPrivKey = "E1B0F79B202D213D7613530314EA7BA53DFFEBA25B4D550C71F0E94CBADB8A498E8D6807EC"
 
-	// myUser
+	// registered users
+	// myUser    = "new1"
+	// txPrivHex = "E1B0F79B200B3031C5889C900260D92E20EE8A2CF62B7213DC902F712E19039EF98305D4D0"
+
 	myUser    = "myuser1"
-	txPrivHex = "A328891240C3EB3D287AA0D3EA41D8A016B9A602FB845EFD1F407CA65BFF0A4560AB8DFA517AC83395BC2F6AE32D5641D4A824B5B22ED6A23FC51C479A1C8BEBC7C94970DD"
+	txPrivHex = "E1B0F79B20801B33B99F73D134AF828874A2B9716A5F15B562115930414BC398EB96807F7A"
 
 	post1 = "post1"
 
@@ -31,10 +35,15 @@ func setup(t *testing.T) {
 // func TestBasic(t *testing.T) {
 // 	setup(t)
 
-// 	masterPriv := crypto.GenPrivKeyEd25519()
-// 	txPriv := crypto.GenPrivKeyEd25519()
-// 	microPriv := crypto.GenPrivKeyEd25519()
-// 	postPriv := crypto.GenPrivKeyEd25519()
+// 	masterPriv := crypto.GenPrivKeySecp256k1()
+// 	txPriv := crypto.GenPrivKeySecp256k1()
+// 	microPriv := crypto.GenPrivKeySecp256k1()
+// 	postPriv := crypto.GenPrivKeySecp256k1()
+
+// 	t.Errorf("master private key is: %s", strings.ToUpper(hex.EncodeToString(masterPriv.Bytes())))
+// 	t.Errorf("transaction private key is: %s", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
+// 	t.Errorf("micropayment private key is: %s", strings.ToUpper(hex.EncodeToString(microPriv.Bytes())))
+// 	t.Errorf("post private key is: %s", strings.ToUpper(hex.EncodeToString(postPriv.Bytes())))
 
 // 	masterPub := masterPriv.PubKey()
 // 	txPub := txPriv.PubKey()
@@ -45,11 +54,6 @@ func setup(t *testing.T) {
 // 	txPubHex := hex.EncodeToString(txPub.Bytes())
 // 	microPubHex := hex.EncodeToString(microPub.Bytes())
 // 	postPubHex := hex.EncodeToString(postPub.Bytes())
-
-// 	t.Errorf("masterPriv: %v", strings.ToUpper(hex.EncodeToString(masterPriv.Bytes())))
-// 	t.Errorf("txPriv: %v", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
-// 	t.Errorf("microPriv: %v", strings.ToUpper(hex.EncodeToString(microPriv.Bytes())))
-// 	t.Errorf("postPriv: %v", strings.ToUpper(hex.EncodeToString(postPriv.Bytes())))
 
 // 	seq, err := testAPI.GetSeqNumber("lino")
 // 	if err != nil {
@@ -80,15 +84,16 @@ func TestAccount(t *testing.T) {
 	// }
 	// t.Error("err")
 
-	_, err := testAPI.GetAllFollowingMeta(myUser)
-	if err != nil {
-		t.Errorf("TestAccount: failed to get account all relationship: %v", err)
-	}
+	// _, err := testAPI.GetAllFollowingMeta(myUser)
+	// if err != nil {
+	// 	t.Errorf("TestAccount: failed to get account all relationship: %v", err)
+	// }
 
-	// _, err := testAPI.GetAccountInfo(myUser)
+	// ai, err := testAPI.GetAccountInfo("new1")
 	// if err != nil {
 	// 	t.Errorf("TestAccount: failed to get account info: %v", err)
 	// }
+	// t.Errorf("ai: %v ", ai)
 
 	// 	_, err = testAPI.GetAccountBank("lino")
 	// 	if err != nil {
@@ -105,10 +110,10 @@ func TestAccount(t *testing.T) {
 	// 		t.Errorf("TestAccount: failed to get reward: %v", err)
 	// 	}
 
-	// 	_, err = testAPI.GetAllBalanceHistory(myUser)
-	// 	if err != nil {
-	// 		t.Errorf("TestAccount: failed to get balance history: %v", err)
-	// 	}
+	// _, err := testAPI.GetAllBalanceHistory(myUser)
+	// if err != nil {
+	// 	t.Errorf("TestAccount: failed to get balance history: %v", err)
+	// }
 
 	// Tested successfully
 	//
@@ -121,11 +126,11 @@ func TestAccount(t *testing.T) {
 	// 	t.Errorf("TestAccount: failed to transfer 0.1B to myUser")
 	// }
 
-	// myUserSeq, err := testAPI.GetSeqNumber(myUser)
+	// seq, err := testAPI.GetSeqNumber("lino")
 	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
+	// 	t.Errorf("TestAccount: failed to get lino seq number: %v", err)
 	// }
-	// err = testAPI.Claim(myUser, txPrivHex, myUserSeq)
+	// err = testAPI.Claim("lino", referrerTxPrivKey, seq)
 	// if err != nil {
 	// 	t.Errorf("TestAccount: failed to broadcast claim msg: %v", err)
 	// }
@@ -257,37 +262,38 @@ func TestAccount(t *testing.T) {
 // }
 
 // func TestPost(t *testing.T) {
-// 	// setup(t)
+// 	setup(t)
 
-// 	// Tested successfully
-// 	//
-// 	// seq, err := testAPI.GetSeqNumber(myUser)
-// 	// if err != nil {
-// 	// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
-// 	// }
-// 	// err = testAPI.CreatePost(myUser, post1, "mytitle", "mycontent", "", "", "", "", "0.2", links, txPrivHex, seq)
-// 	// if err != nil {
-// 	// 	t.Errorf("TestPost: failed to broadcast CreatePost msg: %v", err)
-// 	// }
+// Tested successfully
+//
+// seq, err := testAPI.GetSeqNumber(myUser)
+// if err != nil {
+// 	t.Errorf("TestAccount: failed to get seq number: %v", err)
+// }
+// links := map[string]string{}
+// err = testAPI.CreatePost(myUser, post1, "mytitle", "mycontent", "", "", "", "", "0.2", links, txPrivHex, seq)
+// if err != nil {
+// 	t.Errorf("TestPost: failed to broadcast CreatePost msg: %v", err)
+// }
 
-// 	_, err := testAPI.GetPostInfo(myUser, post1)
-// 	if err != nil {
-// 		t.Errorf("TestPost: failed to get post info: %v", err)
-// 	}
+// _, err := testAPI.GetPostInfo(myUser, post1)
+// if err != nil {
+// 	t.Errorf("TestPost: failed to get post info: %v", err)
+// }
 
 // 	_, err = testAPI.GetPostMeta(myUser, post1)
 // 	if err != nil {
 // 		t.Errorf("TestPost: failed to get post meta: %v", err)
 // 	}
 
-// 	seq, err := testAPI.GetSeqNumber(myUser)
-// 	if err != nil {
-// 		t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
-// 	}
-// 	err = testAPI.Like(myUser, myUser, 10, post1, txPrivHex, seq)
-// 	if err != nil {
-// 		t.Errorf("TestPost: failed to broadcast Like: %v", err)
-// 	}
+// seq, err := testAPI.GetSeqNumber(myUser)
+// if err != nil {
+// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
+// }
+// err = testAPI.Like(myUser, myUser, 10, post1, txPrivHex, seq)
+// if err != nil {
+// 	t.Errorf("TestPost: failed to broadcast Like: %v", err)
+// }
 
 // 	seq++
 // 	links := map[string]string{}
@@ -301,47 +307,47 @@ func TestAccount(t *testing.T) {
 // 		t.Errorf("TestPost: failed to get post like: %v", err)
 // 	}
 
-// 	// Tested successfully
-// 	//
-// 	// seq++
-// 	// err = testAPI.DeletePost(myUser, post1, txPrivHex, seq)
-// 	// if err != nil {
-// 	// 	t.Errorf("TestPost: failed to broadcast DeletePost: %v", err)
-// 	// }
+// Tested successfully
+//
+// seq++
+// err = testAPI.DeletePost(myUser, post1, txPrivHex, seq)
+// if err != nil {
+// 	t.Errorf("TestPost: failed to broadcast DeletePost: %v", err)
+// }
 // }
 
 // func TestVoting(t *testing.T) {
 
-// 	_, err := testAPI.GetVoter("lino")
-// 	if err != nil {
-// 		t.Errorf("TestVoting: failed to get voter lino: %v", err)
-// 	}
+// _, err := testAPI.GetVoter("lino")
+// if err != nil {
+// 	t.Errorf("TestVoting: failed to get voter lino: %v", err)
+// }
 
-// 	// _, err = testAPI.GetAllDelegation(myUser)
-// 	// if err != nil {
-// 	// 	t.Errorf("TestVoting: failed to get all delegation: %v", err)
-// 	// }
+// _, err = testAPI.GetAllDelegation(myUser)
+// if err != nil {
+// 	t.Errorf("TestVoting: failed to get all delegation: %v", err)
+// }
 
-// 	// seq, err := testAPI.GetSeqNumber(myUser)
-// 	// if err != nil {
-// 	// 	t.Errorf("TestVoting: failed to get myUser seq number: %v", err)
-// 	// }
+// seq, err := testAPI.GetSeqNumber(myUser)
+// if err != nil {
+// 	t.Errorf("TestVoting: failed to get myUser seq number: %v", err)
+// }
 
-// 	// err = testAPI.VoterWithdraw(myUser, "500", txPrivHex, seq)
-// 	// if err != nil {
-// 	// 	t.Errorf("TestVoting: failed to broadcast VoterWithdraw: %v", err)
-// 	// }
+// err = testAPI.VoterWithdraw(myUser, "500", txPrivHex, seq)
+// if err != nil {
+// 	t.Errorf("TestVoting: failed to broadcast VoterWithdraw: %v", err)
+// }
 
-// 	// err = testAPI.Delegate(myUser, "lino", "1000", txPrivHex, seq)
-// 	// if err != nil {
-// 	// 	t.Errorf("TestVoting: failed to broadcast Delegate: %v", err)
-// 	// }
+// err = testAPI.Delegate(myUser, "lino", "1000", txPrivHex, seq)
+// if err != nil {
+// 	t.Errorf("TestVoting: failed to broadcast Delegate: %v", err)
+// }
 
-// 	// Tested successfully
-// 	// err = testAPI.VoterDeposit(myUser, "320000", txPrivHex, seq)
-// 	// if err != nil {
-// 	// 	t.Errorf("TestVoting: failed to broadcast VoterDeposit: %v", err)
-// 	// }
+// // Tested successfully
+// err = testAPI.VoterDeposit(myUser, "320000", txPrivHex, seq)
+// if err != nil {
+// 	t.Errorf("TestVoting: failed to broadcast VoterDeposit: %v", err)
+// }
 // }
 
 // func TestValidators(t *testing.T) {
@@ -398,10 +404,10 @@ func TestAccount(t *testing.T) {
 // 		t.Errorf("TestProposal: failed to get all proposals: %v", err)
 // 	}
 
-// 	// _, err = testAPI.GetProposal("1")
-// 	// if err != nil {
-// 	// 	t.Errorf("TestProposal: failed to get proposal: %v", err)
-// 	// }
+// _, err = testAPI.GetProposal("1")
+// if err != nil {
+// 	t.Errorf("TestProposal: failed to get proposal: %v", err)
+// }
 
 // 	_, err = testAPI.GetOngoingProposal()
 // 	if err != nil {
@@ -414,71 +420,71 @@ func TestAccount(t *testing.T) {
 // 	}
 // }
 
-// // func TestParams(t *testing.T) {
-// // 	// testAPI := setup(t)
+// func TestParams(t *testing.T) {
+// testAPI := setup(t)
 
-// // 	// seq, err := testAPI.GetSeqNumber(myUser)
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
-// // 	// }
+// seq, err := testAPI.GetSeqNumber(myUser)
+// if err != nil {
+// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
+// }
 
-// // 	// p := model.CoinDayParam{
-// // 	// 	DaysToRecoverCoinDayStake:    int64(10),
-// // 	// 	SecondsToRecoverCoinDayStake: int64(7 * 24 * 3600),
-// // 	// }
-// // 	// err = testAPI.ChangeCoinDayParam(myUser, p, txPrivHex, seq)
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to broadcast ChangeCoinDayParam: %v", err)
-// // 	// }
+// p := model.CoinDayParam{
+// 	DaysToRecoverCoinDayStake:    int64(10),
+// 	SecondsToRecoverCoinDayStake: int64(7 * 24 * 3600),
+// }
+// err = testAPI.ChangeCoinDayParam(myUser, p, txPrivHex, seq)
+// if err != nil {
+// 	t.Errorf("TestParams: failed to broadcast ChangeCoinDayParam: %v", err)
+// }
 
-// // 	// _, err := testAPI.GetEvaluateOfContentValueParam()
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to get evaluate of content value param: %v", err)
-// // 	// }
-// // 	// t.Errorf("TestPar")
+// _, err := testAPI.GetEvaluateOfContentValueParam()
+// if err != nil {
+// 	t.Errorf("TestParams: failed to get evaluate of content value param: %v", err)
+// }
+// t.Errorf("TestPar")
 
-// // 	// _, err = testAPI.GetGlobalAllocationParam()
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to get global allocation param: %v", err)
-// // 	// }
+// _, err = testAPI.GetGlobalAllocationParam()
+// if err != nil {
+// 	t.Errorf("TestParams: failed to get global allocation param: %v", err)
+// }
 
-// // 	// _, err = testAPI.GetInfraInternalAllocationParam()
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to get infra internal allocation param: %v", err)
-// // 	// }
+// _, err = testAPI.GetInfraInternalAllocationParam()
+// if err != nil {
+// 	t.Errorf("TestParams: failed to get infra internal allocation param: %v", err)
+// }
 
-// // 	// _, err = testAPI.GetDeveloperParam()
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to get developer param: %v", err)
-// // 	// }
+// _, err = testAPI.GetDeveloperParam()
+// if err != nil {
+// 	t.Errorf("TestParams: failed to get developer param: %v", err)
+// }
 
-// // 	// _, err = testAPI.GetVoteParam()
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to get vote param: %v", err)
-// // 	// }
+// _, err = testAPI.GetVoteParam()
+// if err != nil {
+// 	t.Errorf("TestParams: failed to get vote param: %v", err)
+// }
 
-// // 	// _, err = testAPI.GetProposalParam()
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to get proposal param: %v", err)
-// // 	// }
+// _, err = testAPI.GetProposalParam()
+// if err != nil {
+// 	t.Errorf("TestParams: failed to get proposal param: %v", err)
+// }
 
-// // 	// _, err = testAPI.GetValidatorParam()
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to get validator param: %v", err)
-// // 	// }
+// _, err = testAPI.GetValidatorParam()
+// if err != nil {
+// 	t.Errorf("TestParams: failed to get validator param: %v", err)
+// }
 
-// // 	// _, err = testAPI.GetCoinDayParam()
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to get coin day param: %v", err)
-// // 	// }
+// _, err = testAPI.GetCoinDayParam()
+// if err != nil {
+// 	t.Errorf("TestParams: failed to get coin day param: %v", err)
+// }
 
-// // 	// _, err = testAPI.GetBandwidthParam()
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to get bandwidth param: %v", err)
-// // 	// }
+// _, err = testAPI.GetBandwidthParam()
+// if err != nil {
+// 	t.Errorf("TestParams: failed to get bandwidth param: %v", err)
+// }
 
-// // 	// _, err = testAPI.GetAccountParam()
-// // 	// if err != nil {
-// // 	// 	t.Errorf("TestParams: failed to get account param: %v", err)
-// // 	// }
-// // }
+// _, err = testAPI.GetAccountParam()
+// if err != nil {
+// 	t.Errorf("TestParams: failed to get account param: %v", err)
+// }
+// }

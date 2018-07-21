@@ -7,12 +7,13 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/lino-network/lino-go/errors"
+	"github.com/lino-network/lino-go/model"
 	"github.com/spf13/viper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-	cmn "github.com/tendermint/tmlibs/common"
 )
 
 // Transport is a wrapper of tendermint rpc client and codec.
@@ -48,7 +49,7 @@ func NewTransportFromConfig() *Transport {
 // NewTransportFromArgs initiates an instance of Transport from parameters passed in.
 func NewTransportFromArgs(chainID, nodeUrl string) *Transport {
 	if nodeUrl == "" {
-		nodeUrl = "localhost:46657"
+		nodeUrl = "localhost:26657"
 	}
 	rpc := rpcclient.NewHTTP(nodeUrl, "/websocket")
 	return &Transport{
@@ -123,22 +124,27 @@ func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, erro
 
 // SignBuildBroadcast signs msg with private key and then broadcasts
 // the transaction to blockchain.
-func (t Transport) SignBuildBroadcast(msg interface{},
-	privKeyHex string, seq int64) (*ctypes.ResultBroadcastTxCommit, error) {
+func (t Transport) SignBuildBroadcast(msg model.Msg,
+	privKeyHex string, seq int64, memo string) (*ctypes.ResultBroadcastTxCommit, error) {
+	msgs := []model.Msg{msg}
+
 	privKey, err := GetPrivKeyFromHex(privKeyHex)
 	if err != nil {
 		return nil, err
 	}
 
-	signMsgBytes, err := EncodeSignMsg(t.Cdc, msg, t.chainId, seq)
+	signMsgBytes, err := EncodeSignMsg(t.Cdc, msgs, t.chainId, seq)
 	if err != nil {
 		return nil, err
 	}
 	// SignatureFromBytes
-	sig := privKey.Sign(signMsgBytes)
+	sig, err := privKey.Sign(signMsgBytes)
+	if err != nil {
+		return nil, err
+	}
 
 	// build transaction bytes
-	txBytes, err := EncodeTx(t.Cdc, msg, privKey.PubKey(), sig, seq)
+	txBytes, err := EncodeTx(t.Cdc, msgs, privKey.PubKey(), sig, seq, memo)
 	if err != nil {
 		return nil, err
 	}

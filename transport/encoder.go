@@ -8,7 +8,7 @@ import (
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 
-	crypto "github.com/tendermint/go-crypto"
+	crypto "github.com/tendermint/tendermint/crypto"
 )
 
 // ZeroFee is used in building a standard transaction.
@@ -23,6 +23,14 @@ func MakeCodec() *wire.Codec {
 
 	cdc.RegisterInterface((*model.Msg)(nil), nil)
 	cdc.RegisterInterface((*model.Tx)(nil), nil)
+
+	// cdc.RegisterInterface((*PubKey)(nil), nil)
+	// cdc.RegisterConcrete(PubKeySecp256k1{},
+	// 	"tendermint/PubKeySecp256k1", nil)
+
+	// cdc.RegisterInterface((*PrivKey)(nil), nil)
+	// cdc.RegisterConcrete(PrivKeySecp256k1{},
+	// "tendermint/PrivKeySecp256k1", nil)
 
 	// account
 	cdc.RegisterConcrete(model.RegisterMsg{}, "lino/register", nil)
@@ -102,9 +110,61 @@ func MakeCodec() *wire.Codec {
 	return cdc
 }
 
+func sortJSON(toSortJSON []byte) ([]byte, error) {
+	var c interface{}
+	err := json.Unmarshal(toSortJSON, &c)
+	if err != nil {
+		return nil, err
+	}
+	js, err := json.Marshal(c)
+	if err != nil {
+		return nil, err
+	}
+	return js, nil
+}
+
+// EncodeSignMsg encodes the message to the standard signed message.
+func EncodeSignMsg(cdc *wire.Codec, msgs []model.Msg, chainId string, seq int64) ([]byte, error) {
+	feeBytes, err := cdc.MarshalJSON(ZeroFee)
+	if err != nil {
+		return nil, err
+	}
+
+	var msgsBytes []json.RawMessage
+	for _, msg := range msgs {
+		bz, err := cdc.MarshalJSON(msg)
+		if err != nil {
+			return nil, err
+		}
+
+		signBytes, err := sortJSON(bz)
+		if err != nil {
+			return nil, err
+		}
+
+		msgsBytes = append(msgsBytes, json.RawMessage(signBytes))
+	}
+
+	stdSignMsg := model.SignMsg{
+		AccountNumber: 0,
+		ChainID:       chainId,
+		Fee:           json.RawMessage(feeBytes),
+		Memo:          "",
+		Msgs:          msgsBytes,
+		Sequence:      seq,
+	}
+
+	signMsgBytes, err := cdc.MarshalJSON(stdSignMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	return sortJSON(signMsgBytes)
+}
+
 // EncodeTx encodes a message to the standard transaction.
-func EncodeTx(cdc *wire.Codec, msg interface{}, pubKey crypto.PubKey,
-	sig crypto.Signature, seq int64) ([]byte, error) {
+func EncodeTx(cdc *wire.Codec, msgs []model.Msg, pubKey crypto.PubKey,
+	sig crypto.Signature, seq int64, memo string) ([]byte, error) {
 	stdSig := model.Signature{
 		PubKey:   pubKey,
 		Sig:      sig,
@@ -112,31 +172,12 @@ func EncodeTx(cdc *wire.Codec, msg interface{}, pubKey crypto.PubKey,
 	}
 
 	stdTx := model.Transaction{
-		Msg:  msg,
-		Sigs: []model.Signature{stdSig},
-		Fee:  ZeroFee,
+		Msgs:       msgs,
+		Fee:        ZeroFee,
+		Signatures: []model.Signature{stdSig},
+		Memo:       memo,
 	}
 	return cdc.MarshalJSON(stdTx)
-}
-
-// EncodeSignMsg encodes the message to the standard signed message.
-func EncodeSignMsg(cdc *wire.Codec, msg interface{}, chainId string, seq int64) ([]byte, error) {
-	feeBytes, err := cdc.MarshalJSON(ZeroFee)
-	if err != nil {
-		return nil, err
-	}
-	msgBytes, err := cdc.MarshalJSON(msg)
-	if err != nil {
-		return nil, err
-	}
-	stdSignMsg := model.SignMsg{
-		ChainID:        chainId,
-		AccountNumbers: []int64{},
-		Sequences:      []int64{seq},
-		FeeBytes:       feeBytes,
-		MsgBytes:       msgBytes,
-	}
-	return json.Marshal(stdSignMsg)
 }
 
 // GetPrivKeyFromHex gets private key from private key hex.

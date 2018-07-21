@@ -3,10 +3,9 @@ package model
 import (
 	"math/big"
 
-	"github.com/cznic/mathutil"
-	"github.com/tendermint/go-crypto"
-
-	ttypes "github.com/tendermint/tendermint/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	crypto "github.com/tendermint/tendermint/crypto"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 //
@@ -63,19 +62,20 @@ type FollowingMeta struct {
 }
 
 type Reward struct {
-	OriginalIncome Coin `json:"original_income"`
-	FrictionIncome Coin `json:"friction_income"`
-	ActualReward   Coin `json:"actual_reward"`
-	UnclaimReward  Coin `json:"unclaim_reward"`
+	TotalIncome     Coin `json:"total_income"`
+	OriginalIncome  Coin `json:"original_income"`
+	FrictionIncome  Coin `json:"friction_income"`
+	InflationIncome Coin `json:"inflation_income"`
+	UnclaimReward   Coin `json:"unclaim_reward"`
 }
 
 type RewardDetail struct {
-	OriginalIncome Coin   `json:"original_income"`
-	FrictionIncome Coin   `json:"friction_income"`
-	ActualReward   Coin   `json:"actual_reward"`
-	Consumer       string `json:"consumer"`
-	PostAuthor     string `json:"post_author"`
-	PostID         string `json:"post_id`
+	OriginalDonation Coin   `json:"original_donation"`
+	FrictionDonation Coin   `json:"friction_donation"`
+	ActualReward     Coin   `json:"actual_reward"`
+	Consumer         string `json:"consumer"`
+	PostAuthor       string `json:"post_author"`
+	PostID           string `json:"post_id`
 }
 
 type RewardHistory struct {
@@ -321,7 +321,7 @@ type ProposalList struct {
 
 // Coin is the same struct used in Lino blockchain.
 type Coin struct {
-	Amount mathutil.Int128 `json:"amount"`
+	Amount sdk.Int `json:"amount"`
 }
 
 // SDKCoin is the same struct used in cosmos-sdk.
@@ -354,10 +354,10 @@ func (r *Rat) UnmarshalAmino(text string) (err error) {
 }
 
 type Block struct {
-	Header     *ttypes.Header      `json:"header"`
-	Evidence   ttypes.EvidenceData `json:"evidence"`
-	LastCommit *ttypes.Commit      `json:"last_commit"`
-	Data       *Data               `json:"data"`
+	Header     *tmtypes.Header      `json:"header"`
+	Evidence   tmtypes.EvidenceData `json:"evidence"`
+	LastCommit *tmtypes.Commit      `json:"last_commit"`
+	Data       *Data                `json:"data"`
 }
 
 type Data struct {

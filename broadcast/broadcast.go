@@ -54,7 +54,7 @@ func (broadcast *Broadcast) Register(referrer, registerFee, username, masterPubK
 		NewMicropaymentPubKey: micropaymentPubKey,
 		NewPostPubKey:         postPubKey,
 	}
-	return broadcast.broadcastTransaction(msg, referrerPrivKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, referrerPrivKeyHex, seq, "")
 }
 
 // Transfer sends a certain amount of LINO token from the sender to the receiver.
@@ -66,7 +66,7 @@ func (broadcast *Broadcast) Transfer(sender, receiver, amount, memo, privKeyHex 
 		Amount:   amount,
 		Memo:     memo,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // Follow creates a social relationship between follower and followee.
@@ -76,7 +76,7 @@ func (broadcast *Broadcast) Follow(follower, followee, privKeyHex string, seq in
 		Follower: follower,
 		Followee: followee,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // Unfollow revokes the social relationship between follower and followee.
@@ -86,7 +86,7 @@ func (broadcast *Broadcast) Unfollow(follower, followee, privKeyHex string, seq 
 		Follower: follower,
 		Followee: followee,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // Claim claims rewards of a certain user.
@@ -95,7 +95,7 @@ func (broadcast *Broadcast) Claim(username, privKeyHex string, seq int64) error 
 	msg := model.ClaimMsg{
 		Username: username,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // UpdateAccount updates account related info in jsonMeta which are not
@@ -106,7 +106,7 @@ func (broadcast *Broadcast) UpdateAccount(username, jsonMeta, privKeyHex string,
 		Username: username,
 		JSONMeta: jsonMeta,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // Recover resets all keys of a user in case of losing or compromising.
@@ -136,7 +136,7 @@ func (broadcast *Broadcast) Recover(username, newMasterPubKeyHex, newTransaction
 		NewMicropaymentPubKey: micropaymentPubKey,
 		NewPostPubKey:         postPubKey,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 //
@@ -168,7 +168,7 @@ func (broadcast *Broadcast) CreatePost(author, postID, title, content, parentAut
 		Links:        mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // Like adds a weighted-like to a post that is performed by a user.
@@ -180,7 +180,7 @@ func (broadcast *Broadcast) Like(username, author string, weight int64, postID, 
 		Author:   author,
 		PostID:   postID,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // Donate adds a money donation to a post by a user.
@@ -195,7 +195,7 @@ func (broadcast *Broadcast) Donate(username, author, amount, postID, fromApp, me
 		Memo:           memo,
 		IsMicroPayment: isMicroPayment,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ReportOrUpvote adds a report or upvote action to a post.
@@ -207,7 +207,7 @@ func (broadcast *Broadcast) ReportOrUpvote(username, author, postID string, isRe
 		PostID:   postID,
 		IsReport: isReport,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // DeletePost deletes a post from the blockchain. It doesn't actually
@@ -219,7 +219,7 @@ func (broadcast *Broadcast) DeletePost(author, postID, privKeyHex string, seq in
 		Author: author,
 		PostID: postID,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // View increases the view count of a post by one.
@@ -230,7 +230,7 @@ func (broadcast *Broadcast) View(username, author, postID, privKeyHex string, se
 		Author:   author,
 		PostID:   postID,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // UpdatePost updates post info with new data.
@@ -253,7 +253,7 @@ func (broadcast *Broadcast) UpdatePost(author, title, postID, content, redistrib
 		Links:   mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 //
@@ -275,7 +275,7 @@ func (broadcast *Broadcast) ValidatorDeposit(username, deposit, validatorPubKey,
 		ValPubKey: valPubKey,
 		Link:      link,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ValidatorWithdraw withdraws part of LINO token from a validator's deposit,
@@ -286,7 +286,7 @@ func (broadcast *Broadcast) ValidatorWithdraw(username, amount, privKeyHex strin
 		Username: username,
 		Amount:   amount,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ValidatorRevoke revokes all deposited LINO token of a validator
@@ -296,7 +296,7 @@ func (broadcast *Broadcast) ValidatorRevoke(username, privKeyHex string, seq int
 	msg := model.ValidatorRevokeMsg{
 		Username: username,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 //
@@ -311,7 +311,7 @@ func (broadcast *Broadcast) VoterDeposit(username, deposit, privKeyHex string, s
 		Username: username,
 		Deposit:  deposit,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // VoterWithdraw withdraws part of LINO token from a voter's deposit,
@@ -322,7 +322,7 @@ func (broadcast *Broadcast) VoterWithdraw(username, amount, privKeyHex string, s
 		Username: username,
 		Amount:   amount,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // VoterRevoke reovkes all deposited LINO token of a voter
@@ -332,7 +332,7 @@ func (broadcast *Broadcast) VoterRevoke(username, privKeyHex string, seq int64) 
 	msg := model.VoterRevokeMsg{
 		Username: username,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // Delegate delegates a certain amount of LINO token of delegator to a voter, so
@@ -344,7 +344,7 @@ func (broadcast *Broadcast) Delegate(delegator, voter, amount, privKeyHex string
 		Voter:     voter,
 		Amount:    amount,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // DelegatorWithdraw withdraws part of delegated LINO token of a delegator
@@ -356,7 +356,7 @@ func (broadcast *Broadcast) DelegatorWithdraw(delegator, voter, amount, privKeyH
 		Voter:     voter,
 		Amount:    amount,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // RevokeDelegation reovkes all delegated LINO token of a delegator to a voter
@@ -367,7 +367,7 @@ func (broadcast *Broadcast) RevokeDelegation(delegator, voter, privKeyHex string
 		Delegator: delegator,
 		Voter:     voter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 //
@@ -385,7 +385,7 @@ func (broadcast *Broadcast) DeveloperRegister(username, deposit, website,
 		Description: description,
 		AppMetaData: appMetaData,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // DeveloperRevoke reovkes all deposited LINO token of a developer
@@ -395,7 +395,7 @@ func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int
 	msg := model.DeveloperRevokeMsg{
 		Username: username,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // GrantPermission grants a certain (e.g. Post or Micropayment) permission to
@@ -409,7 +409,7 @@ func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, va
 		GrantLevel:      grantLevel,
 		Times:           times,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // RevokePermission revokes the permission given previously to a app.
@@ -425,7 +425,7 @@ func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string, grantLe
 		PubKey:     pubKey,
 		GrantLevel: grantLevel,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 //
@@ -439,7 +439,7 @@ func (broadcast *Broadcast) ProviderReport(username string, usage int64, privKey
 		Username: username,
 		Usage:    usage,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 //
@@ -453,7 +453,7 @@ func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(creator string, pa
 		Creator:   creator,
 		Parameter: parameter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeGlobalAllocationParam changes GlobalAllocationParam with new value.
@@ -463,7 +463,7 @@ func (broadcast *Broadcast) ChangeGlobalAllocationParam(creator string, paramete
 		Creator:   creator,
 		Parameter: parameter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeInfraInternalAllocationParam changes InfraInternalAllocationParam with new value.
@@ -473,7 +473,7 @@ func (broadcast *Broadcast) ChangeInfraInternalAllocationParam(creator string, p
 		Creator:   creator,
 		Parameter: parameter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeVoteParam changes VoteParam with new value.
@@ -483,7 +483,7 @@ func (broadcast *Broadcast) ChangeVoteParam(creator string, parameter model.Vote
 		Creator:   creator,
 		Parameter: parameter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeProposalParam changes ProposalParam with new value.
@@ -493,7 +493,7 @@ func (broadcast *Broadcast) ChangeProposalParam(creator string, parameter model.
 		Creator:   creator,
 		Parameter: parameter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeDeveloperParam changes DeveloperParam with new value.
@@ -503,7 +503,7 @@ func (broadcast *Broadcast) ChangeDeveloperParam(creator string, parameter model
 		Creator:   creator,
 		Parameter: parameter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeValidatorParam changes ValidatorParam with new value.
@@ -513,7 +513,7 @@ func (broadcast *Broadcast) ChangeValidatorParam(creator string, parameter model
 		Creator:   creator,
 		Parameter: parameter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeBandwidthParam changes BandwidthParam with new value.
@@ -523,7 +523,7 @@ func (broadcast *Broadcast) ChangeBandwidthParam(creator string, parameter model
 		Creator:   creator,
 		Parameter: parameter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeAccountParam changes AccountParam with new value.
@@ -533,7 +533,7 @@ func (broadcast *Broadcast) ChangeAccountParam(creator string, parameter model.A
 		Creator:   creator,
 		Parameter: parameter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangePostParam changes PostParam with new value.
@@ -543,7 +543,7 @@ func (broadcast *Broadcast) ChangePostParam(creator string, parameter model.Post
 		Creator:   creator,
 		Parameter: parameter,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // DeletePostContent deletes the content of a post on blockchain, which is used
@@ -556,7 +556,7 @@ func (broadcast *Broadcast) DeletePostContent(creator, postAuthor, postID, reaso
 		Permlink: permlink,
 		Reason:   reason,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // VoteProposal adds a vote to a certain proposal with agree/disagree.
@@ -567,14 +567,14 @@ func (broadcast *Broadcast) VoteProposal(voter, proposalID string, result bool, 
 		ProposalID: proposalID,
 		Result:     result,
 	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq)
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 //
 // internal helper functions
 //
-func (broadcast *Broadcast) broadcastTransaction(msg interface{}, privKeyHex string, seq int64) error {
-	res, err := broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq)
+func (broadcast *Broadcast) broadcastTransaction(msg model.Msg, privKeyHex string, seq int64, memo string) error {
+	res, err := broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq, memo)
 	if err != nil {
 		return errors.FailedToBroadcastf("failed to broadcast msg: %v, got err: %v", msg, err)
 	}
