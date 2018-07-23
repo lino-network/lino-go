@@ -1,9 +1,6 @@
 package model
 
 import (
-	"math/big"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	crypto "github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -313,43 +310,7 @@ type ProposalList struct {
 	PastProposal    []string `json:"past_proposal"`
 }
 
-//
-// others
-//
-
-// Coin is the same struct used in Lino blockchain.
-type Coin struct {
-	Amount sdk.Int `json:"amount"`
-}
-
-// SDKCoin is the same struct used in cosmos-sdk.
-type SDKCoin struct {
-	Denom  string `json:"denom"`
-	Amount int64  `json:"amount"`
-}
-
-type SDKCoins []SDKCoin
-
-type Rat struct {
-	big.Rat `json:"rat"`
-}
-
-// MarshalAmino wraps r.MarshalText().
-func (r Rat) MarshalAmino() (string, error) {
-	bz, err := (&(r.Rat)).MarshalText()
-	return string(bz), err
-}
-
-// UnmarshalAmino requires a valid JSON string - strings quotes and calls UnmarshalText
-func (r *Rat) UnmarshalAmino(text string) (err error) {
-	tempRat := big.NewRat(0, 1)
-	err = tempRat.UnmarshalText([]byte(text))
-	if err != nil {
-		return err
-	}
-	r.Rat = *tempRat
-	return nil
-}
+// Other
 
 type Block struct {
 	Header     *tmtypes.Header      `json:"header"`
