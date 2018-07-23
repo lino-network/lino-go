@@ -104,7 +104,6 @@ func (query *Query) GetAccountBank(username string) (*model.AccountBank, error) 
 	if err := query.transport.Cdc.UnmarshalJSON(resp, bank); err != nil {
 		return nil, err
 	}
-
 	return bank, nil
 }
 

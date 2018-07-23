@@ -91,11 +91,11 @@ func TestAccount(t *testing.T) {
 	// }
 	// t.Errorf("ai: %v ", ai)
 
-	ab, err := testAPI.GetAccountBank("lino")
-	if err != nil {
-		t.Errorf("TestAccount: failed to get account bank: %v", err)
-	}
-	t.Errorf("ab: %v", ab)
+	// ab, err := testAPI.GetAccountBank("lino")
+	// if err != nil {
+	// 	t.Errorf("TestAccount: failed to get account bank: %v", err)
+	// }
+	// t.Errorf("ab: %v", ab)
 
 	// 	_, err = testAPI.GetAccountMeta("lino")
 	// 	if err != nil {
