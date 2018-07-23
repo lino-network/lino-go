@@ -310,7 +310,9 @@ type ProposalList struct {
 	PastProposal    []string `json:"past_proposal"`
 }
 
-// Other
+//
+// block related
+//
 
 type Block struct {
 	Header     *tmtypes.Header      `json:"header"`

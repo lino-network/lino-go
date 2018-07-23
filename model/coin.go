@@ -11,6 +11,35 @@ type Coin struct {
 	Amount Int `json:"amount"`
 }
 
+func (c Coin) CoinToLNO() string {
+	amountStr := c.Amount.String()
+
+	numZero := strings.Count(amountStr, "0")
+	if numZero >= 5 {
+		index := len(amountStr) - 5
+		return amountStr[:index]
+	} else {
+		numOfRemainZero := 5 - numZero
+		amountStr = strings.TrimRight(amountStr, "0")
+
+		if len(amountStr) > numOfRemainZero {
+			index := len(amountStr) - numOfRemainZero
+			return amountStr[:index] + "." + amountStr[index:]
+		} else {
+			numOfAddingZero := numOfRemainZero - len(amountStr)
+			res := "0."
+			for numOfAddingZero > 0 {
+				res += "0"
+				numOfAddingZero--
+			}
+
+			return res + amountStr
+		}
+	}
+
+	return ""
+}
+
 type Int struct {
 	i *big.Int
 }
@@ -81,35 +110,6 @@ func (i *Int) UnmarshalJSON(bz []byte) error {
 		i.i = new(big.Int)
 	}
 	return unmarshalJSON(i.i, bz)
-}
-
-func (c Coin) CoinToLNO() string {
-	amountStr := c.Amount.String()
-
-	numZero := strings.Count(amountStr, "0")
-	if numZero >= 5 {
-		index := len(amountStr) - 5
-		return amountStr[:index]
-	} else {
-		numOfRemainZero := 5 - numZero
-		amountStr = strings.TrimRight(amountStr, "0")
-
-		if len(amountStr) > numOfRemainZero {
-			index := len(amountStr) - numOfRemainZero
-			return amountStr[:index] + "." + amountStr[index:]
-		} else {
-			numOfAddingZero := numOfRemainZero - len(amountStr)
-			res := "0."
-			for numOfAddingZero > 0 {
-				res += "0"
-				numOfAddingZero--
-			}
-
-			return res + amountStr
-		}
-	}
-
-	return ""
 }
 
 // SDKCoin is the same struct used in cosmos-sdk.
