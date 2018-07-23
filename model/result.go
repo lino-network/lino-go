@@ -12,12 +12,11 @@ import (
 // account related
 //
 type AccountInfo struct {
-	Username        string        `json:"username"`
-	CreatedAt       int64         `json:"created_at"`
-	ResetKey        crypto.PubKey `json:"reset_key"`
-	TransactionKey  crypto.PubKey `json:"transaction_key"`
-	MicropaymentKey crypto.PubKey `json:"micropayment_key"`
-	PostKey         crypto.PubKey `json:"post_key"`
+	Username       string        `json:"username"`
+	CreatedAt      int64         `json:"created_at"`
+	ResetKey       crypto.PubKey `json:"reset_key"`
+	TransactionKey crypto.PubKey `json:"transaction_key"`
+	PostKey        crypto.PubKey `json:"post_key"`
 }
 
 type AccountBank struct {
@@ -38,7 +37,6 @@ type FrozenMoney struct {
 type GrantPubKey struct {
 	Username   string     `json:"username"`
 	Permission Permission `json:"permission"`
-	LeftTimes  int64      `json:"left_times"`
 	CreatedAt  int64      `json:"created_at"`
 	ExpiresAt  int64      `json:"expires_at"`
 }

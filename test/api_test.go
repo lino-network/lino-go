@@ -37,22 +37,18 @@ func setup(t *testing.T) {
 
 // 	resetPriv := crypto.GenPrivKeySecp256k1()
 // 	txPriv := crypto.GenPrivKeySecp256k1()
-// 	microPriv := crypto.GenPrivKeySecp256k1()
 // 	postPriv := crypto.GenPrivKeySecp256k1()
 
 // 	t.Errorf("reset private key is: %s", strings.ToUpper(hex.EncodeToString(resetPriv.Bytes())))
 // 	t.Errorf("transaction private key is: %s", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
-// 	t.Errorf("micropayment private key is: %s", strings.ToUpper(hex.EncodeToString(microPriv.Bytes())))
 // 	t.Errorf("post private key is: %s", strings.ToUpper(hex.EncodeToString(postPriv.Bytes())))
 
 // 	resetPub := resetPriv.PubKey()
 // 	txPub := txPriv.PubKey()
-// 	microPub := microPriv.PubKey()
 // 	postPub := postPriv.PubKey()
 
 // 	resetPubHex := hex.EncodeToString(resetPub.Bytes())
 // 	txPubHex := hex.EncodeToString(txPub.Bytes())
-// 	microPubHex := hex.EncodeToString(microPub.Bytes())
 // 	postPubHex := hex.EncodeToString(postPub.Bytes())
 
 // 	seq, err := testAPI.GetSeqNumber("lino")
@@ -60,7 +56,7 @@ func setup(t *testing.T) {
 // 		t.Errorf("failed to get seq: %v", err)
 // 	}
 
-// 	err = testAPI.Register(referrer, registerFee, myUser, resetPubHex, txPubHex, microPubHex, postPubHex, referrerTxPrivKey, seq)
+// 	err = testAPI.Register(referrer, registerFee, myUser, resetPubHex, txPubHex, postPubHex, referrerTxPrivKey, seq)
 // 	if err != nil {
 // 		t.Errorf("failed to register: %v", err)
 // 	}

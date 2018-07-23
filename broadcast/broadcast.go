@@ -27,7 +27,7 @@ func NewBroadcast(transport *transport.Transport) *Broadcast {
 // Register registers a new user on blockchain.
 // It composes RegisterMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Register(referrer, registerFee, username, resetPubKeyHex,
-	transactionPubKeyHex, micropaymentPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
+	transactionPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
 	resetPubKey, err := transport.GetPubKeyFromHex(resetPubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHex("Register: failed to get Reset pub key").AddCause(err)
@@ -36,23 +36,18 @@ func (broadcast *Broadcast) Register(referrer, registerFee, username, resetPubKe
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
 	}
-	micropaymentPubKey, err := transport.GetPubKeyFromHex(micropaymentPubKeyHex)
-	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get Micropayment pub key").AddCause(err)
-	}
 	postPubKey, err := transport.GetPubKeyFromHex(postPubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHex("Register: failed to get Post pub key").AddCause(err)
 	}
 
 	msg := model.RegisterMsg{
-		Referrer:              referrer,
-		RegisterFee:           registerFee,
-		NewUser:               username,
-		NewResetPubKey:        resetPubKey,
-		NewTransactionPubKey:  txPubKey,
-		NewMicropaymentPubKey: micropaymentPubKey,
-		NewPostPubKey:         postPubKey,
+		Referrer:             referrer,
+		RegisterFee:          registerFee,
+		NewUser:              username,
+		NewResetPubKey:       resetPubKey,
+		NewTransactionPubKey: txPubKey,
+		NewPostPubKey:        postPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, referrerPrivKeyHex, seq, "")
 }
@@ -109,9 +104,9 @@ func (broadcast *Broadcast) UpdateAccount(username, jsonMeta, privKeyHex string,
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
-// Recover resets all keys of a user in case of losing or compromising.
+// Recover recovers all keys of a user in case of losing or compromising.
 // It composes RecoverMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Recover(username, newResetPubKeyHex, newTransactionPubKeyHex, newMicropaymentPubKeyHex, newPostPubKeyHex, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Recover(username, newResetPubKeyHex, newTransactionPubKeyHex, newPostPubKeyHex, privKeyHex string, seq int64) error {
 	resetPubKey, err := transport.GetPubKeyFromHex(newResetPubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Reset pub key").AddCause(err)
@@ -120,21 +115,16 @@ func (broadcast *Broadcast) Recover(username, newResetPubKeyHex, newTransactionP
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Tx pub key").AddCause(err)
 	}
-	micropaymentPubKey, err := transport.GetPubKeyFromHex(newMicropaymentPubKeyHex)
-	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Micropayment pub key").AddCause(err)
-	}
 	postPubKey, err := transport.GetPubKeyFromHex(newPostPubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Post pub key").AddCause(err)
 	}
 
 	msg := model.RecoverMsg{
-		Username:              username,
-		NewResetPubKey:        resetPubKey,
-		NewTransactionPubKey:  txPubKey,
-		NewMicropaymentPubKey: micropaymentPubKey,
-		NewPostPubKey:         postPubKey,
+		Username:             username,
+		NewResetPubKey:       resetPubKey,
+		NewTransactionPubKey: txPubKey,
+		NewPostPubKey:        postPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
@@ -185,15 +175,14 @@ func (broadcast *Broadcast) Like(username, author string, weight int64, postID, 
 
 // Donate adds a money donation to a post by a user.
 // It composes DonateMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Donate(username, author, amount, postID, fromApp, memo string, isMicroPayment bool, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Donate(username, author, amount, postID, fromApp, memo string, privKeyHex string, seq int64) error {
 	msg := model.DonateMsg{
-		Username:       username,
-		Amount:         amount,
-		Author:         author,
-		PostID:         postID,
-		FromApp:        fromApp,
-		Memo:           memo,
-		IsMicroPayment: isMicroPayment,
+		Username: username,
+		Amount:   amount,
+		Author:   author,
+		PostID:   postID,
+		FromApp:  fromApp,
+		Memo:     memo,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
@@ -398,16 +387,15 @@ func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
-// GrantPermission grants a certain (e.g. Post or Micropayment) permission to
+// GrantPermission grants a certain (e.g. Post) permission to
 // an authenticated app with a certain period of time.
 // It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, validityPeriod int64, grantLevel model.Permission, times int64, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, validityPeriod int64, grantLevel model.Permission, privKeyHex string, seq int64) error {
 	msg := model.GrantPermissionMsg{
 		Username:        username,
 		AuthenticateApp: authenticateApp,
 		ValidityPeriod:  validityPeriod,
 		GrantLevel:      grantLevel,
-		Times:           times,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }

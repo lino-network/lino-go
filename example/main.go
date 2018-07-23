@@ -98,12 +98,11 @@ func main() {
 	// resetPriv := crypto.GenPrivKeyEd25519()
 	// txPriv := crypto.GenPrivKeyEd25519()
 	// fmt.Println("tx priv:", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
-	// micropaymentPriv := crypto.GenPrivKeyEd25519()
 	// postPriv := crypto.GenPrivKeyEd25519()
 
 	// err := broadcast.Register(
 	// 	"lino", "100000000", user, hex.EncodeToString(resetPriv.PubKey().Bytes()), hex.EncodeToString(txPriv.PubKey().Bytes()),
-	// 	hex.EncodeToString(micropaymentPriv.PubKey().Bytes()), hex.EncodeToString(postPriv.PubKey().Bytes()), "E1B0F79A207610DF4B9AA480C78F06C5B505B6F56A9B57A8CA05DCA868A41A95B664E319C9", 22)
+	// 	 hex.EncodeToString(postPriv.PubKey().Bytes()), "E1B0F79A207610DF4B9AA480C78F06C5B505B6F56A9B57A8CA05DCA868A41A95B664E319C9", 22)
 	// fmt.Println(err)
 
 	// // time.Sleep(3 * time.Second)
