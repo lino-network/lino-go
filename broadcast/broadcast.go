@@ -27,7 +27,7 @@ func NewBroadcast(transport *transport.Transport) *Broadcast {
 // Register registers a new user on blockchain.
 // It composes RegisterMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Register(referrer, registerFee, username, resetPubKeyHex,
-	transactionPubKeyHex, postPubKeyHex, referrerPrivKeyHex string, seq int64) error {
+	transactionPubKeyHex, appPubKeyHex, referrerPrivKeyHex string, seq int64) error {
 	resetPubKey, err := transport.GetPubKeyFromHex(resetPubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHex("Register: failed to get Reset pub key").AddCause(err)
@@ -36,9 +36,9 @@ func (broadcast *Broadcast) Register(referrer, registerFee, username, resetPubKe
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
 	}
-	postPubKey, err := transport.GetPubKeyFromHex(postPubKeyHex)
+	appPubKey, err := transport.GetPubKeyFromHex(appPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get Post pub key").AddCause(err)
+		return errors.FailedToGetPubKeyFromHex("Register: failed to get App pub key").AddCause(err)
 	}
 
 	msg := model.RegisterMsg{
@@ -47,7 +47,7 @@ func (broadcast *Broadcast) Register(referrer, registerFee, username, resetPubKe
 		NewUser:              username,
 		NewResetPubKey:       resetPubKey,
 		NewTransactionPubKey: txPubKey,
-		NewPostPubKey:        postPubKey,
+		NewAppPubKey:         appPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, referrerPrivKeyHex, seq, "")
 }
@@ -106,7 +106,7 @@ func (broadcast *Broadcast) UpdateAccount(username, jsonMeta, privKeyHex string,
 
 // Recover recovers all keys of a user in case of losing or compromising.
 // It composes RecoverMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Recover(username, newResetPubKeyHex, newTransactionPubKeyHex, newPostPubKeyHex, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Recover(username, newResetPubKeyHex, newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex string, seq int64) error {
 	resetPubKey, err := transport.GetPubKeyFromHex(newResetPubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Reset pub key").AddCause(err)
@@ -115,16 +115,16 @@ func (broadcast *Broadcast) Recover(username, newResetPubKeyHex, newTransactionP
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Tx pub key").AddCause(err)
 	}
-	postPubKey, err := transport.GetPubKeyFromHex(newPostPubKeyHex)
+	appPubKey, err := transport.GetPubKeyFromHex(newAppPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Post pub key").AddCause(err)
+		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get App pub key").AddCause(err)
 	}
 
 	msg := model.RecoverMsg{
 		Username:             username,
 		NewResetPubKey:       resetPubKey,
 		NewTransactionPubKey: txPubKey,
-		NewPostPubKey:        postPubKey,
+		NewAppPubKey:         appPubKey,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
@@ -157,18 +157,6 @@ func (broadcast *Broadcast) CreatePost(author, postID, title, content, parentAut
 		SourcePostID: sourcePostID,
 		Links:        mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
-	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
-}
-
-// Like adds a weighted-like to a post that is performed by a user.
-// It composes LikeMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Like(username, author string, weight int64, postID, privKeyHex string, seq int64) error {
-	msg := model.LikeMsg{
-		Username: username,
-		Weight:   weight,
-		Author:   author,
-		PostID:   postID,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
@@ -387,7 +375,7 @@ func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
-// GrantPermission grants a certain (e.g. Post) permission to
+// GrantPermission grants a certain (e.g. App) permission to
 // an authenticated app with a certain period of time.
 // It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, validityPeriod int64, grantLevel model.Permission, privKeyHex string, seq int64) error {

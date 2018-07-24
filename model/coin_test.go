@@ -73,12 +73,15 @@ func TestCoinToLNO(t *testing.T) {
 //
 
 func NewCoinFromInt64(amount int64) Coin {
-	return Coin{sdk.NewInt(amount)}
+	return Coin{
+		Amount: Int{big.NewInt(amount)},
+	}
 }
 
 func NewCoinFromBigInt(amount *big.Int) Coin {
-	sdkInt := sdk.NewIntFromBigInt(amount)
-	return Coin{sdkInt}
+	return Coin{
+		Amount: Int{amount},
+	}
 }
 
 func LinoToCoin(lino string) (Coin, error) {

@@ -19,7 +19,7 @@ type RegisterMsg struct {
 	NewUser              string        `json:"new_username"`
 	NewResetPubKey       crypto.PubKey `json:"new_reset_public_key"`
 	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
-	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
+	NewAppPubKey         crypto.PubKey `json:"new_app_public_key"`
 }
 
 type FollowMsg struct {
@@ -40,7 +40,7 @@ type RecoverMsg struct {
 	Username             string        `json:"username"`
 	NewResetPubKey       crypto.PubKey `json:"new_reset_public_key"`
 	NewTransactionPubKey crypto.PubKey `json:"new_transaction_public_key"`
-	NewPostPubKey        crypto.PubKey `json:"new_post_public_key"`
+	NewAppPubKey         crypto.PubKey `json:"new_app_public_key"`
 }
 
 type TransferMsg struct {
@@ -88,13 +88,6 @@ type UpdatePostMsg struct {
 type DeletePostMsg struct {
 	Author string `json:"author"`
 	PostID string `json:"post_id"`
-}
-
-type LikeMsg struct {
-	Username string `json:"username"`
-	Weight   int64  `json:"weight"`
-	Author   string `json:"author"`
-	PostID   string `json:"post_id"`
 }
 
 type DonateMsg struct {

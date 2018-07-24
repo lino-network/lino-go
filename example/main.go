@@ -98,11 +98,11 @@ func main() {
 	// resetPriv := crypto.GenPrivKeyEd25519()
 	// txPriv := crypto.GenPrivKeyEd25519()
 	// fmt.Println("tx priv:", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
-	// postPriv := crypto.GenPrivKeyEd25519()
+	// appPriv := crypto.GenPrivKeyEd25519()
 
 	// err := broadcast.Register(
 	// 	"lino", "100000000", user, hex.EncodeToString(resetPriv.PubKey().Bytes()), hex.EncodeToString(txPriv.PubKey().Bytes()),
-	// 	 hex.EncodeToString(postPriv.PubKey().Bytes()), "E1B0F79A207610DF4B9AA480C78F06C5B505B6F56A9B57A8CA05DCA868A41A95B664E319C9", 22)
+	// 	 hex.EncodeToString(appPriv.PubKey().Bytes()), "E1B0F79A207610DF4B9AA480C78F06C5B505B6F56A9B57A8CA05DCA868A41A95B664E319C9", 22)
 	// fmt.Println(err)
 
 	// // time.Sleep(3 * time.Second)
@@ -110,27 +110,27 @@ func main() {
 	// // fmt.Println(err)
 
 	// time.Sleep(3 * time.Second)
-	// err = broadcast.GrantPermission(user, "lino", 1000000, model.PostPermission, 10, hex.EncodeToString(txPriv.Bytes()), 0)
+	// err = broadcast.GrantPermission(user, "lino", 1000000, model.AppPermission, 10, hex.EncodeToString(txPriv.Bytes()), 0)
 	// fmt.Println(err)
 
 	// posts, _ := api.Query.GetUserAllPosts(user)
 	// fmt.Println(posts)
 
-	// postPub, _ := api.Query.GetPostPubKey("lino")
-	// fmt.Println(postPub)
+	// appPub, _ := api.Query.GetAppPubKey("lino")
+	// fmt.Println(appPub)
 	// pubKeyToGrantPubKeyMap, _ := api.Query.GetAllGrantPubKeys(user)
 	// fmt.Println(pubKeyToGrantPubKeyMap)
 	// fmt.Println(pubKeyToGrantPubKeyMap["65623561653938323231303338303430623038666561646563616232623735366664396339323836356136633234653539396663353165613233623235353039343939666663666431303763"])
 	// resetPub := resetPriv.PubKey()
 	// txPub := txPriv.PubKey()
-	// postPub := postPriv.PubKey()
+	// appPub := appPriv.PubKey()
 	api := api.NewLinoAPIFromArgs("test-chain-BgWrtq", "http://18.188.188.164:26657")
 	seq, _ := api.GetSeqNumber("test1")
-	err := api.GrantPermission("test1", "lino", 7*24*60*60, model.PostPermission, "A32889124085D932085B23628D966E7F98AE4F711282A82C4B9BBD5E38A143C091E3501313A6BF760D89B3AA67E12754420967BC4C4F963921B26B48BC618E9E79B12D2A94", seq)
+	err := api.GrantPermission("test1", "lino", 7*24*60*60, model.AppPermission, "A32889124085D932085B23628D966E7F98AE4F711282A82C4B9BBD5E38A143C091E3501313A6BF760D89B3AA67E12754420967BC4C4F963921B26B48BC618E9E79B12D2A94", seq)
 	if err != nil {
 		panic(err)
 	}
-	pub, _ := api.GetPostPubKey("lino")
+	pub, _ := api.GetAppPubKey("lino")
 	fmt.Println(pub)
 	info, _ := api.GetGrantPubKey("test1", "EB5AE98221037BB974CF968EFD294714D01BDF9D848981147BF7FE7432AED3219AA63E307144")
 	fmt.Printf("%+v\n", info)
@@ -140,7 +140,7 @@ func main() {
 	// resetPrivHex := hex.EncodeToString(resetPriv.Bytes())
 	// resetPubHex := hex.EncodeToString(resetPub.Bytes())
 	// txPubHex := hex.EncodeToString(txPub.Bytes())
-	// postPubHex := hex.EncodeToString(postPub.Bytes())
+	// appPubHex := hex.EncodeToString(appPub.Bytes())
 
 	// linoTxPriv := "A32889124067E8FDA45CB7FC07C4DE02E6E78F46A82A9D40FB41024C219EE5A21852E84F20638D16DEA1030F8DD58270638048080C699DA02342420155693330E1FF4272BD"
 
@@ -154,7 +154,7 @@ func main() {
 	// if err != nil {
 	// 	panic(err)
 	// }
-	// err = broadcast.Register(user, resetPubHex, postPubHex, txPubHex, resetPrivHex)
+	// err = broadcast.Register(user, resetPubHex, appPubHex, txPubHex, resetPrivHex)
 	// if err != nil {
 	// 	panic(err)
 	// }

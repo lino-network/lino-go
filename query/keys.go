@@ -42,11 +42,10 @@ var (
 	// post substore
 	postInfoSubStore           = []byte{0x00}
 	postMetaSubStore           = []byte{0x01}
-	postLikeSubStore           = []byte{0x02}
-	postReportOrUpvoteSubStore = []byte{0x03}
-	postCommentSubStore        = []byte{0x04}
-	postViewsSubStore          = []byte{0x05}
-	postDonationsSubStore      = []byte{0x06}
+	postReportOrUpvoteSubStore = []byte{0x02}
+	postCommentSubStore        = []byte{0x03}
+	postViewsSubStore          = []byte{0x04}
+	postDonationsSubStore      = []byte{0x05}
 
 	// validator substore
 	validatorSubstore     = []byte{0x00}
@@ -189,14 +188,6 @@ func getUserPostMetaPrefix(me string) []byte {
 
 func getPostMetaKey(permlink string) []byte {
 	return append(postMetaSubStore, permlink...)
-}
-
-func getPostLikePrefix(permlink string) []byte {
-	return append(append(postLikeSubStore, permlink...), KeySeparator...)
-}
-
-func getPostLikeKey(permlink string, likeUser string) []byte {
-	return append(getPostLikePrefix(permlink), likeUser...)
 }
 
 func getPostReportOrUpvotePrefix(permlink string) []byte {

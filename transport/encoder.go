@@ -45,7 +45,6 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.CreatePostMsg{}, "lino/createPost", nil)
 	cdc.RegisterConcrete(model.UpdatePostMsg{}, "lino/updatePost", nil)
 	cdc.RegisterConcrete(model.DeletePostMsg{}, "lino/deletePost", nil)
-	cdc.RegisterConcrete(model.LikeMsg{}, "lino/like", nil)
 	cdc.RegisterConcrete(model.DonateMsg{}, "lino/donate", nil)
 	cdc.RegisterConcrete(model.ViewMsg{}, "lino/view", nil)
 	cdc.RegisterConcrete(model.ReportOrUpvoteMsg{}, "lino/reportOrUpvote", nil)
