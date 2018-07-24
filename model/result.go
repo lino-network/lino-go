@@ -1,9 +1,6 @@
 package model
 
 import (
-	"math/big"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	crypto "github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -16,7 +13,7 @@ type AccountInfo struct {
 	CreatedAt      int64         `json:"created_at"`
 	ResetKey       crypto.PubKey `json:"reset_key"`
 	TransactionKey crypto.PubKey `json:"transaction_key"`
-	PostKey        crypto.PubKey `json:"post_key"`
+	AppKey         crypto.PubKey `json:"app_key"`
 }
 
 type AccountBank struct {
@@ -119,10 +116,7 @@ type PostMeta struct {
 	LastActivityAt          int64  `json:"last_activity_at"`
 	AllowReplies            bool   `json:"allow_replies"`
 	IsDeleted               bool   `json:"is_deleted"`
-	TotalLikeCount          int64  `json:"total_like_count"`
 	TotalDonateCount        int64  `json:"total_donate_count"`
-	TotalLikeWeight         int64  `json:"total_like_weight"`
-	TotalDislikeWeight      int64  `json:"total_dislike_weight"`
 	TotalReportStake        Coin   `json:"total_report_stake"`
 	TotalUpvoteStake        Coin   `json:"total_upvote_stake"`
 	TotalViewCount          int64  `json:"total_view_count"`
@@ -146,21 +140,12 @@ type Post struct {
 	LastActivityAt          int64            `json:"last_activity_at"`
 	AllowReplies            bool             `json:"allow_replies"`
 	IsDeleted               bool             `json:"is_deleted"`
-	TotalLikeCount          int64            `json:"total_like_count"`
 	TotalDonateCount        int64            `json:"total_donate_count"`
-	TotalLikeWeight         int64            `json:"total_like_weight"`
-	TotalDislikeWeight      int64            `json:"total_dislike_weight"`
 	TotalReportStake        Coin             `json:"total_report_stake"`
 	TotalUpvoteStake        Coin             `json:"total_upvote_stake"`
 	TotalViewCount          int64            `json:"total_view_count"`
 	TotalReward             Coin             `json:"reward"`
 	RedistributionSplitRate string           `json:"redistribution_split_rate"`
-}
-
-type Like struct {
-	Username  string `json:"username"`
-	Weight    int64  `json:"weight"`
-	CreatedAt int64  `json:"created_at"`
 }
 
 type ReportOrUpvote struct {
@@ -172,7 +157,7 @@ type ReportOrUpvote struct {
 
 type Comment struct {
 	Author    string `json:"author"`
-	PostID    string `json:"post_key"`
+	PostID    string `json:"post_id"`
 	CreatedAt int64  `json:"created_at"`
 }
 
@@ -314,42 +299,8 @@ type ProposalList struct {
 }
 
 //
-// others
+// block related
 //
-
-// Coin is the same struct used in Lino blockchain.
-type Coin struct {
-	Amount sdk.Int `json:"amount"`
-}
-
-// SDKCoin is the same struct used in cosmos-sdk.
-type SDKCoin struct {
-	Denom  string `json:"denom"`
-	Amount int64  `json:"amount"`
-}
-
-type SDKCoins []SDKCoin
-
-type Rat struct {
-	big.Rat `json:"rat"`
-}
-
-// MarshalAmino wraps r.MarshalText().
-func (r Rat) MarshalAmino() (string, error) {
-	bz, err := (&(r.Rat)).MarshalText()
-	return string(bz), err
-}
-
-// UnmarshalAmino requires a valid JSON string - strings quotes and calls UnmarshalText
-func (r *Rat) UnmarshalAmino(text string) (err error) {
-	tempRat := big.NewRat(0, 1)
-	err = tempRat.UnmarshalText([]byte(text))
-	if err != nil {
-		return err
-	}
-	r.Rat = *tempRat
-	return nil
-}
 
 type Block struct {
 	Header     *tmtypes.Header      `json:"header"`

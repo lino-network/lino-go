@@ -90,20 +90,6 @@ func (query *Query) GetPostReportOrUpvote(author, postID, user string) (*model.R
 	return reportOrUpvote, nil
 }
 
-// GetPostLike returns like that a user has given to a post.
-func (query *Query) GetPostLike(author, postID, likeUser string) (*model.Like, error) {
-	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(getPostLikeKey(permlink, likeUser), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-	like := new(model.Like)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, like); err != nil {
-		return nil, err
-	}
-	return like, nil
-}
-
 //
 // Range query
 //
@@ -142,10 +128,7 @@ func (query *Query) GetUserAllPosts(username string) (map[string]*model.Post, er
 			LastActivityAt:          pm.LastActivityAt,
 			AllowReplies:            pm.AllowReplies,
 			IsDeleted:               pm.IsDeleted,
-			TotalLikeCount:          pm.TotalLikeCount,
 			TotalDonateCount:        pm.TotalDonateCount,
-			TotalLikeWeight:         pm.TotalLikeWeight,
-			TotalDislikeWeight:      pm.TotalDislikeWeight,
 			TotalReportStake:        pm.TotalReportStake,
 			TotalUpvoteStake:        pm.TotalUpvoteStake,
 			TotalViewCount:          pm.TotalViewCount,
@@ -237,24 +220,4 @@ func (query *Query) GetPostAllReportOrUpvotes(author, postID string) (map[string
 	}
 
 	return userToReportOrUpvotesMap, nil
-}
-
-// GetPostAllLikes returns all likes that a post has received.
-func (query *Query) GetPostAllLikes(author, postID string) (map[string]*model.Like, error) {
-	permlink := getPermlink(author, postID)
-	resKVs, err := query.transport.QuerySubspace(getPostLikePrefix(permlink), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-
-	userToLikeMap := make(map[string]*model.Like)
-	for _, KV := range resKVs {
-		like := new(model.Like)
-		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, like); err != nil {
-			return nil, err
-		}
-		userToLikeMap[getSubstringAfterKeySeparator(KV.Key)] = like
-	}
-
-	return userToLikeMap, nil
 }

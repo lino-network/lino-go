@@ -36,8 +36,8 @@ func (query *Query) GetTransactionPubKey(username string) (string, error) {
 	return strings.ToUpper(hex.EncodeToString(info.TransactionKey.Bytes())), nil
 }
 
-// GetPostPubKey returns string format post public key.
-func (query *Query) GetPostPubKey(username string) (string, error) {
+// GetAppPubKey returns string format app public key.
+func (query *Query) GetAppPubKey(username string) (string, error) {
 	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
 	if err != nil {
 		return "", err
@@ -46,7 +46,7 @@ func (query *Query) GetPostPubKey(username string) (string, error) {
 	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
 		return "", err
 	}
-	return strings.ToUpper(hex.EncodeToString(info.PostKey.Bytes())), nil
+	return strings.ToUpper(hex.EncodeToString(info.AppKey.Bytes())), nil
 }
 
 // DoesUsernameMatchResetPrivKey returns true if a user has the reset private key.
@@ -79,19 +79,19 @@ func (query *Query) DoesUsernameMatchTxPrivKey(username, txPrivKeyHex string) (b
 	return accInfo.TransactionKey.Equals(txPrivKey.PubKey()), nil
 }
 
-// DoesUsernameMatchPostPrivKey returns true if a user has the post private key.
-func (query *Query) DoesUsernameMatchPostPrivKey(username, postPrivKeyHex string) (bool, error) {
+// DoesUsernameMatchAppPrivKey returns true if a user has the app private key.
+func (query *Query) DoesUsernameMatchAppPrivKey(username, appPrivKeyHex string) (bool, error) {
 	accInfo, err := query.GetAccountInfo(username)
 	if err != nil {
 		return false, err
 	}
 
-	postPrivKey, e := transport.GetPrivKeyFromHex(postPrivKeyHex)
+	appPrivKey, e := transport.GetPrivKeyFromHex(appPrivKeyHex)
 	if e != nil {
 		return false, e
 	}
 
-	return accInfo.PostKey.Equals(postPrivKey.PubKey()), nil
+	return accInfo.AppKey.Equals(appPrivKey.PubKey()), nil
 }
 
 // GetAccountBank returns account bank info for a specific user.

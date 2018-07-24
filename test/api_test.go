@@ -37,26 +37,26 @@ func setup(t *testing.T) {
 
 // 	resetPriv := crypto.GenPrivKeySecp256k1()
 // 	txPriv := crypto.GenPrivKeySecp256k1()
-// 	postPriv := crypto.GenPrivKeySecp256k1()
+// 	appPriv := crypto.GenPrivKeySecp256k1()
 
 // 	t.Errorf("reset private key is: %s", strings.ToUpper(hex.EncodeToString(resetPriv.Bytes())))
 // 	t.Errorf("transaction private key is: %s", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
-// 	t.Errorf("post private key is: %s", strings.ToUpper(hex.EncodeToString(postPriv.Bytes())))
+// 	t.Errorf("app private key is: %s", strings.ToUpper(hex.EncodeToString(appPriv.Bytes())))
 
 // 	resetPub := resetPriv.PubKey()
 // 	txPub := txPriv.PubKey()
-// 	postPub := postPriv.PubKey()
+// 	appPub := appPriv.PubKey()
 
 // 	resetPubHex := hex.EncodeToString(resetPub.Bytes())
 // 	txPubHex := hex.EncodeToString(txPub.Bytes())
-// 	postPubHex := hex.EncodeToString(postPub.Bytes())
+// 	appPubHex := hex.EncodeToString(appPub.Bytes())
 
 // 	seq, err := testAPI.GetSeqNumber("lino")
 // 	if err != nil {
 // 		t.Errorf("failed to get seq: %v", err)
 // 	}
 
-// 	err = testAPI.Register(referrer, registerFee, myUser, resetPubHex, txPubHex, postPubHex, referrerTxPrivKey, seq)
+// 	err = testAPI.Register(referrer, registerFee, myUser, resetPubHex, txPubHex, appPubHex, referrerTxPrivKey, seq)
 // 	if err != nil {
 // 		t.Errorf("failed to register: %v", err)
 // 	}
@@ -91,10 +91,11 @@ func TestAccount(t *testing.T) {
 	// }
 	// t.Errorf("ai: %v ", ai)
 
-	// 	_, err = testAPI.GetAccountBank("lino")
-	// 	if err != nil {
-	// 		t.Errorf("TestAccount: failed to get account bank: %v", err)
-	// 	}
+	// ab, err := testAPI.GetAccountBank("lino")
+	// if err != nil {
+	// 	t.Errorf("TestAccount: failed to get account bank: %v", err)
+	// }
+	// t.Errorf("ab: %v", ab)
 
 	// 	_, err = testAPI.GetAccountMeta("lino")
 	// 	if err != nil {
@@ -286,21 +287,11 @@ func TestAccount(t *testing.T) {
 // if err != nil {
 // 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
 // }
-// err = testAPI.Like(myUser, myUser, 10, post1, txPrivHex, seq)
-// if err != nil {
-// 	t.Errorf("TestPost: failed to broadcast Like: %v", err)
-// }
 
-// 	seq++
 // 	links := map[string]string{}
 // 	err = testAPI.UpdatePost(myUser, "newTitle", post1, "newContent", "0.3", links, txPrivHex, seq)
 // 	if err != nil {
 // 		t.Errorf("TestPost: failed to broadcast UpdatePost: %v", err)
-// 	}
-
-// 	_, err = testAPI.GetPostLike(myUser, post1, myUser)
-// 	if err != nil {
-// 		t.Errorf("TestPost: failed to get post like: %v", err)
 // 	}
 
 // Tested successfully

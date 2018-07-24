@@ -8,10 +8,10 @@ const (
 
 	// Different permission levels
 	UnknownPermission     = Permission(0)
-	PostPermission        = Permission(1)
+	AppPermission         = Permission(1)
 	TransactionPermission = Permission(2)
 	ResetPermission       = Permission(3)
-	GrantPostPermission   = Permission(4)
+	GrantAppPermission    = Permission(4)
 
 	// Different possible incomes
 	TransferIn           = DetailType(0)
