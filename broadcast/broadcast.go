@@ -376,15 +376,29 @@ func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int
 }
 
 // GrantPermission grants a certain (e.g. App) permission to
-// an authenticated app with a certain period of time.
+// an authorized app with a certain period of time.
 // It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) GrantPermission(username, authenticateApp string, validityPeriod int64, grantLevel model.Permission, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) GrantPermission(username, authorizedApp string, validityPeriodSec int64, grantLevel model.Permission, privKeyHex string, seq int64) error {
 	msg := model.GrantPermissionMsg{
-		Username:        username,
-		AuthenticateApp: authenticateApp,
-		ValidityPeriod:  validityPeriod,
-		GrantLevel:      grantLevel,
+		Username:          username,
+		AuthorizedApp:     authorizedApp,
+		ValidityPeriodSec: validityPeriodSec,
+		GrantLevel:        grantLevel,
 	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
+}
+
+// PreAuthorizationPermission grants a PreAuthorization permission to
+// an authorzied app with a certain period of time.
+// It composes PreAuthorizationMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) PreAuthorizationPermission(username, authorizedApp string, validityPeriodSec int64, amount string, privKeyHex string, seq int64) error {
+	msg := model.PreAuthorizationMsg{
+		Username:          username,
+		AuthorizedApp:     authorizedApp,
+		ValidityPeriodSec: validityPeriodSec,
+		Amount:            amount,
+	}
+
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
