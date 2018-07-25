@@ -7,11 +7,12 @@ const (
 	InvalidSeqErrCode = 3
 
 	// Different permission levels
-	UnknownPermission     = Permission(0)
-	AppPermission         = Permission(1)
-	TransactionPermission = Permission(2)
-	ResetPermission       = Permission(3)
-	GrantAppPermission    = Permission(4)
+	UnknownPermission          = Permission(0)
+	AppPermission              = Permission(1)
+	TransactionPermission      = Permission(2)
+	ResetPermission            = Permission(3)
+	GrantAppPermission         = Permission(4)
+	PreAuthorizationPermission = Permission(5)
 
 	// Different possible incomes
 	TransferIn           = DetailType(0)

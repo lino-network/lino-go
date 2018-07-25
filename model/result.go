@@ -36,6 +36,7 @@ type GrantPubKey struct {
 	Permission Permission `json:"permission"`
 	CreatedAt  int64      `json:"created_at"`
 	ExpiresAt  int64      `json:"expires_at"`
+	Amount     Coin       `json:"amount"`
 }
 
 type AccountMeta struct {

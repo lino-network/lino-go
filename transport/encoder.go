@@ -67,6 +67,7 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.DeveloperRevokeMsg{}, "lino/devRevoke", nil)
 	cdc.RegisterConcrete(model.GrantPermissionMsg{}, "lino/grantPermission", nil)
 	cdc.RegisterConcrete(model.RevokePermissionMsg{}, "lino/revokePermission", nil)
+	cdc.RegisterConcrete(model.PreAuthorizationMsg{}, "lino/preAuthorizationPermission", nil)
 
 	// infra provider
 	cdc.RegisterConcrete(model.ProviderReportMsg{}, "lino/providerReport", nil)
