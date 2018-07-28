@@ -176,6 +176,13 @@ type DeveloperRegisterMsg struct {
 	AppMetaData string `json:"app_meta_data"`
 }
 
+type DeveloperUpdateMsg struct {
+	Username    string `json:"username"`
+	Website     string `json:"website"`
+	Description string `json:"description"`
+	AppMetaData string `json:"app_meta_data"`
+}
+
 type DeveloperRevokeMsg struct {
 	Username string `json:"username"`
 }
@@ -225,59 +232,65 @@ type VoteProposalMsg struct {
 type UpgradeProtocolMsg struct {
 	Creator string `json:"creator"`
 	Link    string `json:"link"`
+	Reason  string `json:"reason"`
 }
 
 type ChangeGlobalAllocationParamMsg struct {
 	Creator   string                `json:"creator"`
 	Parameter GlobalAllocationParam `json:"parameter"`
+	Reason    string                `json:"reason"`
 }
 
 type ChangeEvaluateOfContentValueParamMsg struct {
 	Creator   string                      `json:"creator"`
 	Parameter EvaluateOfContentValueParam `json:"parameter"`
+	Reason    string                      `json:"reason"`
 }
 
 type ChangeInfraInternalAllocationParamMsg struct {
 	Creator   string                       `json:"creator"`
 	Parameter InfraInternalAllocationParam `json:"parameter"`
+	Reason    string                       `json:"reason"`
 }
 
 type ChangeVoteParamMsg struct {
 	Creator   string    `json:"creator"`
 	Parameter VoteParam `json:"parameter"`
+	Reason    string    `json:"reason"`
 }
 
 type ChangeProposalParamMsg struct {
 	Creator   string        `json:"creator"`
 	Parameter ProposalParam `json:"parameter"`
+	Reason    string        `json:"reason"`
 }
 
 type ChangeDeveloperParamMsg struct {
 	Creator   string         `json:"creator"`
 	Parameter DeveloperParam `json:"parameter"`
+	Reason    string         `json:"reason"`
 }
 
 type ChangeValidatorParamMsg struct {
 	Creator   string         `json:"creator"`
 	Parameter ValidatorParam `json:"parameter"`
-}
-
-type ChangeCoinDayParamMsg struct {
-	Creator   string       `json:"creator"`
-	Parameter CoinDayParam `json:"parameter"`
+	Reason    string         `json:"reason"`
 }
 
 type ChangeBandwidthParamMsg struct {
 	Creator   string         `json:"creator"`
 	Parameter BandwidthParam `json:"parameter"`
+	Reason    string         `json:"reason"`
 }
 
 type ChangeAccountParamMsg struct {
 	Creator   string       `json:"creator"`
 	Parameter AccountParam `json:"parameter"`
+	Reason    string       `json:"reason"`
 }
 
 type ChangePostParamMsg struct {
 	Creator   string    `json:"creator"`
 	Parameter PostParam `json:"parameter"`
+	Reason    string    `json:"reason"`
 }

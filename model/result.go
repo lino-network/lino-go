@@ -280,7 +280,8 @@ type NextProposalID struct {
 
 type ChangeParamProposal struct {
 	ProposalInfo
-	Param Parameter `json:"param"`
+	Param  Parameter `json:"param"`
+	Reason string    `json:"reason"`
 }
 
 type ContentCensorshipProposal struct {
@@ -291,7 +292,8 @@ type ContentCensorshipProposal struct {
 
 type ProtocolUpgradeProposal struct {
 	ProposalInfo
-	Link string `json:"link"`
+	Link   string `json:"link"`
+	Reason string `json:"reason"`
 }
 
 type ProposalList struct {

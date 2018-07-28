@@ -365,6 +365,19 @@ func (broadcast *Broadcast) DeveloperRegister(username, deposit, website,
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
+// DeveloperUpdate updates a developer  info on blockchain.
+// It composes DeveloperUpdateMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) DeveloperUpdate(username, website,
+	description, appMetaData, privKeyHex string, seq int64) error {
+	msg := model.DeveloperUpdateMsg{
+		Username:    username,
+		Website:     website,
+		Description: description,
+		AppMetaData: appMetaData,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
+}
+
 // DeveloperRevoke reovkes all deposited LINO token of a developer
 // so the user will not be a developer anymore.
 // It composes DeveloperRevokeMsg and then broadcasts the transaction to blockchain.
@@ -404,16 +417,15 @@ func (broadcast *Broadcast) PreAuthorizationPermission(username, authorizedApp s
 
 // RevokePermission revokes the permission given previously to a app.
 // It composes RevokePermissionMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string, grantLevel model.Permission, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string, privKeyHex string, seq int64) error {
 	pubKey, err := transport.GetPubKeyFromHex(pubKeyHex)
 	if err != nil {
 		return errors.FailedToGetPubKeyFromHex("Register: failed to get pub key").AddCause(err)
 	}
 
 	msg := model.RevokePermissionMsg{
-		Username:   username,
-		PubKey:     pubKey,
-		GrantLevel: grantLevel,
+		Username: username,
+		PubKey:   pubKey,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
@@ -438,100 +450,110 @@ func (broadcast *Broadcast) ProviderReport(username string, usage int64, privKey
 
 // ChangeEvaluateOfContentValueParam changes EvaluateOfContentValueParam with new value.
 // It composes ChangeEvaluateOfContentValueParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(creator string, parameter model.EvaluateOfContentValueParam, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(creator string, parameter model.EvaluateOfContentValueParam, reason string, privKeyHex string, seq int64) error {
 	msg := model.ChangeEvaluateOfContentValueParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
+		Reason:    reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeGlobalAllocationParam changes GlobalAllocationParam with new value.
 // It composes ChangeGlobalAllocationParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeGlobalAllocationParam(creator string, parameter model.GlobalAllocationParam, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ChangeGlobalAllocationParam(creator string, parameter model.GlobalAllocationParam, reason string, privKeyHex string, seq int64) error {
 	msg := model.ChangeGlobalAllocationParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
+		Reason:    reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeInfraInternalAllocationParam changes InfraInternalAllocationParam with new value.
 // It composes ChangeInfraInternalAllocationParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeInfraInternalAllocationParam(creator string, parameter model.InfraInternalAllocationParam, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ChangeInfraInternalAllocationParam(creator string, parameter model.InfraInternalAllocationParam, reason string, privKeyHex string, seq int64) error {
 	msg := model.ChangeInfraInternalAllocationParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
+		Reason:    reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeVoteParam changes VoteParam with new value.
 // It composes ChangeVoteParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeVoteParam(creator string, parameter model.VoteParam, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ChangeVoteParam(creator string, parameter model.VoteParam, reason string, privKeyHex string, seq int64) error {
 	msg := model.ChangeVoteParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
+		Reason:    reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeProposalParam changes ProposalParam with new value.
 // It composes ChangeProposalParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeProposalParam(creator string, parameter model.ProposalParam, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ChangeProposalParam(creator string, parameter model.ProposalParam, reason string, privKeyHex string, seq int64) error {
 	msg := model.ChangeProposalParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
+		Reason:    reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeDeveloperParam changes DeveloperParam with new value.
 // It composes ChangeDeveloperParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeDeveloperParam(creator string, parameter model.DeveloperParam, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ChangeDeveloperParam(creator string, parameter model.DeveloperParam, reason string, privKeyHex string, seq int64) error {
 	msg := model.ChangeDeveloperParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
+		Reason:    reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeValidatorParam changes ValidatorParam with new value.
 // It composes ChangeValidatorParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeValidatorParam(creator string, parameter model.ValidatorParam, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ChangeValidatorParam(creator string, parameter model.ValidatorParam, reason string, privKeyHex string, seq int64) error {
 	msg := model.ChangeValidatorParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
+		Reason:    reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeBandwidthParam changes BandwidthParam with new value.
 // It composes ChangeBandwidthParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeBandwidthParam(creator string, parameter model.BandwidthParam, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ChangeBandwidthParam(creator string, parameter model.BandwidthParam, reason string, privKeyHex string, seq int64) error {
 	msg := model.ChangeBandwidthParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
+		Reason:    reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangeAccountParam changes AccountParam with new value.
 // It composes ChangeAccountParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeAccountParam(creator string, parameter model.AccountParam, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ChangeAccountParam(creator string, parameter model.AccountParam, reason string, privKeyHex string, seq int64) error {
 	msg := model.ChangeAccountParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
+		Reason:    reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
 // ChangePostParam changes PostParam with new value.
 // It composes ChangePostParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangePostParam(creator string, parameter model.PostParam, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ChangePostParam(creator string, parameter model.PostParam, reason string, privKeyHex string, seq int64) error {
 	msg := model.ChangePostParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
+		Reason:    reason,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
