@@ -9,6 +9,7 @@ import (
 	"github.com/lino-network/lino-go/model"
 
 	crypto "github.com/tendermint/tendermint/crypto"
+	cryptoAmino "github.com/tendermint/tendermint/crypto/encoding/amino"
 )
 
 // ZeroFee is used in building a standard transaction.
@@ -187,7 +188,7 @@ func GetPrivKeyFromHex(privHex string) (crypto.PrivKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	return crypto.PrivKeyFromBytes(keyBytes)
+	return cryptoAmino.PrivKeyFromBytes(keyBytes)
 }
 
 // GetPubKeyFromHex gets public key from public key hex.
@@ -200,5 +201,5 @@ func GetPubKeyFromHex(pubHex string) (crypto.PubKey, error) {
 	if keyBytes == nil || len(keyBytes) == 0 {
 		return nil, errors.EmptyResponse("Empty bytes !")
 	}
-	return crypto.PubKeyFromBytes(keyBytes)
+	return cryptoAmino.PubKeyFromBytes(keyBytes)
 }

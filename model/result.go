@@ -306,7 +306,7 @@ type ProposalList struct {
 //
 
 type Block struct {
-	Header     *tmtypes.Header      `json:"header"`
+	Header     tmtypes.Header       `json:"header"`
 	Evidence   tmtypes.EvidenceData `json:"evidence"`
 	LastCommit *tmtypes.Commit      `json:"last_commit"`
 	Data       *Data                `json:"data"`

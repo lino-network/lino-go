@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/lino-network/lino-go/api"
 	"github.com/lino-network/lino-go/model"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 //"encoding/hex"
@@ -124,15 +126,24 @@ func main() {
 	// resetPub := resetPriv.PubKey()
 	// txPub := txPriv.PubKey()
 	// appPub := appPriv.PubKey()
-	api := api.NewLinoAPIFromArgs("test-chain-BgWrtq", "http://18.188.188.164:26657")
-	seq, _ := api.GetSeqNumber("test1")
-	err := api.GrantPermission("test1", "lino", 7*24*60*60, model.AppPermission, "A32889124085D932085B23628D966E7F98AE4F711282A82C4B9BBD5E38A143C091E3501313A6BF760D89B3AA67E12754420967BC4C4F963921B26B48BC618E9E79B12D2A94", seq)
+	newUserResetKey := secp256k1.GenPrivKey()
+	newUserTxKey := secp256k1.GenPrivKey()
+	newUserAppKey := secp256k1.GenPrivKey()
+	newUser := "test3"
+
+	api := api.NewLinoAPIFromArgs("test-chain-knWedd", "http://localhost:26657")
+	seq, _ := api.GetSeqNumber("lino")
+	err := api.Register("lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B20F3A428EAB69457ED61200193B45CA2499A0C612F7597A41925A540E4C0AFEF46", seq)
+	if err != nil {
+		panic(err)
+	}
+	err = api.GrantPermission(newUser, "lino", 7*24*60*60, model.AppPermission, hex.EncodeToString(newUserTxKey.Bytes()), 0)
 	if err != nil {
 		panic(err)
 	}
 	pub, _ := api.GetAppPubKey("lino")
 	fmt.Println(pub)
-	info, _ := api.GetGrantPubKey("test1", "EB5AE98221037BB974CF968EFD294714D01BDF9D848981147BF7FE7432AED3219AA63E307144")
+	info, _ := api.GetGrantPubKey(newUser, pub)
 	fmt.Printf("%+v\n", info)
 	// addr := resetPub.Address()
 
