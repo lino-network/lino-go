@@ -10,6 +10,11 @@ type Coin struct {
 	Amount Int `json:"amount"`
 }
 
+func NewCoinFromString(amount string) (Coin, bool) {
+	res, ok := NewIntFromString(amount)
+	return Coin{res}, ok
+}
+
 func (c Coin) CoinToLNO() string {
 	amountStr := c.Amount.String()
 
