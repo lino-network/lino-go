@@ -14,6 +14,20 @@ func (i Int) BigInt() *big.Int {
 	return new(big.Int).Set(i.i)
 }
 
+// NewIntFromString constructs Int from string
+func NewIntFromString(s string) (res Int, ok bool) {
+	i, ok := newIntegerFromString(s)
+	if !ok {
+		return
+	}
+	// Check overflow
+	if i.BitLen() > 255 {
+		ok = false
+		return
+	}
+	return Int{i}, true
+}
+
 // IsZero returns true if Int is zero
 func (i Int) IsZero() bool {
 	return i.i.Sign() == 0
@@ -94,6 +108,10 @@ func MinInt(i1, i2 Int) Int {
 
 func (i Int) String() string {
 	return i.i.String()
+}
+
+func newIntegerFromString(s string) (*big.Int, bool) {
+	return new(big.Int).SetString(s, 0)
 }
 
 func equal(i *big.Int, i2 *big.Int) bool { return i.Cmp(i2) == 0 }
