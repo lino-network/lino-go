@@ -44,8 +44,116 @@ type Int struct {
 	i *big.Int
 }
 
+// BigInt converts Int to big.Int
+func (i Int) BigInt() *big.Int {
+	return new(big.Int).Set(i.i)
+}
+
+// IsZero returns true if Int is zero
+func (i Int) IsZero() bool {
+	return i.i.Sign() == 0
+}
+
+// Sign returns sign of Int
+func (i Int) Sign() int {
+	return i.i.Sign()
+}
+
+// Equal compares two Ints
+func (i Int) Equal(i2 Int) bool {
+	return equal(i.i, i2.i)
+}
+
+// GT returns true if first Int is greater than second
+func (i Int) GT(i2 Int) bool {
+	return gt(i.i, i2.i)
+}
+
+// LT returns true if first Int is lesser than second
+func (i Int) LT(i2 Int) bool {
+	return lt(i.i, i2.i)
+}
+
+// Add adds Int from another
+func (i Int) Add(i2 Int) (res Int) {
+	res = Int{add(i.i, i2.i)}
+	// Check overflow
+	if res.i.BitLen() > 255 {
+		panic("Int overflow")
+	}
+	return
+}
+
+// Sub subtracts Int from another
+func (i Int) Sub(i2 Int) (res Int) {
+	res = Int{sub(i.i, i2.i)}
+	// Check overflow
+	if res.i.BitLen() > 255 {
+		panic("Int overflow")
+	}
+	return
+}
+
+// Mul multiples two Ints
+func (i Int) Mul(i2 Int) (res Int) {
+	// Check overflow
+	if i.i.BitLen()+i2.i.BitLen()-1 > 255 {
+		panic("Int overflow")
+	}
+	res = Int{mul(i.i, i2.i)}
+	// Check overflow if sign of both are same
+	if res.i.BitLen() > 255 {
+		panic("Int overflow")
+	}
+	return
+}
+
+// Div divides Int with Int
+func (i Int) Div(i2 Int) (res Int) {
+	// Check division-by-zero
+	if i2.i.Sign() == 0 {
+		panic("Division by zero")
+	}
+	return Int{div(i.i, i2.i)}
+}
+
+// Neg negates Int
+func (i Int) Neg() (res Int) {
+	return Int{neg(i.i)}
+}
+
+// Return the minimum of the ints
+func MinInt(i1, i2 Int) Int {
+	return Int{min(i1.BigInt(), i2.BigInt())}
+}
+
 func (i Int) String() string {
 	return i.i.String()
+}
+
+func equal(i *big.Int, i2 *big.Int) bool { return i.Cmp(i2) == 0 }
+
+func gt(i *big.Int, i2 *big.Int) bool { return i.Cmp(i2) == 1 }
+
+func lt(i *big.Int, i2 *big.Int) bool { return i.Cmp(i2) == -1 }
+
+func add(i *big.Int, i2 *big.Int) *big.Int { return new(big.Int).Add(i, i2) }
+
+func sub(i *big.Int, i2 *big.Int) *big.Int { return new(big.Int).Sub(i, i2) }
+
+func mul(i *big.Int, i2 *big.Int) *big.Int { return new(big.Int).Mul(i, i2) }
+
+func div(i *big.Int, i2 *big.Int) *big.Int { return new(big.Int).Div(i, i2) }
+
+// func mod(i *big.Int, i2 *big.Int) *big.Int { return new(big.Int).Mod(i, i2) }
+
+func neg(i *big.Int) *big.Int { return new(big.Int).Neg(i) }
+
+func min(i *big.Int, i2 *big.Int) *big.Int {
+	if i.Cmp(i2) == 1 {
+		return new(big.Int).Set(i2)
+	}
+	return new(big.Int).Set(i)
 }
 
 // MarshalAmino for custom encoding scheme
