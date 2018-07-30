@@ -588,7 +588,7 @@ func (broadcast *Broadcast) VoteProposal(voter, proposalID string, result bool, 
 func (broadcast *Broadcast) broadcastTransaction(msg model.Msg, privKeyHex string, seq int64, memo string) error {
 	res, err := broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq, memo)
 	if err != nil {
-		return errors.FailedToBroadcastf("failed to broadcast msg: %v, got err: %v", msg, err)
+		return err
 	}
 
 	code := retrieveCodeFromBlockChainCode(res.CheckTx.Code)
