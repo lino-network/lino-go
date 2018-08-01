@@ -87,7 +87,7 @@ type BalanceHistory struct {
 }
 
 type Detail struct {
-	DetailType DetailType `json:"detail"`
+	DetailType DetailType `json:"detail_type"`
 	From       string     `json:"from"`
 	To         string     `json:"to"`
 	Amount     Coin       `json:"amount"`
