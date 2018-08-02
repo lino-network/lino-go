@@ -62,12 +62,17 @@ func NewTransportFromArgs(chainID, nodeUrl string) *Transport {
 
 // Query from Tendermint with the provided key and storename
 func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err error) {
-	return t.query(key, storeName, "key")
+	return t.query(key, storeName, "key", 0)
+}
+
+// Query from Tendermint with the provided key and storename at certain height
+func (t Transport) QueryAtHeight(key cmn.HexBytes, storeName string, height int64) (res []byte, err error) {
+	return t.query(key, storeName, "key", height)
 }
 
 // Query from Tendermint with the provided subspace and storename
 func (t Transport) QuerySubspace(subspace []byte, storeName string) (res []sdk.KVPair, err error) {
-	resRaw, err := t.query(subspace, storeName, "subspace")
+	resRaw, err := t.query(subspace, storeName, "subspace", 0)
 	if err != nil {
 		return res, err
 	}
@@ -75,14 +80,18 @@ func (t Transport) QuerySubspace(subspace []byte, storeName string) (res []sdk.K
 	return
 }
 
-func (t Transport) query(key cmn.HexBytes, storeName, endPath string) (res []byte, err error) {
+func (t Transport) query(key cmn.HexBytes, storeName, endPath string, height int64) (res []byte, err error) {
 	path := fmt.Sprintf("/store/%s/%s", storeName, endPath)
 	node, err := t.GetNode()
 	if err != nil {
 		return res, err
 	}
 
-	result, err := node.ABCIQuery(path, key)
+	opts := rpcclient.ABCIQueryOptions{
+		Height:  height,
+		Trusted: true,
+	}
+	result, err := node.ABCIQueryWithOptions(path, key, opts)
 	if err != nil {
 		return res, err
 	}
