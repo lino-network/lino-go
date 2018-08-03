@@ -1,16 +1,17 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/lino-network/lino-go/api"
 )
 
 var (
-	chainID = "test-chain-q8lMWR"
-	nodeURL = "http://localhost:26657"
-	// chainID = "test-chain-BgWrtq"
-	// nodeURL = "http://fullnode.linovalidator.io:80"
+	// chainID = "test-chain-q8lMWR"
+	// nodeURL = "http://localhost:26657"
+	chainID = "test-chain-BgWrtq"
+	nodeURL = "http://fullnode.linovalidator.io:80"
 
 	referrer          = "lino"
 	registerFee       = "10000000"
@@ -85,27 +86,34 @@ func TestAccount(t *testing.T) {
 	// 	t.Errorf("TestAccount: failed to get account all relationship: %v", err)
 	// }
 
-	// ai, err := testAPI.GetAccountInfo("new1")
+	// ai, err := testAPI.GetAccountInfo("lino")
 	// if err != nil {
 	// 	t.Errorf("TestAccount: failed to get account info: %v", err)
 	// }
-	// t.Errorf("ai: %v ", ai)
+	// t.Errorf("lino ai: %v ", ai)
 
-	// ab, err := testAPI.GetAccountBank("lino")
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get account bank: %v", err)
-	// }
-	// t.Errorf("ab: %v", ab)
+	ab, err := testAPI.GetAccountBank("lino")
+	if err != nil {
+		t.Errorf("TestAccount: failed to get account bank: %v", err)
+	}
+	t.Errorf("ab: %v", ab)
 
 	// 	_, err = testAPI.GetAccountMeta("lino")
 	// 	if err != nil {
 	// 		t.Errorf("TestAccount: failed to get account meta: %v", err)
 	// 	}
 
-	// 	_, err = testAPI.GetReward("lino")
-	// 	if err != nil {
-	// 		t.Errorf("TestAccount: failed to get reward: %v", err)
-	// 	}
+	r1, err := testAPI.GetReward("test1")
+	if err != nil {
+		t.Errorf("TestAccount: failed to get reward: %v", err)
+	}
+	fmt.Println(">>r1: ", r1)
+
+	r2, err := testAPI.GetRewardAtHeight("test1", 10)
+	if err != nil {
+		t.Errorf("TestAccount: failed to get reward at height: %v", err)
+	}
+	fmt.Println(">>r2: ", r2)
 
 	// _, err := testAPI.GetAllBalanceHistory(myUser)
 	// if err != nil {
@@ -118,6 +126,7 @@ func TestAccount(t *testing.T) {
 	// if err != nil {
 	// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
 	// }
+	// fmt.Println("seq: ", linoSeq)
 	// err = testAPI.Transfer("lino", myUser, "1", "memo1", referrerTxPrivKey, linoSeq)
 	// if err != nil {
 	// 	t.Errorf("TestAccount: failed to transfer 0.1B to myUser")

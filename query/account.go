@@ -294,6 +294,27 @@ func (query *Query) GetReward(username string) (*model.Reward, error) {
 	return reward, nil
 }
 
+// GetRewardAtHeight returns rewards of a user at certain height.
+func (query *Query) GetRewardAtHeight(username string, height int64) (*model.Reward, error) {
+	resp, err := query.transport.QueryAtHeight(getRewardKey(username), AccountKVStoreKey, height)
+	if err != nil {
+		switch err.(type) {
+		case errors.Error:
+			vErr := err.(errors.Error)
+			if vErr.CodeType() == errors.CodeEmptyResponse {
+				return nil, nil
+			}
+		}
+		return nil, err
+	}
+
+	reward := new(model.Reward)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, reward); err != nil {
+		return reward, err
+	}
+	return reward, nil
+}
+
 // GetAllRewardHistory returns all reward history related to
 // a user's posts reward, in reverse-chronological order.
 func (query *Query) GetAllRewardHistory(username string) (*model.RewardHistory, error) {
