@@ -92,11 +92,11 @@ func TestAccount(t *testing.T) {
 	// }
 	// t.Errorf("lino ai: %v ", ai)
 
-	ab, err := testAPI.GetAccountBank("lino")
+	_, err := testAPI.GetAccountBank("lino")
 	if err != nil {
 		t.Errorf("TestAccount: failed to get account bank: %v", err)
 	}
-	t.Errorf("ab: %v", ab)
+	// t.Errorf("ab: %v", ab)
 
 	// 	_, err = testAPI.GetAccountMeta("lino")
 	// 	if err != nil {
@@ -385,13 +385,19 @@ func TestAccount(t *testing.T) {
 // 	}
 // }
 
-// func TestBlocks(t *testing.T) {
+func TestBlocks(t *testing.T) {
 
-// 	_, err := testAPI.GetBlock(1)
-// 	if err != nil {
-// 		t.Errorf("TestBlocks: failed to get block at height 1: %v", err)
-// 	}
-// }
+	_, err := testAPI.GetBlock(1)
+	if err != nil {
+		t.Errorf("TestBlocks: failed to get block at height 1: %v", err)
+	}
+
+	bs, err := testAPI.GetBlockStatus()
+	if err != nil {
+		t.Errorf("TestBlocks: failed to get block status: %v", err)
+	}
+	t.Errorf(">> bs: %v", bs)
+}
 
 // func TestProposal(t *testing.T) {
 
