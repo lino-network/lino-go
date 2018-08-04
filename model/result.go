@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	crypto "github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -310,6 +312,11 @@ type Block struct {
 	Evidence   tmtypes.EvidenceData `json:"evidence"`
 	LastCommit *tmtypes.Commit      `json:"last_commit"`
 	Data       *Data                `json:"data"`
+}
+
+type BlockStatus struct {
+	LatestBlockHeight int64     `json:"latest_block_height"`
+	LatestBlockTime   time.Time `json:"latest_block_time"`
 }
 
 type Data struct {

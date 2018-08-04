@@ -42,3 +42,18 @@ func (query *Query) GetBlock(height int64) (*model.Block, error) {
 	}
 	return block, nil
 }
+
+// GetBlockStatus returns the current block status from blockchain.
+func (query *Query) GetBlockStatus() (*model.BlockStatus, error) {
+	resp, err := query.transport.QueryBlockStatus()
+	if err != nil {
+		return nil, errors.QueryFailf("GetBlockStatus err").AddCause(err)
+	}
+
+	bs := &model.BlockStatus{
+		LatestBlockHeight: resp.SyncInfo.LatestBlockHeight,
+		LatestBlockTime:   resp.SyncInfo.LatestBlockTime,
+	}
+
+	return bs, nil
+}

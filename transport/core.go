@@ -117,6 +117,16 @@ func (t Transport) QueryBlock(height int64) (res *ctypes.ResultBlock, err error)
 	return node.Block(&height)
 }
 
+// QueryBlockStatus queries block status from blockchain.
+func (t Transport) QueryBlockStatus() (res *ctypes.ResultStatus, err error) {
+	node, err := t.GetNode()
+	if err != nil {
+		return res, err
+	}
+
+	return node.Status()
+}
+
 // BroadcastTx broadcasts a transcation to blockchain.
 func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, error) {
 	node, err := t.GetNode()
