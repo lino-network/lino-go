@@ -1,5 +1,7 @@
 package model
 
+import "github.com/lino-network/lino/types"
+
 // parameters can be changed by proposal
 type Parameter interface{}
 
@@ -79,10 +81,11 @@ type BandwidthParam struct {
 }
 
 type AccountParam struct {
-	MinimumBalance           Coin  `json:"minimum_balance"`
-	RegisterFee              Coin  `json:"register_fee"`
-	BalanceHistoryBundleSize int64 `json:"balance_history_bundle_size"`
-	RewardHistoryBundleSize  int64 `json:"reward_history_bundle_size"`
+	MinimumBalance             Coin       `json:"minimum_balance"`
+	RegisterFee                Coin       `json:"register_fee"`
+	BalanceHistoryBundleSize   int64      `json:"balance_history_bundle_size"`
+	RewardHistoryBundleSize    int64      `json:"reward_history_bundle_size"`
+	FirstDepositFullStakeLimit types.Coin `json:"first_deposit_full_stake_limit"`
 }
 
 type PostParam struct {
