@@ -2,6 +2,24 @@
 * [Get Tools & dependencies](#get-tools-dependencies)  
 * [Init](#init)  
 * [API](#api)  
+    * [Query](#query)  
+        * [Account](#account)  
+        * [Developer](#developer)  
+        * [Infra](#infra)  
+        * [Blockchain Parameters](#blockchain-parameters)  
+        * [Post](#post)  
+        * [Proposal](#proposal)  
+        * [Block](#block)  
+        * [Validator](#validator)  
+        * [Vote](#vote)  
+    * [Broadcast](#broadcast)  
+        * [Account](#broadcast-account)  
+        * [Post](#broadcast-post)  
+        * [Validator](#broadcast-validator)  
+        * [Vote](#broadcast-vote)  
+        * [Developer](#broadcast-developer)  
+        * [Infra](#broadcast-infra)  
+        * [Proposal](#broadcast-proposal)  
 
 ## Get Tools & Dependencies
 ```
@@ -142,7 +160,7 @@ developer, err := api.GetDeveloper(developerName)
 devevlopers, err := api.GetDevelopers()
 ```
 
-#### Infrastructure
+#### Infra
 ##### Get Infra Provider
 ```
 infraProvider, err := api.GetInfraProvider(providerName)
@@ -286,8 +304,34 @@ validator, err := api.GetValidator()
 validators, err := api.GetAllValidators()
 ```
 
+#### Vote
+##### Get Delegation
+```
+delegation, err := api.GetDelegation(voter, delegator)
+```
+##### Get Voter All Delegations
+```
+delegations, err := api.GetVoterAllDelegation(voter)
+```
+##### Get Delegator All Delegations
+```
+delegations, err := api.GetDelegatorAllDelegation(delegatorName)
+```
+##### Get Voter
+```
+voter, err := api.GetVoter(voterName)
+```
+##### Get Vote
+```
+vote, err := api.GetVote(proposalID, voter)
+```
+##### Get Proposal All Votes
+```
+votes, err := api.GetProposalAllVotes(proposalID)
+```
+
 ### Broadcast
-#### Account
+#### Broadcast Account
 ##### Register A New User
 ```
 seq, err := api.GetSeqNumber(referrer)
@@ -324,7 +368,7 @@ seq, err := api.GetSeqNumber(username)
 err = api.Recover(username, newResetPubKeyHex, newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex, seq)
 ```
 
-#### Post
+#### Broadcast Post
 ##### Create Post
 ```
 seq, err := api.GetSeqNumber(author)
@@ -356,7 +400,7 @@ seq, err := api.GetSeqNumber(author)
 err = api.UpdatePost(author, title, postID, content, redistributionSplitRate, links, privKeyHex, seq)
 ```
 
-#### Validator
+#### Broadcast Validator
 ##### Validator Deposit
 ```
 seq, err := api.GetSeqNumber(username)
@@ -373,7 +417,7 @@ seq, err := api.GetSeqNumber(username)
 err = api.ValidatorRevoke(username, privKeyHex, seq)
 ```
 
-#### Vote
+#### Broadcast Vote
 ##### Voter Deposit
 ```
 seq, err := api.GetSeqNumber(username)
@@ -405,7 +449,7 @@ seq, err := api.GetSeqNumber(delegator)
 err = api.RevokeDelegation(delegator, voter, privKeyHex, seq)
 ```
 
-#### Developer
+#### Broadcast Developer
 ##### Developer Register
 ```
 seq, err := api.GetSeqNumber(username)
@@ -437,14 +481,14 @@ seq, err := api.GetSeqNumber(username)
 err = api.RevokePermission(username, pubKeyHex, privKeyHex, seq)
 ```
 
-#### Infra
+#### Broadcast Infra
 ##### Infra Provider Report
 ```
 seq, err := api.GetSeqNumber(username)
 err = api.ProviderReport(username, usage, privKeyHex, seq)
 ```
 
-#### Proposal
+#### Broadcast Proposal
 ##### Change Evaluate Of Content Value Param
 ```
 seq, err := api.GetSeqNumber(creator)
