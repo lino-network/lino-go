@@ -1,7 +1,7 @@
 # Documentation
-[Get Tools & dependencies](#get Tools & Dependencies)  
-[Init](#init)  
-[API](#aPI)  
+* [Get Tools & dependencies](#get-tools-dependencies)  
+* [Init](#init)  
+* [API](#api)  
 
 ## Get Tools & Dependencies
 ```
