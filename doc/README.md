@@ -1,7 +1,7 @@
 # Documentation
-[Get Tools & dependencies](## Get Tools & Dependencies)
-[Init](## Init)
-[API](## API)
+[Get Tools & dependencies](#get Tools & Dependencies)  
+[Init](#init)  
+[API](#aPI)  
 
 ## Get Tools & Dependencies
 ```
@@ -16,8 +16,8 @@ chanID and nodeURL can be found remotely from https://linotracker.io/
 or locally from ~/.lino/config/genesis.json
 
 For example,  
-Remotely, chainID = "test-chain-BgWrtq" and nodeURL = "http://fullnode.linovalidator.io:80"  
-Locally, chainID = "test-chain-q8lMWR" and nodeURL = "http://localhost:26657"  
+Remotely: chainID = "test-chain-BgWrtq" and nodeURL = "http://fullnode.linovalidator.io:80"  
+Locally: chainID = "test-chain-q8lMWR" and nodeURL = "http://localhost:26657"  
 
 ## API
 
