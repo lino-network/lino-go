@@ -1,6 +1,7 @@
 package query
 
 import (
+	"encoding/base64"
 	"encoding/hex"
 	"math"
 	"strings"
@@ -8,6 +9,7 @@ import (
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 // GetAccountInfo returns account info for a specific user.
@@ -564,4 +566,22 @@ func (query *Query) GetAllFollowingMeta(username string) (map[string]*model.Foll
 	}
 
 	return followingMetas, nil
+}
+
+// GetAllFollowingMeta returns all following meta of a user.
+func (query *Query) VerifyUserSignatureUsingAppKey(username string, payload string, signature string) (bool, error) {
+	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+	if err != nil {
+		return false, err
+	}
+	info := new(model.AccountInfo)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
+		return false, err
+	}
+	data, err := base64.StdEncoding.DecodeString(signature)
+	if err != nil {
+		return false, err
+	}
+	sig := secp256k1.SignatureSecp256k1(data)
+	return info.AppKey.VerifyBytes([]byte(payload), sig), nil
 }
