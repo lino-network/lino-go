@@ -297,7 +297,7 @@ blockStatus, err := api.GetBlockStatus()
 #### Validator
 ##### Get Validator
 ```
-validator, err := api.GetValidator()
+validator, err := api.GetValidator(username)
 ```
 ##### Get All Validators
 ```
@@ -350,12 +350,12 @@ err = api.Follow(follower, followee, privKeyHex, seq)
 ##### Unfollow 
 ```
 seq, err := api.GetSeqNumber(follower)
-err = api.Follow(follower, followee, privKeyHex, seq)
+err = api.Unfollow(follower, followee, privKeyHex, seq)
 ```
 ##### Claim Reward
 ```
 seq, err := api.GetSeqNumber(username)
-err = api.Follow(username, privKeyHex, seq)
+err = api.Claim(username, privKeyHex, seq)
 ```
 ##### Update Account
 ```
