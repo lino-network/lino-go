@@ -582,6 +582,17 @@ func (broadcast *Broadcast) VoteProposal(voter, proposalID string, result bool, 
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
+// UpgradeProtocol upgrades the protocol.
+// It composes UpgradeProtocolMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) UpgradeProtocol(creator, link, reason string, privKeyHex string, seq int64) error {
+	msg := model.UpgradeProtocolMsg{
+		Creator: creator,
+		Link:    link,
+		Reason:  reason,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
+}
+
 //
 // internal helper functions
 //
