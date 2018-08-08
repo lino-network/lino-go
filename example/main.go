@@ -6,6 +6,7 @@ import (
 
 	"github.com/lino-network/lino-go/api"
 	"github.com/lino-network/lino-go/model"
+	"github.com/lino-network/lino-go/transport"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
@@ -131,20 +132,25 @@ func main() {
 	newUserAppKey := secp256k1.GenPrivKey()
 	newUser := "test3"
 
-	api := api.NewLinoAPIFromArgs("test-chain-knWedd", "http://localhost:26657")
+	api := api.NewLinoAPIFromArgs("test-chain-BgWrtq", "http://18.188.188.164:26657")
 	seq, _ := api.GetSeqNumber("lino")
 	err := api.Register("lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B20F3A428EAB69457ED61200193B45CA2499A0C612F7597A41925A540E4C0AFEF46", seq)
 	if err != nil {
-		panic(err)
+		// panic(err)
 	}
 	err = api.GrantPermission(newUser, "lino", 7*24*60*60, model.AppPermission, hex.EncodeToString(newUserTxKey.Bytes()), 0)
 	if err != nil {
-		panic(err)
+		// panic(err)
 	}
 	pub, _ := api.GetAppPubKey("lino")
 	fmt.Println(pub)
 	info, _ := api.GetGrantPubKey(newUser, pub)
 	fmt.Printf("%+v\n", info)
+	privKey, _ := transport.GetPrivKeyFromHex("E1B0F79B20490005A517EB5CA5C8BE22FB7865ADD64F01AAF9797440DE18F0260A2421E633")
+	sig, err := api.Query.SignWithSha256("wpbqekqjaa", privKey)
+	fmt.Println([]byte(sig.(secp256k1.SignatureSecp256k1)), err)
+	res, err := api.Query.VerifyUserSignatureUsingAppKey("lino", "wpbqekqjaa", "MEUCIQCobG+y7tjoLlxo1ZwsiXPsiOXZZrhUy8XcX0D0glUNegIgaOdN+NwZnBxkzSwaQ0J2XnlUvXcV0x1VGqjeZaOWI0E=")
+	fmt.Printf("verify sig result: %+v, %+v\n", res, err)
 	// addr := resetPub.Address()
 
 	// addrHex := strings.ToUpper(hex.EncodeToString(addr))

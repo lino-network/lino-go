@@ -1,6 +1,7 @@
 package query
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 	"math"
@@ -9,6 +10,7 @@ import (
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
+	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
@@ -569,6 +571,14 @@ func (query *Query) GetAllFollowingMeta(username string) (map[string]*model.Foll
 }
 
 // GetAllFollowingMeta returns all following meta of a user.
+func (query *Query) SignWithSha256(payload string, privKey crypto.PrivKey) (crypto.Signature, error) {
+	hasher := sha256.New()
+	hasher.Write([]byte(payload))
+	signByte := hasher.Sum(nil)
+	return privKey.Sign(signByte)
+}
+
+// GetAllFollowingMeta returns all following meta of a user.
 func (query *Query) VerifyUserSignatureUsingAppKey(username string, payload string, signature string) (bool, error) {
 	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
 	if err != nil {
@@ -582,6 +592,6 @@ func (query *Query) VerifyUserSignatureUsingAppKey(username string, payload stri
 	if err != nil {
 		return false, err
 	}
-	sig := secp256k1.SignatureSecp256k1(data)
+	sig := secp256k1.SignatureSecp256k1(append(data, 0))
 	return info.AppKey.VerifyBytes([]byte(payload), sig), nil
 }
