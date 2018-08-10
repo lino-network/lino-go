@@ -2,7 +2,6 @@ package query
 
 import (
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/hex"
 	"math"
 	"strings"
@@ -588,10 +587,10 @@ func (query *Query) VerifyUserSignatureUsingAppKey(username string, payload stri
 	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
 		return false, err
 	}
-	data, err := base64.StdEncoding.DecodeString(signature)
+	data, err := hex.DecodeString(signature)
 	if err != nil {
 		return false, err
 	}
-	sig := secp256k1.SignatureSecp256k1(append(data, 0))
+	sig := secp256k1.SignatureSecp256k1(data)
 	return info.AppKey.VerifyBytes([]byte(payload), sig), nil
 }

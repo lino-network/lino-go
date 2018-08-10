@@ -149,7 +149,7 @@ func main() {
 	privKey, _ := transport.GetPrivKeyFromHex("E1B0F79B20490005A517EB5CA5C8BE22FB7865ADD64F01AAF9797440DE18F0260A2421E633")
 	sig, err := api.Query.SignWithSha256("wpbqekqjaa", privKey)
 	fmt.Println([]byte(sig.(secp256k1.SignatureSecp256k1)), err)
-	res, err := api.Query.VerifyUserSignatureUsingAppKey("lino", "wpbqekqjaa", "MEUCIQCobG+y7tjoLlxo1ZwsiXPsiOXZZrhUy8XcX0D0glUNegIgaOdN+NwZnBxkzSwaQ0J2XnlUvXcV0x1VGqjeZaOWI0E=")
+	res, err := api.Query.VerifyUserSignatureUsingAppKey("lino", "qdgnouryic", "3045022100c359dd4753ff29ce5a67dbabc14ae5ecacdb4ac8d0a4ca944b766b0922dc2fd602203899e2e5f41f740859b58685d2d48284d41fa8daf480d2172877a74b86933794")
 	fmt.Printf("verify sig result: %+v, %+v\n", res, err)
 	// addr := resetPub.Address()
 
