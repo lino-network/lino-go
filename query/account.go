@@ -478,7 +478,7 @@ func (query *Query) GetFollowerMeta(me, myFollower string) (*model.FollowerMeta,
 
 // GetFollowingMeta returns the following meta of two users.
 func (query *Query) GetFollowingMeta(me, myFollowing string) (*model.FollowingMeta, error) {
-	resp, err := query.transport.Query(getFollowerKey(me, myFollowing), AccountKVStoreKey)
+	resp, err := query.transport.Query(getFollowingKey(me, myFollowing), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
