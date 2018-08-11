@@ -79,11 +79,9 @@ type BandwidthParam struct {
 }
 
 type AccountParam struct {
-	MinimumBalance             Coin  `json:"minimum_balance"`
-	RegisterFee                Coin  `json:"register_fee"`
-	BalanceHistoryBundleSize   int64 `json:"balance_history_bundle_size"`
-	RewardHistoryBundleSize    int64 `json:"reward_history_bundle_size"`
-	FirstDepositFullStakeLimit Coin  `json:"first_deposit_full_stake_limit"`
+	MinimumBalance             Coin `json:"minimum_balance"`
+	RegisterFee                Coin `json:"register_fee"`
+	FirstDepositFullStakeLimit Coin `json:"first_deposit_full_stake_limit"`
 }
 
 type PostParam struct {
