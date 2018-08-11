@@ -93,6 +93,7 @@ type Detail struct {
 	From       string     `json:"from"`
 	To         string     `json:"to"`
 	Amount     Coin       `json:"amount"`
+	Balance    Coin       `json:"balance"`
 	CreatedAt  int64      `json:"created_at"`
 	Memo       string     `json:"memo"`
 }
@@ -170,15 +171,10 @@ type View struct {
 	Times      int64  `jons:"times"`
 }
 
-type Donation struct {
-	Amount       Coin  `json:"amount"`
-	CreatedAt    int64 `json:"created_at"`
-	DonationType int   `json:"donation_type"`
-}
-
 type Donations struct {
-	Username     string     `json:"username"`
-	DonationList []Donation `json:"donation_list"`
+	Username string `json:"username"`
+	Times    int64  `json:"times"`
+	Amount   Coin   `json:"amount"`
 }
 
 //
@@ -274,6 +270,7 @@ type ProposalInfo struct {
 	Result        int    `json:"result"`
 	CreatedAt     int64  `json:"created_at"`
 	ExpiredAt     int64  `json:"expired_at"`
+	Reason        string `json:"reason"`
 }
 
 type NextProposalID struct {

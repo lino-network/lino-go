@@ -25,14 +25,6 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterInterface((*model.Msg)(nil), nil)
 	cdc.RegisterInterface((*model.Tx)(nil), nil)
 
-	// cdc.RegisterInterface((*PubKey)(nil), nil)
-	// cdc.RegisterConcrete(PubKeySecp256k1{},
-	// 	"tendermint/PubKeySecp256k1", nil)
-
-	// cdc.RegisterInterface((*PrivKey)(nil), nil)
-	// cdc.RegisterConcrete(PrivKeySecp256k1{},
-	// "tendermint/PrivKeySecp256k1", nil)
-
 	// account
 	cdc.RegisterConcrete(model.RegisterMsg{}, "lino/register", nil)
 	cdc.RegisterConcrete(model.FollowMsg{}, "lino/follow", nil)
