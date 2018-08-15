@@ -132,15 +132,15 @@ func main() {
 	newUserAppKey := secp256k1.GenPrivKey()
 	newUser := "test3"
 
-	api := api.NewLinoAPIFromArgs("test-chain-BgWrtq", "http://18.188.188.164:26657")
+	api := api.NewLinoAPIFromArgs("test-chain-oS6Ywt", "localhost:26657")
 	seq, _ := api.GetSeqNumber("lino")
-	err := api.Register("lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B20F3A428EAB69457ED61200193B45CA2499A0C612F7597A41925A540E4C0AFEF46", seq)
+	err := api.Register("lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B20D8C47F0A23DE7A2D8FDA7BF2886C3D8EC8A2DEF7F0395C38AEFAA13B452FE241", seq)
 	if err != nil {
-		// panic(err)
+		panic(err)
 	}
 	err = api.GrantPermission(newUser, "lino", 7*24*60*60, model.AppPermission, hex.EncodeToString(newUserTxKey.Bytes()), 0)
 	if err != nil {
-		// panic(err)
+		panic(err)
 	}
 	pub, _ := api.GetAppPubKey("lino")
 	fmt.Println(pub)
@@ -148,7 +148,7 @@ func main() {
 	fmt.Printf("%+v\n", info)
 	privKey, _ := transport.GetPrivKeyFromHex("E1B0F79B20490005A517EB5CA5C8BE22FB7865ADD64F01AAF9797440DE18F0260A2421E633")
 	sig, err := api.Query.SignWithSha256("wpbqekqjaa", privKey)
-	fmt.Println([]byte(sig.(secp256k1.SignatureSecp256k1)), err)
+	fmt.Println(sig)
 	res, err := api.Query.VerifyUserSignatureUsingAppKey("lino", "qdgnouryic", "3045022100c359dd4753ff29ce5a67dbabc14ae5ecacdb4ac8d0a4ca944b766b0922dc2fd602203899e2e5f41f740859b58685d2d48284d41fa8daf480d2172877a74b86933794")
 	fmt.Printf("verify sig result: %+v, %+v\n", res, err)
 	// addr := resetPub.Address()

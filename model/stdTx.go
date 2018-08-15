@@ -14,10 +14,10 @@ type Transaction struct {
 }
 
 type Signature struct {
-	PubKey        crypto.PubKey    `json:"pub_key"`
-	Sig           crypto.Signature `json:"signature"`
-	AccountNumber int64            `json:"account_number"`
-	Sequence      int64            `json:"sequence"`
+	PubKey        crypto.PubKey `json:"pub_key"`
+	Sig           []byte        `json:"signature"`
+	AccountNumber int64         `json:"account_number"`
+	Sequence      int64         `json:"sequence"`
 }
 
 type SignMsg struct {
