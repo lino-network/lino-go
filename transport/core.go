@@ -163,13 +163,13 @@ func (t Transport) SignBuildBroadcast(msg model.Msg,
 	}
 
 	// build transaction bytes
-	txBytes, err := EncodeTx(t.Cdc, msgs, privKey.PubKey(), sig, seq, memo)
+	txByte, err := EncodeTx(t.Cdc, msgs, privKey.PubKey(), sig, seq, memo)
 	if err != nil {
 		return nil, err
 	}
 
 	// broadcast
-	return t.BroadcastTx(txBytes)
+	return t.BroadcastTx(txByte)
 }
 
 // GetNote returns the Tendermint rpc client node.
