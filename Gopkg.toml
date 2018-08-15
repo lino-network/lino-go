@@ -28,7 +28,7 @@
   name = "github.com/cosmos/cosmos-sdk"
   version = "v0.24.0-rc1"
 
-[[override]]
+[[constraint]]
   name = "github.com/tendermint/tendermint"
   version = "=v0.23.0"
 
