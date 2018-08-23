@@ -1,25 +1,20 @@
 package test
 
 import (
-	"fmt"
+	"context"
 	"testing"
 
 	"github.com/lino-network/lino-go/api"
 )
 
 var (
-	// chainID = "test-chain-q8lMWR"
-	// nodeURL = "http://localhost:26657"
-	chainID = "test-chain-BgWrtq"
-	nodeURL = "http://fullnode.linovalidator.io:80"
+	chainID = "test-chain-WZznDz"
+	nodeURL = "http://localhost:26657"
+	// nodeURL = "http://fullnode.linovalidator.io:80"
 
 	referrer          = "lino"
 	registerFee       = "10000000"
-	referrerTxPrivKey = "E1B0F79B202D213D7613530314EA7BA53DFFEBA25B4D550C71F0E94CBADB8A498E8D6807EC"
-
-	// registered users
-	// myUser    = "new1"
-	// txPrivHex = "E1B0F79B200B3031C5889C900260D92E20EE8A2CF62B7213DC902F712E19039EF98305D4D0"
+	referrerTxPrivKey = "E1B0F79B200D44E9B233AB277047A86D4DC3F247E213AEC15185EFE15DF6E1C19B90EB1AEE"
 
 	myUser    = "myuser1"
 	txPrivHex = "E1B0F79B20801B33B99F73D134AF828874A2B9716A5F15B562115930414BC398EB96807F7A"
@@ -36,9 +31,9 @@ func setup(t *testing.T) {
 // func TestBasic(t *testing.T) {
 // 	setup(t)
 
-// 	resetPriv := crypto.GenPrivKeySecp256k1()
-// 	txPriv := crypto.GenPrivKeySecp256k1()
-// 	appPriv := crypto.GenPrivKeySecp256k1()
+// 	resetPriv := secp256k1.GenPrivKey()
+// 	txPriv := secp256k1.GenPrivKey()
+// 	appPriv := secp256k1.GenPrivKey()
 
 // 	t.Errorf("reset private key is: %s", strings.ToUpper(hex.EncodeToString(resetPriv.Bytes())))
 // 	t.Errorf("transaction private key is: %s", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
@@ -52,7 +47,7 @@ func setup(t *testing.T) {
 // 	txPubHex := hex.EncodeToString(txPub.Bytes())
 // 	appPubHex := hex.EncodeToString(appPub.Bytes())
 
-// 	seq, err := testAPI.GetSeqNumber("lino")
+// 	seq, err := testAPI.GetSeqNumber(referrer)
 // 	if err != nil {
 // 		t.Errorf("failed to get seq: %v", err)
 // 	}
@@ -86,16 +81,16 @@ func TestAccount(t *testing.T) {
 	// 	t.Errorf("TestAccount: failed to get account all relationship: %v", err)
 	// }
 
-	// ai, err := testAPI.GetAccountInfo("lino")
-	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to get account info: %v", err)
-	// }
-	// t.Errorf("lino ai: %v ", ai)
-
-	_, err := testAPI.GetAccountBank("lino")
+	ai, err := testAPI.GetAccountInfo(context.Background(), myUser)
 	if err != nil {
-		t.Errorf("TestAccount: failed to get account bank: %v", err)
+		t.Errorf("TestAccount: failed to get account info: %v", err)
 	}
+	t.Errorf("lino ai: %v ", ai)
+
+	// _, err := testAPI.GetAccountBank("lino")
+	// if err != nil {
+	// 	t.Errorf("TestAccount: failed to get account bank: %v", err)
+	// }
 	// t.Errorf("ab: %v", ab)
 
 	// 	_, err = testAPI.GetAccountMeta("lino")
@@ -103,17 +98,17 @@ func TestAccount(t *testing.T) {
 	// 		t.Errorf("TestAccount: failed to get account meta: %v", err)
 	// 	}
 
-	r1, err := testAPI.GetReward("test1")
-	if err != nil {
-		t.Errorf("TestAccount: failed to get reward: %v", err)
-	}
-	fmt.Println(">>r1: ", r1)
+	// r1, err := testAPI.GetReward("test1")
+	// if err != nil {
+	// 	t.Errorf("TestAccount: failed to get reward: %v", err)
+	// }
+	// fmt.Println(">>r1: ", r1)
 
-	r2, err := testAPI.GetRewardAtHeight("test1", 10)
-	if err != nil {
-		t.Errorf("TestAccount: failed to get reward at height: %v", err)
-	}
-	fmt.Println(">>r2: ", r2)
+	// r2, err := testAPI.GetRewardAtHeight("test1", 10)
+	// if err != nil {
+	// 	t.Errorf("TestAccount: failed to get reward at height: %v", err)
+	// }
+	// fmt.Println(">>r2: ", r2)
 
 	// _, err := testAPI.GetAllBalanceHistory(myUser)
 	// if err != nil {
@@ -385,19 +380,19 @@ func TestAccount(t *testing.T) {
 // 	}
 // }
 
-func TestBlocks(t *testing.T) {
+// func TestBlocks(t *testing.T) {
 
-	_, err := testAPI.GetBlock(1)
-	if err != nil {
-		t.Errorf("TestBlocks: failed to get block at height 1: %v", err)
-	}
+// 	_, err := testAPI.GetBlock(1)
+// 	if err != nil {
+// 		t.Errorf("TestBlocks: failed to get block at height 1: %v", err)
+// 	}
 
-	bs, err := testAPI.GetBlockStatus()
-	if err != nil {
-		t.Errorf("TestBlocks: failed to get block status: %v", err)
-	}
-	t.Errorf(">> bs: %v", bs)
-}
+// 	bs, err := testAPI.GetBlockStatus()
+// 	if err != nil {
+// 		t.Errorf("TestBlocks: failed to get block status: %v", err)
+// 	}
+// 	t.Errorf(">> bs: %v", bs)
+// }
 
 // func TestProposal(t *testing.T) {
 

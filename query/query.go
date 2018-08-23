@@ -3,6 +3,8 @@
 package query
 
 import (
+	"context"
+
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
@@ -21,8 +23,8 @@ func NewQuery(transport *transport.Transport) *Query {
 }
 
 // GetBlock returns a block at a certain height from blockchain.
-func (query *Query) GetBlock(height int64) (*model.Block, error) {
-	resp, err := query.transport.QueryBlock(height)
+func (query *Query) GetBlock(ctx context.Context, height int64) (*model.Block, error) {
+	resp, err := query.transport.QueryBlock(ctx, height)
 	if err != nil {
 		return nil, errors.QueryFailf("GetBlock err").AddCause(err)
 	}
@@ -44,8 +46,8 @@ func (query *Query) GetBlock(height int64) (*model.Block, error) {
 }
 
 // GetBlockStatus returns the current block status from blockchain.
-func (query *Query) GetBlockStatus() (*model.BlockStatus, error) {
-	resp, err := query.transport.QueryBlockStatus()
+func (query *Query) GetBlockStatus(ctx context.Context) (*model.BlockStatus, error) {
+	resp, err := query.transport.QueryBlockStatus(ctx)
 	if err != nil {
 		return nil, errors.QueryFailf("GetBlockStatus err").AddCause(err)
 	}

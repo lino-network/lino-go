@@ -1,13 +1,15 @@
 package query
 
 import (
+	"context"
+
 	"github.com/lino-network/lino-go/model"
 )
 
 // GetProposalList returns a list of all proposals, including onging
 // proposals and past ones.
-func (query *Query) GetProposalList() (*model.ProposalList, error) {
-	resp, err := query.transport.Query(getProposalListKey(), ProposalKVStoreKey)
+func (query *Query) GetProposalList(ctx context.Context) (*model.ProposalList, error) {
+	resp, err := query.transport.Query(ctx, getProposalListKey(), ProposalKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -20,8 +22,8 @@ func (query *Query) GetProposalList() (*model.ProposalList, error) {
 }
 
 // GetProposal returns proposal info of a specific proposalID.
-func (query *Query) GetProposal(proposalID string) (*model.Proposal, error) {
-	resp, err := query.transport.Query(getProposalKey(proposalID), ProposalKVStoreKey)
+func (query *Query) GetProposal(ctx context.Context, proposalID string) (*model.Proposal, error) {
+	resp, err := query.transport.Query(ctx, getProposalKey(proposalID), ProposalKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -34,15 +36,15 @@ func (query *Query) GetProposal(proposalID string) (*model.Proposal, error) {
 }
 
 // GetOngoingProposal returns all ongoing proposals.
-func (query *Query) GetOngoingProposal() ([]*model.Proposal, error) {
-	proposalList, err := query.GetProposalList()
+func (query *Query) GetOngoingProposal(ctx context.Context) ([]*model.Proposal, error) {
+	proposalList, err := query.GetProposalList(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var ongoingProposals []*model.Proposal
 	for _, proposalID := range proposalList.OngoingProposal {
-		p, err := query.GetProposal(proposalID)
+		p, err := query.GetProposal(ctx, proposalID)
 		if err != nil {
 			return nil, err
 		}
@@ -54,15 +56,15 @@ func (query *Query) GetOngoingProposal() ([]*model.Proposal, error) {
 }
 
 // GetExpiredProposal returns all past proposals.
-func (query *Query) GetExpiredProposal() ([]*model.Proposal, error) {
-	proposalList, err := query.GetProposalList()
+func (query *Query) GetExpiredProposal(ctx context.Context) ([]*model.Proposal, error) {
+	proposalList, err := query.GetProposalList(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var expiredProposals []*model.Proposal
 	for _, proposalID := range proposalList.PastProposal {
-		p, err := query.GetProposal(proposalID)
+		p, err := query.GetProposal(ctx, proposalID)
 		if err != nil {
 			return nil, err
 		}
@@ -74,8 +76,8 @@ func (query *Query) GetExpiredProposal() ([]*model.Proposal, error) {
 }
 
 // GetProposal returns proposal info of a specific proposalID.
-func (query *Query) GetNextProposalID() (*model.NextProposalID, error) {
-	resp, err := query.transport.Query(GetNextProposalIDKey(), ProposalKVStoreKey)
+func (query *Query) GetNextProposalID(ctx context.Context) (*model.NextProposalID, error) {
+	resp, err := query.transport.Query(ctx, GetNextProposalIDKey(), ProposalKVStoreKey)
 	if err != nil {
 		return nil, err
 	}

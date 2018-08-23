@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"math"
@@ -13,8 +14,8 @@ import (
 )
 
 // GetAccountInfo returns account info for a specific user.
-func (query *Query) GetAccountInfo(username string) (*model.AccountInfo, error) {
-	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+func (query *Query) GetAccountInfo(ctx context.Context, username string) (*model.AccountInfo, error) {
+	resp, err := query.transport.Query(ctx, getAccountInfoKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +27,8 @@ func (query *Query) GetAccountInfo(username string) (*model.AccountInfo, error) 
 }
 
 // GetTransactionPubKey returns string format transaction public key.
-func (query *Query) GetTransactionPubKey(username string) (string, error) {
-	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+func (query *Query) GetTransactionPubKey(ctx context.Context, username string) (string, error) {
+	resp, err := query.transport.Query(ctx, getAccountInfoKey(username), AccountKVStoreKey)
 	if err != nil {
 		return "", err
 	}
@@ -39,8 +40,8 @@ func (query *Query) GetTransactionPubKey(username string) (string, error) {
 }
 
 // GetAppPubKey returns string format app public key.
-func (query *Query) GetAppPubKey(username string) (string, error) {
-	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+func (query *Query) GetAppPubKey(ctx context.Context, username string) (string, error) {
+	resp, err := query.transport.Query(ctx, getAccountInfoKey(username), AccountKVStoreKey)
 	if err != nil {
 		return "", err
 	}
@@ -52,8 +53,8 @@ func (query *Query) GetAppPubKey(username string) (string, error) {
 }
 
 // DoesUsernameMatchResetPrivKey returns true if a user has the reset private key.
-func (query *Query) DoesUsernameMatchResetPrivKey(username, resetPrivKeyHex string) (bool, error) {
-	accInfo, err := query.GetAccountInfo(username)
+func (query *Query) DoesUsernameMatchResetPrivKey(ctx context.Context, username, resetPrivKeyHex string) (bool, error) {
+	accInfo, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
 		return false, err
 	}
@@ -67,8 +68,8 @@ func (query *Query) DoesUsernameMatchResetPrivKey(username, resetPrivKeyHex stri
 }
 
 // DoesUsernameMatchTxPrivKey returns true if a user has the transaction private key.
-func (query *Query) DoesUsernameMatchTxPrivKey(username, txPrivKeyHex string) (bool, error) {
-	accInfo, err := query.GetAccountInfo(username)
+func (query *Query) DoesUsernameMatchTxPrivKey(ctx context.Context, username, txPrivKeyHex string) (bool, error) {
+	accInfo, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
 		return false, err
 	}
@@ -82,8 +83,8 @@ func (query *Query) DoesUsernameMatchTxPrivKey(username, txPrivKeyHex string) (b
 }
 
 // DoesUsernameMatchAppPrivKey returns true if a user has the app private key.
-func (query *Query) DoesUsernameMatchAppPrivKey(username, appPrivKeyHex string) (bool, error) {
-	accInfo, err := query.GetAccountInfo(username)
+func (query *Query) DoesUsernameMatchAppPrivKey(ctx context.Context, username, appPrivKeyHex string) (bool, error) {
+	accInfo, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
 		return false, err
 	}
@@ -97,8 +98,8 @@ func (query *Query) DoesUsernameMatchAppPrivKey(username, appPrivKeyHex string) 
 }
 
 // GetAccountBank returns account bank info for a specific user.
-func (query *Query) GetAccountBank(username string) (*model.AccountBank, error) {
-	resp, err := query.transport.Query(getAccountBankKey(username), AccountKVStoreKey)
+func (query *Query) GetAccountBank(ctx context.Context, username string) (*model.AccountBank, error) {
+	resp, err := query.transport.Query(ctx, getAccountBankKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -110,8 +111,8 @@ func (query *Query) GetAccountBank(username string) (*model.AccountBank, error) 
 }
 
 // GetAccountMeta returns account meta info for a specific user.
-func (query *Query) GetAccountMeta(username string) (*model.AccountMeta, error) {
-	resp, err := query.transport.Query(getAccountMetaKey(username), AccountKVStoreKey)
+func (query *Query) GetAccountMeta(ctx context.Context, username string) (*model.AccountMeta, error) {
+	resp, err := query.transport.Query(ctx, getAccountMetaKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -124,8 +125,8 @@ func (query *Query) GetAccountMeta(username string) (*model.AccountMeta, error) 
 
 // GetSeqNumber returns the next sequence number of a user which should
 // be used for broadcast.
-func (query *Query) GetSeqNumber(username string) (int64, error) {
-	meta, err := query.GetAccountMeta(username)
+func (query *Query) GetSeqNumber(ctx context.Context, username string) (int64, error) {
+	meta, err := query.GetAccountMeta(ctx, username)
 	if err != nil {
 		return 0, err
 	}
@@ -134,8 +135,8 @@ func (query *Query) GetSeqNumber(username string) (int64, error) {
 
 // GetAllBalanceHistory returns all transaction history related to
 // a user's account balance, in reverse-chronological order.
-func (query *Query) GetAllBalanceHistory(username string) (*model.BalanceHistory, error) {
-	accountBank, err := query.GetAccountBank(username)
+func (query *Query) GetAllBalanceHistory(ctx context.Context, username string) (*model.BalanceHistory, error) {
+	accountBank, err := query.GetAccountBank(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +149,7 @@ func (query *Query) GetAllBalanceHistory(username string) (*model.BalanceHistory
 	bucketSlot := (accountBank.NumOfTx - 1) / 100
 
 	for i := bucketSlot; i >= 0; i-- {
-		balanceHistory, err := query.GetBalanceHistory(username, i)
+		balanceHistory, err := query.GetBalanceHistory(ctx, username, i)
 		if err != nil {
 			return nil, err
 		}
@@ -163,12 +164,12 @@ func (query *Query) GetAllBalanceHistory(username string) (*model.BalanceHistory
 
 // GetRecentBalanceHistory returns a certain number of recent transaction history
 // related to a user's account balance, in reverse-chronological order.
-func (query *Query) GetRecentBalanceHistory(username string, numHistory int64) (*model.BalanceHistory, error) {
+func (query *Query) GetRecentBalanceHistory(ctx context.Context, username string, numHistory int64) (*model.BalanceHistory, error) {
 	if numHistory <= 0 || numHistory > math.MaxInt64 {
 		return nil, errors.InvalidArgf("GetRecentBalanceHistory: numHistory is invalid: %v", numHistory)
 	}
 
-	accountBank, err := query.GetAccountBank(username)
+	accountBank, err := query.GetAccountBank(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -185,17 +186,17 @@ func (query *Query) GetRecentBalanceHistory(username string, numHistory int64) (
 
 	to := accountBank.NumOfTx - 1
 
-	return query.GetBalanceHistoryFromTo(username, from, to)
+	return query.GetBalanceHistoryFromTo(ctx, username, from, to)
 }
 
 // GetBalanceHistoryFromTo returns a list of transaction history in the range of index [from, to]
 // related to a user's account balance, in reverse-chronological order.
-func (query *Query) GetBalanceHistoryFromTo(username string, from, to int64) (*model.BalanceHistory, error) {
+func (query *Query) GetBalanceHistoryFromTo(ctx context.Context, username string, from, to int64) (*model.BalanceHistory, error) {
 	if from < 0 || from > math.MaxInt64 || to < 0 || to > math.MaxInt64 || from > to {
 		return nil, errors.InvalidArgf("GetBalanceHistoryFromTo: from [%v] or to [%v] is invalid", from, to)
 	}
 
-	accountBank, err := query.GetAccountBank(username)
+	accountBank, err := query.GetAccountBank(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +223,7 @@ func (query *Query) GetBalanceHistoryFromTo(username string, from, to int64) (*m
 	indexOfTo := to % 100
 
 	for bucketSlot > -1 {
-		balanceHistory, err := query.GetBalanceHistory(username, bucketSlot)
+		balanceHistory, err := query.GetBalanceHistory(ctx, username, bucketSlot)
 		if err != nil {
 			return nil, err
 		}
@@ -250,8 +251,8 @@ func (query *Query) GetBalanceHistoryFromTo(username string, from, to int64) (*m
 }
 
 // GetBalanceHistory returns all balance history in a certain bucket.
-func (query *Query) GetBalanceHistory(username string, index int64) (*model.BalanceHistory, error) {
-	resp, err := query.transport.Query(getBalanceHistoryKey(username, index), AccountKVStoreKey)
+func (query *Query) GetBalanceHistory(ctx context.Context, username string, index int64) (*model.BalanceHistory, error) {
+	resp, err := query.transport.Query(ctx, getBalanceHistoryKey(username, index), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -264,13 +265,13 @@ func (query *Query) GetBalanceHistory(username string, index int64) (*model.Bala
 
 // GetGrantPubKey returns the specific granted pubkey info of a user
 // that has given to the pubKey.
-func (query *Query) GetGrantPubKey(username string, pubKeyHex string) (*model.GrantPubKey, error) {
+func (query *Query) GetGrantPubKey(ctx context.Context, username string, pubKeyHex string) (*model.GrantPubKey, error) {
 	pubKey, err := transport.GetPubKeyFromHex(pubKeyHex)
 	if err != nil {
 		return nil, errors.FailedToGetPubKeyFromHex("GetGrantPubKey: failed to get pub key").AddCause(err)
 	}
 
-	resp, err := query.transport.Query(getGrantPubKeyKey(username, pubKey), AccountKVStoreKey)
+	resp, err := query.transport.Query(ctx, getGrantPubKeyKey(username, pubKey), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -283,8 +284,8 @@ func (query *Query) GetGrantPubKey(username string, pubKeyHex string) (*model.Gr
 }
 
 // GetReward returns rewards of a user.
-func (query *Query) GetReward(username string) (*model.Reward, error) {
-	resp, err := query.transport.Query(getRewardKey(username), AccountKVStoreKey)
+func (query *Query) GetReward(ctx context.Context, username string) (*model.Reward, error) {
+	resp, err := query.transport.Query(ctx, getRewardKey(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -297,8 +298,8 @@ func (query *Query) GetReward(username string) (*model.Reward, error) {
 }
 
 // GetRewardAtHeight returns rewards of a user at certain height.
-func (query *Query) GetRewardAtHeight(username string, height int64) (*model.Reward, error) {
-	resp, err := query.transport.QueryAtHeight(getRewardKey(username), AccountKVStoreKey, height)
+func (query *Query) GetRewardAtHeight(ctx context.Context, username string, height int64) (*model.Reward, error) {
+	resp, err := query.transport.QueryAtHeight(ctx, getRewardKey(username), AccountKVStoreKey, height)
 	if err != nil {
 		switch err.(type) {
 		case errors.Error:
@@ -319,8 +320,8 @@ func (query *Query) GetRewardAtHeight(username string, height int64) (*model.Rew
 
 // GetAllRewardHistory returns all reward history related to
 // a user's posts reward, in reverse-chronological order.
-func (query *Query) GetAllRewardHistory(username string) (*model.RewardHistory, error) {
-	accountBank, err := query.GetAccountBank(username)
+func (query *Query) GetAllRewardHistory(ctx context.Context, username string) (*model.RewardHistory, error) {
+	accountBank, err := query.GetAccountBank(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -333,7 +334,7 @@ func (query *Query) GetAllRewardHistory(username string) (*model.RewardHistory, 
 	bucketSlot := (accountBank.NumOfReward - 1) / 100
 
 	for i := bucketSlot; i >= 0; i-- {
-		rewardHistory, err := query.GetRewardHistory(username, i)
+		rewardHistory, err := query.GetRewardHistory(ctx, username, i)
 		if err != nil {
 			return nil, err
 		}
@@ -348,12 +349,12 @@ func (query *Query) GetAllRewardHistory(username string) (*model.RewardHistory, 
 
 // GetRecentRewardHistory returns a certain number of recent reward history
 // related to a user's posts reward, in reverse-chronological order.
-func (query *Query) GetRecentRewardHistory(username string, numReward int64) (*model.RewardHistory, error) {
+func (query *Query) GetRecentRewardHistory(ctx context.Context, username string, numReward int64) (*model.RewardHistory, error) {
 	if numReward <= 0 || numReward > math.MaxInt64 {
 		return nil, errors.InvalidArgf("GetRecentRewardHistory: numReward is invalid: %v", numReward)
 	}
 
-	accountBank, err := query.GetAccountBank(username)
+	accountBank, err := query.GetAccountBank(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -370,17 +371,17 @@ func (query *Query) GetRecentRewardHistory(username string, numReward int64) (*m
 
 	to := accountBank.NumOfReward - 1
 
-	return query.GetRewardHistoryFromTo(username, from, to)
+	return query.GetRewardHistoryFromTo(ctx, username, from, to)
 }
 
 // GetRewardHistoryFromTo returns a list of reward history in the range of index [from, to]
 // related to a user's posts reward, in reverse-chronological order.
-func (query *Query) GetRewardHistoryFromTo(username string, from, to int64) (*model.RewardHistory, error) {
+func (query *Query) GetRewardHistoryFromTo(ctx context.Context, username string, from, to int64) (*model.RewardHistory, error) {
 	if from < 0 || from > math.MaxInt64 || to < 0 || to > math.MaxInt64 || from > to {
 		return nil, errors.InvalidArgf("GetRewardHistoryFromTo: from [%v] or to [%v] is invalid", from, to)
 	}
 
-	accountBank, err := query.GetAccountBank(username)
+	accountBank, err := query.GetAccountBank(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -407,7 +408,7 @@ func (query *Query) GetRewardHistoryFromTo(username string, from, to int64) (*mo
 	indexOfTo := to % 100
 
 	for bucketSlot > -1 {
-		rewardHistory, err := query.GetRewardHistory(username, bucketSlot)
+		rewardHistory, err := query.GetRewardHistory(ctx, username, bucketSlot)
 		if err != nil {
 			return nil, err
 		}
@@ -435,8 +436,8 @@ func (query *Query) GetRewardHistoryFromTo(username string, from, to int64) (*mo
 }
 
 // GetRewardHistory returns all reward history in a certain bucket
-func (query *Query) GetRewardHistory(username string, index int64) (*model.RewardHistory, error) {
-	resp, err := query.transport.Query(getRewardHistoryKey(username, index), AccountKVStoreKey)
+func (query *Query) GetRewardHistory(ctx context.Context, username string, index int64) (*model.RewardHistory, error) {
+	resp, err := query.transport.Query(ctx, getRewardHistoryKey(username, index), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -448,8 +449,8 @@ func (query *Query) GetRewardHistory(username string, index int64) (*model.Rewar
 }
 
 // GetRelationship returns the donation times of two users.
-func (query *Query) GetRelationship(me, other string) (*model.Relationship, error) {
-	resp, err := query.transport.Query(getRelationshipKey(me, other), AccountKVStoreKey)
+func (query *Query) GetRelationship(ctx context.Context, me, other string) (*model.Relationship, error) {
+	resp, err := query.transport.Query(ctx, getRelationshipKey(me, other), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -462,8 +463,8 @@ func (query *Query) GetRelationship(me, other string) (*model.Relationship, erro
 }
 
 // GetFollowerMeta returns the follower meta of two users.
-func (query *Query) GetFollowerMeta(me, myFollower string) (*model.FollowerMeta, error) {
-	resp, err := query.transport.Query(getFollowerKey(me, myFollower), AccountKVStoreKey)
+func (query *Query) GetFollowerMeta(ctx context.Context, me, myFollower string) (*model.FollowerMeta, error) {
+	resp, err := query.transport.Query(ctx, getFollowerKey(me, myFollower), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -476,8 +477,8 @@ func (query *Query) GetFollowerMeta(me, myFollower string) (*model.FollowerMeta,
 }
 
 // GetFollowingMeta returns the following meta of two users.
-func (query *Query) GetFollowingMeta(me, myFollowing string) (*model.FollowingMeta, error) {
-	resp, err := query.transport.Query(getFollowingKey(me, myFollowing), AccountKVStoreKey)
+func (query *Query) GetFollowingMeta(ctx context.Context, me, myFollowing string) (*model.FollowingMeta, error) {
+	resp, err := query.transport.Query(ctx, getFollowingKey(me, myFollowing), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -494,8 +495,8 @@ func (query *Query) GetFollowingMeta(me, myFollowing string) (*model.FollowingMe
 //
 
 // GetAllGrantPubKeys returns a list of all granted public keys of a user.
-func (query *Query) GetAllGrantPubKeys(username string) (map[string]*model.GrantPubKey, error) {
-	resKVs, err := query.transport.QuerySubspace(getGrantPubKeyPrefix(username), AccountKVStoreKey)
+func (query *Query) GetAllGrantPubKeys(ctx context.Context, username string) (map[string]*model.GrantPubKey, error) {
+	resKVs, err := query.transport.QuerySubspace(ctx, getGrantPubKeyPrefix(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -512,8 +513,8 @@ func (query *Query) GetAllGrantPubKeys(username string) (map[string]*model.Grant
 }
 
 // GetAllRelationships returns all donation relationship of a user.
-func (query *Query) GetAllRelationships(username string) (map[string]*model.Relationship, error) {
-	resKVs, err := query.transport.QuerySubspace(getRelationshipPrefix(username), AccountKVStoreKey)
+func (query *Query) GetAllRelationships(ctx context.Context, username string) (map[string]*model.Relationship, error) {
+	resKVs, err := query.transport.QuerySubspace(ctx, getRelationshipPrefix(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -531,8 +532,8 @@ func (query *Query) GetAllRelationships(username string) (map[string]*model.Rela
 }
 
 // GetAllFollowerMeta returns all follower meta of a user.
-func (query *Query) GetAllFollowerMeta(username string) (map[string]*model.FollowerMeta, error) {
-	resKVs, err := query.transport.QuerySubspace(getFollowerPrefix(username), AccountKVStoreKey)
+func (query *Query) GetAllFollowerMeta(ctx context.Context, username string) (map[string]*model.FollowerMeta, error) {
+	resKVs, err := query.transport.QuerySubspace(ctx, getFollowerPrefix(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -550,8 +551,8 @@ func (query *Query) GetAllFollowerMeta(username string) (map[string]*model.Follo
 }
 
 // GetAllFollowingMeta returns all following meta of a user.
-func (query *Query) GetAllFollowingMeta(username string) (map[string]*model.FollowingMeta, error) {
-	resKVs, err := query.transport.QuerySubspace(getFollowingPrefix(username), AccountKVStoreKey)
+func (query *Query) GetAllFollowingMeta(ctx context.Context, username string) (map[string]*model.FollowingMeta, error) {
+	resKVs, err := query.transport.QuerySubspace(ctx, getFollowingPrefix(username), AccountKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -569,7 +570,7 @@ func (query *Query) GetAllFollowingMeta(username string) (map[string]*model.Foll
 }
 
 // GetAllFollowingMeta returns all following meta of a user.
-func (query *Query) SignWithSha256(payload string, privKey crypto.PrivKey) ([]byte, error) {
+func (query *Query) SignWithSha256(ctx context.Context, payload string, privKey crypto.PrivKey) ([]byte, error) {
 	hasher := sha256.New()
 	hasher.Write([]byte(payload))
 	signByte := hasher.Sum(nil)
@@ -577,8 +578,8 @@ func (query *Query) SignWithSha256(payload string, privKey crypto.PrivKey) ([]by
 }
 
 // GetAllFollowingMeta returns all following meta of a user.
-func (query *Query) VerifyUserSignatureUsingAppKey(username string, payload string, signature string) (bool, error) {
-	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+func (query *Query) VerifyUserSignatureUsingAppKey(ctx context.Context, username string, payload string, signature string) (bool, error) {
+	resp, err := query.transport.Query(ctx, getAccountInfoKey(username), AccountKVStoreKey)
 	if err != nil {
 		return false, err
 	}
