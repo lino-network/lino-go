@@ -127,7 +127,7 @@ func TestAccount(t *testing.T) {
 	// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
 	// }
 	// fmt.Println("seq: ", linoSeq)
-	// err = testAPI.Transfer("linowallet", "jawson", "1", "test", referralTxPrivKey, linoSeq)
+	// err = testAPI.Transfer("linowallet", "jawson", "1", "test", "E1B0F79B20CFD61D55BD37DC67198E722F4B1F2721D5A0AB3B11F9F6F7B975293F083608FE", linoSeq)
 	// if err != nil {
 	// 	t.Errorf("TestAccount: failed to transfer 1, got err: %v", err)
 	// }

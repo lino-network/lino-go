@@ -20,13 +20,11 @@ import (
 
 // Transport is a wrapper of tendermint rpc client and codec.
 type Transport struct {
-	chainId         string
-	nodeUrl         string
-	client          rpcclient.Client
-	Cdc             *wire.Codec
-	queryTimeout    time.Duration
-	BroadcastOkChan chan bool
-	QueryOkChan     chan bool
+	chainId      string
+	nodeUrl      string
+	client       rpcclient.Client
+	Cdc          *wire.Codec
+	queryTimeout time.Duration
 }
 
 // NewTransportFromConfig initiates an instance of Transport from config files.
@@ -44,13 +42,11 @@ func NewTransportFromConfig(queryTimeout time.Duration) *Transport {
 	}
 	rpc := rpcclient.NewHTTP(nodeUrl, "/websocket")
 	return &Transport{
-		chainId:         v.GetString("chain_id"),
-		nodeUrl:         nodeUrl,
-		client:          rpc,
-		Cdc:             MakeCodec(),
-		queryTimeout:    queryTimeout,
-		BroadcastOkChan: make(chan bool),
-		QueryOkChan:     make(chan bool),
+		chainId:      v.GetString("chain_id"),
+		nodeUrl:      nodeUrl,
+		client:       rpc,
+		Cdc:          MakeCodec(),
+		queryTimeout: queryTimeout,
 	}
 }
 
@@ -61,13 +57,11 @@ func NewTransportFromArgs(chainID, nodeUrl string, queryTimeout time.Duration) *
 	}
 	rpc := rpcclient.NewHTTP(nodeUrl, "/websocket")
 	return &Transport{
-		chainId:         chainID,
-		nodeUrl:         nodeUrl,
-		client:          rpc,
-		Cdc:             MakeCodec(),
-		queryTimeout:    queryTimeout,
-		BroadcastOkChan: make(chan bool),
-		QueryOkChan:     make(chan bool),
+		chainId:      chainID,
+		nodeUrl:      nodeUrl,
+		client:       rpc,
+		Cdc:          MakeCodec(),
+		queryTimeout: queryTimeout,
 	}
 }
 
@@ -76,12 +70,14 @@ func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err er
 	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
 	defer cancel()
 
+	finishChan := make(chan bool)
 	go func() {
 		res, err = t.query(key, storeName, "key", 0)
+		finishChan <- true
 	}()
 
 	select {
-	case <-t.QueryOkChan:
+	case <-finishChan:
 		break
 	case <-ctx.Done():
 		return nil, errors.Timeout("query timeout").AddCause(ctx.Err())
@@ -95,12 +91,14 @@ func (t Transport) QueryAtHeight(key cmn.HexBytes, storeName string, height int6
 	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
 	defer cancel()
 
+	finishChan := make(chan bool)
 	go func() {
 		res, err = t.query(key, storeName, "key", height)
+		finishChan <- true
 	}()
 
 	select {
-	case <-t.QueryOkChan:
+	case <-finishChan:
 		break
 	case <-ctx.Done():
 		return nil, errors.Timeoutf("query at height %v timeout", height).AddCause(ctx.Err())
@@ -115,12 +113,14 @@ func (t Transport) QuerySubspace(subspace []byte, storeName string) (res []sdk.K
 	defer cancel()
 
 	var resRaw []byte
+	finishChan := make(chan bool)
 	go func() {
 		resRaw, err = t.query(subspace, storeName, "subspace", 0)
+		finishChan <- true
 	}()
 
 	select {
-	case <-t.QueryOkChan:
+	case <-finishChan:
 		break
 	case <-ctx.Done():
 		return nil, errors.Timeout("query subspace timeout").AddCause(ctx.Err())
@@ -159,8 +159,6 @@ func (t Transport) query(key cmn.HexBytes, storeName, endPath string, height int
 		return nil, errors.EmptyResponse("Empty response!")
 	}
 
-	t.QueryOkChan <- true
-
 	return resp.Value, nil
 }
 
@@ -171,7 +169,23 @@ func (t Transport) QueryBlock(height int64) (res *ctypes.ResultBlock, err error)
 		return res, err
 	}
 
-	return node.Block(&height)
+	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
+	defer cancel()
+
+	finishChan := make(chan bool)
+	go func() {
+		res, err = node.Block(&height)
+		finishChan <- true
+	}()
+
+	select {
+	case <-finishChan:
+		break
+	case <-ctx.Done():
+		return nil, errors.Timeout("query block timeout").AddCause(ctx.Err())
+	}
+
+	return res, err
 }
 
 // QueryBlockStatus queries block status from blockchain.
@@ -181,7 +195,23 @@ func (t Transport) QueryBlockStatus() (res *ctypes.ResultStatus, err error) {
 		return res, err
 	}
 
-	return node.Status()
+	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
+	defer cancel()
+
+	finishChan := make(chan bool)
+	go func() {
+		res, err = node.Status()
+		finishChan <- true
+	}()
+
+	select {
+	case <-finishChan:
+		break
+	case <-ctx.Done():
+		return nil, errors.Timeout("query block status timeout").AddCause(ctx.Err())
+	}
+
+	return res, err
 }
 
 // BroadcastTx broadcasts a transcation to blockchain.
@@ -195,8 +225,6 @@ func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, erro
 	if err != nil {
 		return nil, err
 	}
-
-	t.BroadcastOkChan <- true
 
 	return res, nil
 }

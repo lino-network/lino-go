@@ -631,12 +631,14 @@ func (broadcast *Broadcast) broadcastTransaction(msg model.Msg, privKeyHex strin
 
 	var res *ctypes.ResultBroadcastTxCommit
 	var err error
+	finishChan := make(chan bool)
 	go func() {
 		res, err = broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq, memo)
+		finishChan <- true
 	}()
 
 	select {
-	case <-broadcast.transport.BroadcastOkChan:
+	case <-finishChan:
 		break
 	case <-ctx.Done():
 		return errors.Timeoutf("msg timeout: %v", msg).AddCause(ctx.Err())
