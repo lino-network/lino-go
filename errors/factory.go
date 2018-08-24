@@ -25,6 +25,8 @@ func CodeToDefaultMsg(code CodeType) string {
 		return "Invalid sequence number"
 	case CodeEmptyResponse:
 		return "Empty Response"
+	case CodeTimeout:
+		return "timeout"
 	default:
 		return fmt.Sprintf("Unknown code %d", code)
 	}
@@ -128,4 +130,14 @@ func EmptyResponse(msg string) Error {
 //EmptyResponsef creates an error with CodeEmptyResponse and formatted message
 func EmptyResponsef(format string, args ...interface{}) Error {
 	return newError(CodeEmptyResponse, fmt.Sprintf(format, args...))
+}
+
+//Timeout creates an error with CodeTimeout
+func Timeout(msg string) Error {
+	return newError(CodeTimeout, msg)
+}
+
+//Timeoutf creates an error with CodeTimeout and formatted message
+func Timeoutf(format string, args ...interface{}) Error {
+	return newError(CodeTimeout, fmt.Sprintf(format, args...))
 }
