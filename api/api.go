@@ -19,8 +19,8 @@ type API struct {
 }
 
 type TimeoutOptions struct {
-	QueryTimeout     time.Duration
-	BroadcastTimeout time.Duration
+	QueryTimeout     time.Duration // query usually takes less than 1 second, so it can be set to 1 second.
+	BroadcastTimeout time.Duration // broadcast usually takes 3 seconds, so it can be set to 4 second.
 }
 
 // NewLinoAPIFromConfig initiates an instance of API using
