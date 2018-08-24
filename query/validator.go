@@ -1,14 +1,12 @@
 package query
 
 import (
-	"context"
-
 	"github.com/lino-network/lino-go/model"
 )
 
 // GetValidator returns validator info given a validator name from blockchain.
-func (query *Query) GetValidator(ctx context.Context, username string) (*model.Validator, error) {
-	resp, err := query.transport.Query(ctx, getValidatorKey(username), ValidatorKVStoreKey)
+func (query *Query) GetValidator(username string) (*model.Validator, error) {
+	resp, err := query.transport.Query(getValidatorKey(username), ValidatorKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -20,8 +18,8 @@ func (query *Query) GetValidator(ctx context.Context, username string) (*model.V
 }
 
 // GetAllValidators returns all oncall validators from blockchain.
-func (query *Query) GetAllValidators(ctx context.Context) (*model.ValidatorList, error) {
-	resp, err := query.transport.Query(ctx, getValidatorListKey(), ValidatorKVStoreKey)
+func (query *Query) GetAllValidators() (*model.ValidatorList, error) {
+	resp, err := query.transport.Query(getValidatorListKey(), ValidatorKVStoreKey)
 	if err != nil {
 		return nil, err
 	}

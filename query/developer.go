@@ -1,14 +1,12 @@
 package query
 
 import (
-	"context"
-
 	"github.com/lino-network/lino-go/model"
 )
 
 // GetDeveloper returns a specific developer info from blockchain.
-func (query *Query) GetDeveloper(ctx context.Context, developerName string) (*model.Developer, error) {
-	resp, err := query.transport.Query(ctx, getDeveloperKey(developerName), DeveloperKVStoreKey)
+func (query *Query) GetDeveloper(developerName string) (*model.Developer, error) {
+	resp, err := query.transport.Query(getDeveloperKey(developerName), DeveloperKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -20,8 +18,8 @@ func (query *Query) GetDeveloper(ctx context.Context, developerName string) (*mo
 }
 
 // GetDevelopers returns a list of all developers.
-func (query *Query) GetDevelopers(ctx context.Context) (*model.DeveloperList, error) {
-	resp, err := query.transport.Query(ctx, getDeveloperListKey(), DeveloperKVStoreKey)
+func (query *Query) GetDevelopers() (*model.DeveloperList, error) {
+	resp, err := query.transport.Query(getDeveloperListKey(), DeveloperKVStoreKey)
 	if err != nil {
 		return nil, err
 	}

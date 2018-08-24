@@ -4,6 +4,8 @@
 package api
 
 import (
+	"time"
+
 	"github.com/lino-network/lino-go/broadcast"
 	"github.com/lino-network/lino-go/query"
 	"github.com/lino-network/lino-go/transport"
@@ -16,22 +18,27 @@ type API struct {
 	*broadcast.Broadcast
 }
 
+type TimeoutOptions struct {
+	QueryTimeout     time.Duration
+	BroadcastTimeout time.Duration
+}
+
 // NewLinoAPIFromConfig initiates an instance of API using
 // configs from ~/.lino-go/config.json
-func NewLinoAPIFromConfig() *API {
-	transport := transport.NewTransportFromConfig()
+func NewLinoAPIFromConfig(options TimeoutOptions) *API {
+	transport := transport.NewTransportFromConfig(options.QueryTimeout)
 	return &API{
 		Query:     query.NewQuery(transport),
-		Broadcast: broadcast.NewBroadcast(transport),
+		Broadcast: broadcast.NewBroadcast(transport, options.BroadcastTimeout),
 	}
 }
 
 // NewLinoAPIFromArgs initiates an instance of API using
 // chainID and nodeUrl that are passed in.
-func NewLinoAPIFromArgs(chainID, nodeUrl string) *API {
-	transport := transport.NewTransportFromArgs(chainID, nodeUrl)
+func NewLinoAPIFromArgs(chainID, nodeUrl string, options TimeoutOptions) *API {
+	transport := transport.NewTransportFromArgs(chainID, nodeUrl, options.QueryTimeout)
 	return &API{
 		Query:     query.NewQuery(transport),
-		Broadcast: broadcast.NewBroadcast(transport),
+		Broadcast: broadcast.NewBroadcast(transport, options.BroadcastTimeout),
 	}
 }

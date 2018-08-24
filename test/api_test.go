@@ -1,16 +1,16 @@
 package test
 
 import (
-	"context"
 	"testing"
+	"time"
 
 	"github.com/lino-network/lino-go/api"
 )
 
 var (
-	chainID = "test-chain-WZznDz"
-	nodeURL = "http://localhost:26657"
-	// nodeURL = "http://fullnode.linovalidator.io:80"
+	chainID = "lino-testnet"
+	// nodeURL = "http://localhost:26657"
+	nodeURL = "http://fullnode.linovalidator.io:80"
 
 	referrer          = "lino"
 	registerFee       = "10000000"
@@ -25,7 +25,12 @@ var (
 )
 
 func setup(t *testing.T) {
-	testAPI = api.NewLinoAPIFromArgs(chainID, nodeURL)
+	options := api.TimeoutOptions{
+		QueryTimeout:     1 * time.Second,
+		BroadcastTimeout: 4 * time.Second,
+	}
+
+	testAPI = api.NewLinoAPIFromArgs(chainID, nodeURL, options)
 }
 
 // func TestBasic(t *testing.T) {
@@ -81,11 +86,11 @@ func TestAccount(t *testing.T) {
 	// 	t.Errorf("TestAccount: failed to get account all relationship: %v", err)
 	// }
 
-	ai, err := testAPI.GetAccountInfo(context.Background(), myUser)
-	if err != nil {
-		t.Errorf("TestAccount: failed to get account info: %v", err)
-	}
-	t.Errorf("lino ai: %v ", ai)
+	// _, err := testAPI.GetAccountInfo("linotv")
+	// if err != nil {
+	// 	t.Errorf("TestAccount: failed to get account info: %v", err)
+	// }
+	// t.Errorf("lino ai: %v ", ai)
 
 	// _, err := testAPI.GetAccountBank("lino")
 	// if err != nil {
@@ -117,14 +122,14 @@ func TestAccount(t *testing.T) {
 
 	// Tested successfully
 	//
-	// linoSeq, err := testAPI.GetSeqNumber("lino")
+	// linoSeq, err := testAPI.GetSeqNumber("linowallet")
 	// if err != nil {
 	// 	t.Errorf("TestAccount: failed to get myUser seq number: %v", err)
 	// }
 	// fmt.Println("seq: ", linoSeq)
-	// err = testAPI.Transfer("lino", myUser, "1", "memo1", referrerTxPrivKey, linoSeq)
+	// err = testAPI.Transfer("linowallet", "jawson", "1", "test", referralTxPrivKey, linoSeq)
 	// if err != nil {
-	// 	t.Errorf("TestAccount: failed to transfer 0.1B to myUser")
+	// 	t.Errorf("TestAccount: failed to transfer 1, got err: %v", err)
 	// }
 
 	// seq, err := testAPI.GetSeqNumber("lino")

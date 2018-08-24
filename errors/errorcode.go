@@ -13,4 +13,5 @@ const (
 	CodeInvalidNodeURL
 	CodeInvalidSequenceNumber
 	CodeEmptyResponse // 10
+	CodeTimeout
 )

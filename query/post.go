@@ -1,15 +1,13 @@
 package query
 
 import (
-	"context"
-
 	"github.com/lino-network/lino-go/model"
 )
 
 // GetPostInfo returns post info given a permlink(author#postID).
-func (query *Query) GetPostInfo(ctx context.Context, author, postID string) (*model.PostInfo, error) {
+func (query *Query) GetPostInfo(author, postID string) (*model.PostInfo, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostInfoKey(permlink), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostInfoKey(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -21,9 +19,9 @@ func (query *Query) GetPostInfo(ctx context.Context, author, postID string) (*mo
 }
 
 // GetPostMeta returns post meta given a permlink.
-func (query *Query) GetPostMeta(ctx context.Context, author, postID string) (*model.PostMeta, error) {
+func (query *Query) GetPostMeta(author, postID string) (*model.PostMeta, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostMetaKey(permlink), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostMetaKey(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -36,9 +34,9 @@ func (query *Query) GetPostMeta(ctx context.Context, author, postID string) (*mo
 
 // GetPostComment returns a specific comment of a post given the post permlink
 // and comment permlink.
-func (query *Query) GetPostComment(ctx context.Context, author, postID, commentPermlink string) (*model.Comment, error) {
+func (query *Query) GetPostComment(author, postID, commentPermlink string) (*model.Comment, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostCommentKey(permlink, commentPermlink), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostCommentKey(permlink, commentPermlink), PostKVStoreKey)
 
 	if err != nil {
 		return nil, err
@@ -51,9 +49,9 @@ func (query *Query) GetPostComment(ctx context.Context, author, postID, commentP
 }
 
 // GetPostView returns a view of a post performed by a user.
-func (query *Query) GetPostView(ctx context.Context, author, postID, viewUser string) (*model.View, error) {
+func (query *Query) GetPostView(author, postID, viewUser string) (*model.View, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostViewKey(permlink, viewUser), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostViewKey(permlink, viewUser), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -65,9 +63,9 @@ func (query *Query) GetPostView(ctx context.Context, author, postID, viewUser st
 }
 
 // GetPostDonations returns all donations that a user has given to a post.
-func (query *Query) GetPostDonations(ctx context.Context, author, postID, donateUser string) (*model.Donations, error) {
+func (query *Query) GetPostDonations(author, postID, donateUser string) (*model.Donations, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostDonationsKey(permlink, donateUser), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostDonationsKey(permlink, donateUser), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -79,9 +77,9 @@ func (query *Query) GetPostDonations(ctx context.Context, author, postID, donate
 }
 
 // GetPostReportOrUpvote returns report or upvote that a user has given to a post.
-func (query *Query) GetPostReportOrUpvote(ctx context.Context, author, postID, user string) (*model.ReportOrUpvote, error) {
+func (query *Query) GetPostReportOrUpvote(author, postID, user string) (*model.ReportOrUpvote, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostReportOrUpvoteKey(permlink, user), PostKVStoreKey)
+	resp, err := query.transport.Query(getPostReportOrUpvoteKey(permlink, user), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +95,8 @@ func (query *Query) GetPostReportOrUpvote(ctx context.Context, author, postID, u
 //
 
 // GetUserAllPosts returns all posts that a user has created.
-func (query *Query) GetUserAllPosts(ctx context.Context, username string) (map[string]*model.Post, error) {
-	resKVs, err := query.transport.QuerySubspace(ctx, getUserPostInfoPrefix(username), PostKVStoreKey)
+func (query *Query) GetUserAllPosts(username string) (map[string]*model.Post, error) {
+	resKVs, err := query.transport.QuerySubspace(getUserPostInfoPrefix(username), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +108,7 @@ func (query *Query) GetUserAllPosts(ctx context.Context, username string) (map[s
 			return nil, err
 		}
 
-		pm, err := query.GetPostMeta(ctx, postInfo.Author, postInfo.PostID)
+		pm, err := query.GetPostMeta(postInfo.Author, postInfo.PostID)
 		if err != nil {
 			return nil, err
 		}
@@ -144,9 +142,9 @@ func (query *Query) GetUserAllPosts(ctx context.Context, username string) (map[s
 }
 
 // GetPostAllComments returns all comments that a post has.
-func (query *Query) GetPostAllComments(ctx context.Context, author, postID string) (map[string]*model.Comment, error) {
+func (query *Query) GetPostAllComments(author, postID string) (map[string]*model.Comment, error) {
 	permlink := getPermlink(author, postID)
-	resKVs, err := query.transport.QuerySubspace(ctx, getPostCommentPrefix(permlink), PostKVStoreKey)
+	resKVs, err := query.transport.QuerySubspace(getPostCommentPrefix(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -165,9 +163,9 @@ func (query *Query) GetPostAllComments(ctx context.Context, author, postID strin
 }
 
 // GetPostAllViews returns all views that a post has.
-func (query *Query) GetPostAllViews(ctx context.Context, author, postID string) (map[string]*model.View, error) {
+func (query *Query) GetPostAllViews(author, postID string) (map[string]*model.View, error) {
 	permlink := getPermlink(author, postID)
-	resKVs, err := query.transport.QuerySubspace(ctx, getPostViewPrefix(permlink), PostKVStoreKey)
+	resKVs, err := query.transport.QuerySubspace(getPostViewPrefix(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -185,9 +183,9 @@ func (query *Query) GetPostAllViews(ctx context.Context, author, postID string) 
 }
 
 // GetPostAllDonations returns all donations that a post has received.
-func (query *Query) GetPostAllDonations(ctx context.Context, author, postID string) (map[string]*model.Donations, error) {
+func (query *Query) GetPostAllDonations(author, postID string) (map[string]*model.Donations, error) {
 	permlink := getPermlink(author, postID)
-	resKVs, err := query.transport.QuerySubspace(ctx, getPostDonationsPrefix(permlink), PostKVStoreKey)
+	resKVs, err := query.transport.QuerySubspace(getPostDonationsPrefix(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -205,9 +203,9 @@ func (query *Query) GetPostAllDonations(ctx context.Context, author, postID stri
 }
 
 // GetPostAllReportOrUpvotes returns all reports or upvotes that a post has received.
-func (query *Query) GetPostAllReportOrUpvotes(ctx context.Context, author, postID string) (map[string]*model.ReportOrUpvote, error) {
+func (query *Query) GetPostAllReportOrUpvotes(author, postID string) (map[string]*model.ReportOrUpvote, error) {
 	permlink := getPermlink(author, postID)
-	resKVs, err := query.transport.QuerySubspace(ctx, getPostReportOrUpvotePrefix(permlink), PostKVStoreKey)
+	resKVs, err := query.transport.QuerySubspace(getPostReportOrUpvotePrefix(permlink), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}

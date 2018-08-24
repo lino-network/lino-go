@@ -1,14 +1,12 @@
 package query
 
 import (
-	"context"
-
 	"github.com/lino-network/lino-go/model"
 )
 
 // GetEvaluateOfContentValueParam returns the EvaluateOfContentValueParam.
-func (query *Query) GetEvaluateOfContentValueParam(ctx context.Context) (*model.EvaluateOfContentValueParam, error) {
-	resp, err := query.transport.Query(ctx, getEvaluateOfContentValueParamKey(), ParamKVStoreKey)
+func (query *Query) GetEvaluateOfContentValueParam() (*model.EvaluateOfContentValueParam, error) {
+	resp, err := query.transport.Query(getEvaluateOfContentValueParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -21,8 +19,8 @@ func (query *Query) GetEvaluateOfContentValueParam(ctx context.Context) (*model.
 }
 
 // GetGlobalAllocationParam returns the GlobalAllocationParam.
-func (query *Query) GetGlobalAllocationParam(ctx context.Context) (*model.GlobalAllocationParam, error) {
-	resp, err := query.transport.Query(ctx, getGlobalAllocationParamKey(), ParamKVStoreKey)
+func (query *Query) GetGlobalAllocationParam() (*model.GlobalAllocationParam, error) {
+	resp, err := query.transport.Query(getGlobalAllocationParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -35,8 +33,8 @@ func (query *Query) GetGlobalAllocationParam(ctx context.Context) (*model.Global
 }
 
 // GetInfraInternalAllocationParam returns the InfraInternalAllocationParam.
-func (query *Query) GetInfraInternalAllocationParam(ctx context.Context) (*model.InfraInternalAllocationParam, error) {
-	resp, err := query.transport.Query(ctx, getInfraInternalAllocationParamKey(), ParamKVStoreKey)
+func (query *Query) GetInfraInternalAllocationParam() (*model.InfraInternalAllocationParam, error) {
+	resp, err := query.transport.Query(getInfraInternalAllocationParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +47,8 @@ func (query *Query) GetInfraInternalAllocationParam(ctx context.Context) (*model
 }
 
 // GetDeveloperParam returns the DeveloperParam.
-func (query *Query) GetDeveloperParam(ctx context.Context) (*model.DeveloperParam, error) {
-	resp, err := query.transport.Query(ctx, getDeveloperParamKey(), ParamKVStoreKey)
+func (query *Query) GetDeveloperParam() (*model.DeveloperParam, error) {
+	resp, err := query.transport.Query(getDeveloperParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +61,8 @@ func (query *Query) GetDeveloperParam(ctx context.Context) (*model.DeveloperPara
 }
 
 // GetVoteParam returns the VoteParam.
-func (query *Query) GetVoteParam(ctx context.Context) (*model.VoteParam, error) {
-	resp, err := query.transport.Query(ctx, getVoteParamKey(), ParamKVStoreKey)
+func (query *Query) GetVoteParam() (*model.VoteParam, error) {
+	resp, err := query.transport.Query(getVoteParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -77,8 +75,8 @@ func (query *Query) GetVoteParam(ctx context.Context) (*model.VoteParam, error) 
 }
 
 // GetProposalParam returns the ProposalParam.
-func (query *Query) GetProposalParam(ctx context.Context) (*model.ProposalParam, error) {
-	resp, err := query.transport.Query(ctx, getProposalParamKey(), ParamKVStoreKey)
+func (query *Query) GetProposalParam() (*model.ProposalParam, error) {
+	resp, err := query.transport.Query(getProposalParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -91,8 +89,8 @@ func (query *Query) GetProposalParam(ctx context.Context) (*model.ProposalParam,
 }
 
 // GetValidatorParam returns the ValidatorParam.
-func (query *Query) GetValidatorParam(ctx context.Context) (*model.ValidatorParam, error) {
-	resp, err := query.transport.Query(ctx, getValidatorParamKey(), ParamKVStoreKey)
+func (query *Query) GetValidatorParam() (*model.ValidatorParam, error) {
+	resp, err := query.transport.Query(getValidatorParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -105,8 +103,8 @@ func (query *Query) GetValidatorParam(ctx context.Context) (*model.ValidatorPara
 }
 
 // GetCoinDayParam returns the CoinDayParam.
-func (query *Query) GetCoinDayParam(ctx context.Context) (*model.CoinDayParam, error) {
-	resp, err := query.transport.Query(ctx, getCoinDayParamKey(), ParamKVStoreKey)
+func (query *Query) GetCoinDayParam() (*model.CoinDayParam, error) {
+	resp, err := query.transport.Query(getCoinDayParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -119,8 +117,8 @@ func (query *Query) GetCoinDayParam(ctx context.Context) (*model.CoinDayParam, e
 }
 
 // GetBandwidthParam returns the BandwidthParam.
-func (query *Query) GetBandwidthParam(ctx context.Context) (*model.BandwidthParam, error) {
-	resp, err := query.transport.Query(ctx, getBandwidthParamKey(), ParamKVStoreKey)
+func (query *Query) GetBandwidthParam() (*model.BandwidthParam, error) {
+	resp, err := query.transport.Query(getBandwidthParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -133,8 +131,8 @@ func (query *Query) GetBandwidthParam(ctx context.Context) (*model.BandwidthPara
 }
 
 // GetAccountParam returns the AccountParam.
-func (query *Query) GetAccountParam(ctx context.Context) (*model.AccountParam, error) {
-	resp, err := query.transport.Query(ctx, getAccountParamKey(), ParamKVStoreKey)
+func (query *Query) GetAccountParam() (*model.AccountParam, error) {
+	resp, err := query.transport.Query(getAccountParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +145,8 @@ func (query *Query) GetAccountParam(ctx context.Context) (*model.AccountParam, e
 }
 
 // GetPostParam returns the PostParam.
-func (query *Query) GetPostParam(ctx context.Context) (*model.PostParam, error) {
-	resp, err := query.transport.Query(ctx, getPostParamKey(), ParamKVStoreKey)
+func (query *Query) GetPostParam() (*model.PostParam, error) {
+	resp, err := query.transport.Query(getPostParamKey(), ParamKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
