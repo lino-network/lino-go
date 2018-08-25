@@ -4,7 +4,7 @@ type Permission int
 type DetailType int
 
 const (
-	InvalidSeqErrCode = 3
+	InvalidSeqErrCode = 154
 
 	// Different permission levels
 	UnknownPermission          = Permission(0)
