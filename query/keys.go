@@ -67,9 +67,9 @@ var (
 	infraProviderListSubstore = []byte{0x01}
 
 	// proposal substore
-	proposalSubstore       = []byte{0x00}
-	proposalListSubStore   = []byte{0x01}
-	nextProposalIDSubstore = []byte{0x02}
+	nextProposalIDSubstore  = []byte{0x00}
+	ongoingProposalSubStore = []byte{0x01}
+	expiredProposalSubStore = []byte{0x02}
 
 	// param substore
 	allocationParamSubStore              = []byte{0x00}
@@ -293,15 +293,23 @@ func getInfraProviderListKey() []byte {
 //
 // proposal related
 //
-func getProposalKey(proposalID string) []byte {
-	return append(proposalSubstore, proposalID...)
+func getOngoingProposalKey(proposalID string) []byte {
+	return append(ongoingProposalSubStore, proposalID...)
 }
 
-func getProposalListKey() []byte {
-	return proposalListSubStore
+func getOngoingProposalSubstoreKey() []byte {
+	return ongoingProposalSubStore
 }
 
-func GetNextProposalIDKey() []byte {
+func getExpiredProposalKey(proposalID string) []byte {
+	return append(expiredProposalSubStore, proposalID...)
+}
+
+func getExpiredProposalSubstoreKey() []byte {
+	return expiredProposalSubStore
+}
+
+func getNextProposalIDKey() []byte {
 	return nextProposalIDSubstore
 }
 
