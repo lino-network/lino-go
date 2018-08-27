@@ -94,6 +94,8 @@ const (
 	CodeRegisterFeeInsufficient            BCCodeType = 357
 	CodeFailedToMarshalRewardHistory       BCCodeType = 358
 	CodeFailedToUnmarshalRewardHistory     BCCodeType = 359
+	CodeGetLastPostAt                      BCCodeType = 360
+	CodeUpdateLastPostAt                   BCCodeType = 361
 
 	// Lino post errors reserve 400 ~ 499
 	CodePostMetaNotFound                     BCCodeType = 400
@@ -136,6 +138,7 @@ const (
 	CodeInvalidTarget                        BCCodeType = 437
 	CodeCreatePostSourceInvalid              BCCodeType = 438
 	CodeGetSourcePost                        BCCodeType = 439
+	CodePostTooOften                         BCCodeType = 440
 
 	// Lino validator errors reserve 500 ~ 599
 	CodeValidatorNotFound              BCCodeType = 500

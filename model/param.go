@@ -13,6 +13,9 @@ type EvaluateOfContentValueParam struct {
 }
 
 type GlobalAllocationParam struct {
+	GlobalGrowthRate         Rat `json:"global_growth_rate"`
+	Ceiling                  Rat `json:"ceiling"`
+	Floor                    Rat `json:"floor"`
 	InfraAllocation          Rat `json:"infra_allocation"`
 	ContentCreatorAllocation Rat `json:"content_creator_allocation"`
 	DeveloperAllocation      Rat `json:"developer_allocation"`
@@ -86,4 +89,5 @@ type AccountParam struct {
 
 type PostParam struct {
 	ReportOrUpvoteInterval int64 `json:"report_or_upvote_interval"`
+	PostIntervalSec        int64 `json:"post_interval_sec"`
 }
