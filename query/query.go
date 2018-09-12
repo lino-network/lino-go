@@ -57,3 +57,22 @@ func (query *Query) GetBlockStatus() (*model.BlockStatus, error) {
 
 	return bs, nil
 }
+
+func (query *Query) GetTx(hash []byte) (*model.BlockTx, error) {
+	resp, err := query.transport.QueryTx(hash)
+	if err != nil {
+		return nil, errors.QueryFailf("GetTx err").AddCause(err)
+	}
+
+	var tx model.Transaction
+	if err := query.transport.Cdc.UnmarshalJSON(resp.Tx, &tx); err != nil {
+		return nil, err
+	}
+
+	bt := &model.BlockTx{
+		Height: resp.Height,
+		Tx:     tx,
+	}
+
+	return bt, nil
+}
