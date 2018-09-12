@@ -322,3 +322,8 @@ type Data struct {
 }
 
 type Txs []Transaction
+
+type BlockTx struct {
+	Height int64       `json:"height"`
+	Tx     Transaction `json:"tx"`
+}
