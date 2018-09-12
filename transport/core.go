@@ -214,6 +214,32 @@ func (t Transport) QueryBlockStatus() (res *ctypes.ResultStatus, err error) {
 	return res, err
 }
 
+// QueryTx queries tx from blockchain.
+func (t Transport) QueryTx(hash []byte) (res *ctypes.ResultTx, err error) {
+	node, err := t.GetNode()
+	if err != nil {
+		return res, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
+	defer cancel()
+
+	finishChan := make(chan bool)
+	go func() {
+		res, err = node.Tx(hash, false)
+		finishChan <- true
+	}()
+
+	select {
+	case <-finishChan:
+		break
+	case <-ctx.Done():
+		return nil, errors.Timeout("query tx timeout").AddCause(ctx.Err())
+	}
+
+	return res, err
+}
+
 // BroadcastTx broadcasts a transcation to blockchain.
 func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, error) {
 	node, err := t.GetNode()
