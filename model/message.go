@@ -159,11 +159,6 @@ type DelegatorWithdrawMsg struct {
 	Amount    string `json:"amount"`
 }
 
-type RevokeDelegationMsg struct {
-	Delegator string `json:"delegator"`
-	Voter     string `json:"voter"`
-}
-
 //
 // developer related messages
 //
