@@ -345,17 +345,6 @@ func (broadcast *Broadcast) DelegatorWithdraw(delegator, voter, amount, privKeyH
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
-// RevokeDelegation reovkes all delegated LINO token of a delegator to a voter
-// so there is no delegation between the two users.
-// It composes RevokeDelegationMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) RevokeDelegation(delegator, voter, privKeyHex string, seq int64) error {
-	msg := model.RevokeDelegationMsg{
-		Delegator: delegator,
-		Voter:     voter,
-	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
-}
-
 //
 // Developer related tx
 //

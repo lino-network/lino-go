@@ -53,7 +53,6 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.StakeOutMsg{}, "lino/stakeOut", nil)
 	cdc.RegisterConcrete(model.DelegateMsg{}, "lino/delegate", nil)
 	cdc.RegisterConcrete(model.DelegatorWithdrawMsg{}, "lino/delegateWithdraw", nil)
-	cdc.RegisterConcrete(model.RevokeDelegationMsg{}, "lino/delegateRevoke", nil)
 
 	// developer
 	cdc.RegisterConcrete(model.DeveloperRegisterMsg{}, "lino/devRegister", nil)

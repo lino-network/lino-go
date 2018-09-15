@@ -26,8 +26,6 @@ type InfraInternalAllocationParam struct {
 }
 
 type VoteParam struct {
-	VoterMinDeposit                Coin  `json:"voter_min_deposit"`
-	DelegatorMinWithdraw           Coin  `json:"delegator_min_withdraw"`
 	VoterCoinReturnIntervalSec     int64 `json:"voter_coin_return_interval_second"`
 	VoterCoinReturnTimes           int64 `json:"voter_coin_return_times"`
 	DelegatorCoinReturnIntervalSec int64 `json:"delegator_coin_return_interval_second"`
