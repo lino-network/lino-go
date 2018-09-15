@@ -36,6 +36,10 @@ type ClaimMsg struct {
 	Username string `json:"username"`
 }
 
+type ClaimInterestMsg struct {
+	Username string `json:"username"`
+}
+
 type RecoverMsg struct {
 	Username             string        `json:"username"`
 	NewResetPubKey       crypto.PubKey `json:"new_reset_public_key"`
@@ -77,12 +81,11 @@ type IDToURLMapping struct {
 }
 
 type UpdatePostMsg struct {
-	Author                  string           `json:"author"`
-	PostID                  string           `json:"post_id"`
-	Title                   string           `json:"title"`
-	Content                 string           `json:"content"`
-	Links                   []IDToURLMapping `json:"links"`
-	RedistributionSplitRate string           `json:"redistribution_split_rate"`
+	Author  string           `json:"author"`
+	PostID  string           `json:"post_id"`
+	Title   string           `json:"title"`
+	Content string           `json:"content"`
+	Links   []IDToURLMapping `json:"links"`
 }
 
 type DeletePostMsg struct {
@@ -134,18 +137,14 @@ type ValidatorRevokeMsg struct {
 //
 // Vote related messages
 //
-type VoterDepositMsg struct {
+type StakeInMsg struct {
 	Username string `json:"username"`
 	Deposit  string `json:"deposit"`
 }
 
-type VoterWithdrawMsg struct {
+type StakeOutMsg struct {
 	Username string `json:"username"`
 	Amount   string `json:"amount"`
-}
-
-type VoterRevokeMsg struct {
-	Username string `json:"username"`
 }
 
 type DelegateMsg struct {
@@ -223,12 +222,6 @@ type DeletePostContentMsg struct {
 	Reason   string `json:"reason"`
 }
 
-type VoteProposalMsg struct {
-	Voter      string `json:"voter"`
-	ProposalID string `json:"proposal_id"`
-	Result     bool   `json:"result"`
-}
-
 type UpgradeProtocolMsg struct {
 	Creator string `json:"creator"`
 	Link    string `json:"link"`
@@ -293,4 +286,10 @@ type ChangePostParamMsg struct {
 	Creator   string    `json:"creator"`
 	Parameter PostParam `json:"parameter"`
 	Reason    string    `json:"reason"`
+}
+
+type VoteProposalMsg struct {
+	Voter      string `json:"voter"`
+	ProposalID string `json:"proposal_id"`
+	Result     bool   `json:"result"`
 }

@@ -100,6 +100,15 @@ func (broadcast *Broadcast) Claim(username, privKeyHex string, seq int64) error 
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
+// ClaimInterest claims interest of a certain user.
+// It composes ClaimInterestMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) ClaimInterest(username, privKeyHex string, seq int64) error {
+	msg := model.ClaimInterestMsg{
+		Username: username,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
+}
+
 // UpdateAccount updates account related info in jsonMeta which are not
 // included in AccountInfo or AccountBank.
 // It composes UpdateAccountMsg and then broadcasts the transaction to blockchain.
@@ -222,8 +231,8 @@ func (broadcast *Broadcast) View(username, author, postID, privKeyHex string, se
 
 // UpdatePost updates post info with new data.
 // It composes UpdatePostMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) UpdatePost(author, title, postID,
-	content, redistributionSplitRate string, links map[string]string, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) UpdatePost(author, title, postID, content string,
+	links map[string]string, privKeyHex string, seq int64) error {
 	var mLinks []model.IDToURLMapping
 	if links == nil || len(links) == 0 {
 		mLinks = nil
@@ -239,7 +248,6 @@ func (broadcast *Broadcast) UpdatePost(author, title, postID,
 		Title:   title,
 		Content: content,
 		Links:   mLinks,
-		RedistributionSplitRate: redistributionSplitRate,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
@@ -292,34 +300,23 @@ func (broadcast *Broadcast) ValidatorRevoke(username, privKeyHex string, seq int
 // Vote related tx
 //
 
-// VoterDeposit deposits a certain amount of LINO token for a user
+// StakeIn deposits a certain amount of LINO token for a user
 // in order to become a voter.
-// It composes VoterDepositMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) VoterDeposit(username, deposit, privKeyHex string, seq int64) error {
-	msg := model.VoterDepositMsg{
+// It composes StakeInMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) StakeIn(username, deposit, privKeyHex string, seq int64) error {
+	msg := model.StakeInMsg{
 		Username: username,
 		Deposit:  deposit,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
-// VoterWithdraw withdraws part of LINO token from a voter's deposit,
-// while still keep being a voter.
-// It composes VoterWithdrawMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) VoterWithdraw(username, amount, privKeyHex string, seq int64) error {
-	msg := model.VoterWithdrawMsg{
+// StakeOut withdraws part of LINO token from a voter's deposit.
+// It composes StakeOutMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) StakeOut(username, amount, privKeyHex string, seq int64) error {
+	msg := model.StakeOutMsg{
 		Username: username,
 		Amount:   amount,
-	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
-}
-
-// VoterRevoke reovkes all deposited LINO token of a voter
-// so the user will not be a voter anymore.
-// It composes VoterRevokeMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) VoterRevoke(username, privKeyHex string, seq int64) error {
-	msg := model.VoterRevokeMsg{
-		Username: username,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }

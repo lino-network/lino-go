@@ -100,5 +100,3 @@ func (query *Query) GetProposalAllVotes(prposalID string) ([]*model.Vote, error)
 
 	return votes, nil
 }
-
-// TODO: Get all votes by voter.

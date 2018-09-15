@@ -96,12 +96,15 @@ type SDKCoin struct {
 type SDKCoins []SDKCoin
 
 type Rat struct {
-	big.Rat `json:"rat"`
+	*big.Rat `json:"rat"`
 }
 
 // MarshalAmino wraps r.MarshalText().
 func (r Rat) MarshalAmino() (string, error) {
-	bz, err := (&(r.Rat)).MarshalText()
+	if r.Rat == nil {
+		r.Rat = new(big.Rat)
+	}
+	bz, err := r.Rat.MarshalText()
 	return string(bz), err
 }
 
@@ -112,6 +115,6 @@ func (r *Rat) UnmarshalAmino(text string) (err error) {
 	if err != nil {
 		return err
 	}
-	r.Rat = *tempRat
+	r.Rat = tempRat
 	return nil
 }
