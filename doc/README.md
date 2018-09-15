@@ -357,6 +357,11 @@ err = api.Unfollow(follower, followee, privKeyHex, seq)
 seq, err := api.GetSeqNumber(username)
 err = api.Claim(username, privKeyHex, seq)
 ```
+##### Claim Interest
+```
+seq, err := api.GetSeqNumber(username)
+err = api.ClaimInterest(username, privKeyHex, seq)
+```
 ##### Update Account
 ```
 seq, err := api.GetSeqNumber(username)
@@ -397,7 +402,7 @@ err = api.View(username, author, postID, privKeyHex, seq)
 ##### Update Post
 ```
 seq, err := api.GetSeqNumber(author)
-err = api.UpdatePost(author, title, postID, content, redistributionSplitRate, links, privKeyHex, seq)
+err = api.UpdatePost(author, title, postID, content, links, privKeyHex, seq)
 ```
 
 #### Broadcast Validator
@@ -418,20 +423,15 @@ err = api.ValidatorRevoke(username, privKeyHex, seq)
 ```
 
 #### Broadcast Vote
-##### Voter Deposit
+##### Voter StakeIn
 ```
 seq, err := api.GetSeqNumber(username)
-err = api.VoterDeposit(username, deposit, privKeyHex, seq)
+err = api.StakeIn(username, deposit, privKeyHex, seq)
 ```
-##### Voter Withdraw
-```
-seq, err := api.GetSeqNumber(username)
-err = api.VoterWithdraw(username, amount, privKeyHex, seq)
-```
-##### Voter Revoke
+##### Voter StakeOut
 ```
 seq, err := api.GetSeqNumber(username)
-err = api.VoterRevoke(username, privKeyHex, seq)
+err = api.StakeOut(username, amount, privKeyHex, seq)
 ```
 ##### Delegate To Voter
 ```
