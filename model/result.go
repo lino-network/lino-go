@@ -20,7 +20,7 @@ type AccountInfo struct {
 
 type AccountBank struct {
 	Saving          Coin          `json:"saving"`
-	Stake           Coin          `json:"stake"`
+	CoinDay         Coin          `json:"coin_day"`
 	FrozenMoneyList []FrozenMoney `json:"frozen_money_list"`
 	NumOfTx         int64         `json:"number_of_transaction"`
 	NumOfReward     int64         `json:"number_of_reward"`
@@ -32,6 +32,23 @@ type FrozenMoney struct {
 	Times    int64 `json:"times"`
 	Interval int64 `json:"interval"`
 }
+
+// unused
+
+type PendingCoinDayQueue struct {
+	LastUpdatedAt   int64            `json:"last_updated_at"`
+	TotalCoinDay    Rat              `json:"total_coin_day"`
+	TotalCoin       Coin             `json:"total_coin"`
+	PendingCoinDays []PendingCoinDay `json:"pending_coin_days"`
+}
+
+type PendingCoinDay struct {
+	StartTime int64 `json:"start_time"`
+	EndTime   int64 `json:"end_time"`
+	Coin      Coin  `json:"coin"`
+}
+
+// end unused
 
 type GrantPubKey struct {
 	Username   string     `json:"username"`
@@ -61,6 +78,7 @@ type FollowingMeta struct {
 }
 
 type Reward struct {
+	Interest        Coin `json:"interest"`
 	TotalIncome     Coin `json:"total_income"`
 	OriginalIncome  Coin `json:"original_income"`
 	FrictionIncome  Coin `json:"friction_income"`
@@ -122,8 +140,8 @@ type PostMeta struct {
 	AllowReplies            bool   `json:"allow_replies"`
 	IsDeleted               bool   `json:"is_deleted"`
 	TotalDonateCount        int64  `json:"total_donate_count"`
-	TotalReportStake        Coin   `json:"total_report_stake"`
-	TotalUpvoteStake        Coin   `json:"total_upvote_stake"`
+	TotalReportCoinDay      Coin   `json:"total_report_coin_day"`
+	TotalUpvoteCoinDay      Coin   `json:"total_upvote_coin_day"`
 	TotalViewCount          int64  `json:"total_view_count"`
 	TotalReward             Coin   `json:"total_reward"`
 	RedistributionSplitRate string `json:"redistribution_split_rate"`
@@ -146,8 +164,8 @@ type Post struct {
 	AllowReplies            bool             `json:"allow_replies"`
 	IsDeleted               bool             `json:"is_deleted"`
 	TotalDonateCount        int64            `json:"total_donate_count"`
-	TotalReportStake        Coin             `json:"total_report_stake"`
-	TotalUpvoteStake        Coin             `json:"total_upvote_stake"`
+	TotalReportCoinDay      Coin             `json:"total_report_coin_day"`
+	TotalUpvoteCoinDay      Coin             `json:"total_upvote_coin_day"`
 	TotalViewCount          int64            `json:"total_view_count"`
 	TotalReward             Coin             `json:"reward"`
 	RedistributionSplitRate string           `json:"redistribution_split_rate"`
@@ -155,7 +173,7 @@ type Post struct {
 
 type ReportOrUpvote struct {
 	Username  string `json:"username"`
-	Stake     Coin   `json:"stake"`
+	CoinDay   Coin   `json:"coin_day"`
 	CreatedAt int64  `json:"created_at"`
 	IsReport  bool   `json:"is_report"`
 }
@@ -214,9 +232,10 @@ type ValidatorList struct {
 // vote related struct
 //
 type Voter struct {
-	Username       string `json:"username"`
-	Deposit        Coin   `json:"deposit"`
-	DelegatedPower Coin   `json:"delegated_power"`
+	Username          string `json:"username"`
+	LinoStake         Coin   `json:"lino_stake"`
+	DelegatedPower    Coin   `json:"delegated_power"`
+	LastPowerChangeAt int64  `json:"last_power_change_at"`
 }
 
 type Vote struct {
@@ -228,6 +247,10 @@ type Vote struct {
 type Delegation struct {
 	Delegator string `json:"delegator"`
 	Amount    Coin   `json:"amount"`
+}
+
+type ReferenceList struct {
+	AllValidators []string `json:"all_validators"`
 }
 
 //
@@ -274,10 +297,6 @@ type ProposalInfo struct {
 	Reason        string `json:"reason"`
 }
 
-type NextProposalID struct {
-	NextProposalID int64 `json:"next_proposal_id"`
-}
-
 type ChangeParamProposal struct {
 	ProposalInfo
 	Param  Parameter `json:"param"`
@@ -296,9 +315,8 @@ type ProtocolUpgradeProposal struct {
 	Reason string `json:"reason"`
 }
 
-type ProposalList struct {
-	OngoingProposal []string `json:"ongoing_proposal"`
-	PastProposal    []string `json:"past_proposal"`
+type NextProposalID struct {
+	NextProposalID int64 `json:"next_proposal_id"`
 }
 
 //

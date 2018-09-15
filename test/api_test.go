@@ -1,6 +1,7 @@
 package test
 
 import (
+	"encoding/hex"
 	"testing"
 	"time"
 
@@ -31,6 +32,23 @@ func setup(t *testing.T) {
 	}
 
 	testAPI = api.NewLinoAPIFromArgs(chainID, nodeURL, options)
+}
+
+func TestGetByCommitHash(t *testing.T) {
+	setup(t)
+
+	commitHash := "AB6B3BF21032E135C23A4F47DC1D36393483B339"
+
+	b, err := hex.DecodeString(commitHash)
+	if err != nil {
+		t.Errorf("decode err: %v", err)
+	}
+
+	res, err := testAPI.GetTx(b)
+	if err != nil {
+		t.Errorf("err: %v", err)
+	}
+	t.Errorf(">>res: %v", res)
 }
 
 // func TestBasic(t *testing.T) {
