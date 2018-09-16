@@ -24,6 +24,7 @@ func MakeCodec() *wire.Codec {
 
 	cdc.RegisterInterface((*model.Msg)(nil), nil)
 	cdc.RegisterInterface((*model.Tx)(nil), nil)
+	cdc.RegisterConcrete(model.Transaction{}, "auth/StdTx", nil)
 
 	// account
 	cdc.RegisterConcrete(model.RegisterMsg{}, "lino/register", nil)
