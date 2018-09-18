@@ -1,5 +1,7 @@
 package model
 
+import "github.com/lino-network/lino/types"
+
 // parameters can be changed by proposal
 type Parameter interface{}
 
@@ -26,10 +28,11 @@ type InfraInternalAllocationParam struct {
 }
 
 type VoteParam struct {
-	VoterCoinReturnIntervalSec     int64 `json:"voter_coin_return_interval_second"`
-	VoterCoinReturnTimes           int64 `json:"voter_coin_return_times"`
-	DelegatorCoinReturnIntervalSec int64 `json:"delegator_coin_return_interval_second"`
-	DelegatorCoinReturnTimes       int64 `json:"delegator_coin_return_times"`
+	MinStakeIn                     types.Coin `json:"min_stake_in"`
+	VoterCoinReturnIntervalSec     int64      `json:"voter_coin_return_interval_second"`
+	VoterCoinReturnTimes           int64      `json:"voter_coin_return_times"`
+	DelegatorCoinReturnIntervalSec int64      `json:"delegator_coin_return_interval_second"`
+	DelegatorCoinReturnTimes       int64      `json:"delegator_coin_return_times"`
 }
 
 type ProposalParam struct {
