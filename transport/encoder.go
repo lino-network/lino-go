@@ -32,7 +32,6 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.UnfollowMsg{}, "lino/unfollow", nil)
 	cdc.RegisterConcrete(model.TransferMsg{}, "lino/transfer", nil)
 	cdc.RegisterConcrete(model.ClaimMsg{}, "lino/claim", nil)
-	cdc.RegisterConcrete(model.ClaimInterestMsg{}, "lino/claimInterest", nil)
 	cdc.RegisterConcrete(model.RecoverMsg{}, "lino/recover", nil)
 	cdc.RegisterConcrete(model.UpdateAccountMsg{}, "lino/updateAcc", nil)
 
@@ -54,6 +53,7 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.StakeOutMsg{}, "lino/stakeOut", nil)
 	cdc.RegisterConcrete(model.DelegateMsg{}, "lino/delegate", nil)
 	cdc.RegisterConcrete(model.DelegatorWithdrawMsg{}, "lino/delegateWithdraw", nil)
+	cdc.RegisterConcrete(model.ClaimInterestMsg{}, "lino/claimInterest", nil)
 
 	// developer
 	cdc.RegisterConcrete(model.DeveloperRegisterMsg{}, "lino/devRegister", nil)
