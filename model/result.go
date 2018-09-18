@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"github.com/lino-network/lino/types"
 	crypto "github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -78,7 +79,6 @@ type FollowingMeta struct {
 }
 
 type Reward struct {
-	Interest        Coin `json:"interest"`
 	TotalIncome     Coin `json:"total_income"`
 	OriginalIncome  Coin `json:"original_income"`
 	FrictionIncome  Coin `json:"friction_income"`
@@ -232,10 +232,12 @@ type ValidatorList struct {
 // vote related struct
 //
 type Voter struct {
-	Username          string `json:"username"`
-	LinoStake         Coin   `json:"lino_stake"`
-	DelegatedPower    Coin   `json:"delegated_power"`
-	LastPowerChangeAt int64  `json:"last_power_change_at"`
+	Username          string     `json:"username"`
+	LinoStake         Coin       `json:"lino_stake"`
+	DelegatedPower    Coin       `json:"delegated_power"`
+	DelegateToOthers  types.Coin `json:"delegate_to_others"`
+	LastPowerChangeAt int64      `json:"last_power_change_at"`
+	Interest          types.Coin `json:"interest"`
 }
 
 type Vote struct {
