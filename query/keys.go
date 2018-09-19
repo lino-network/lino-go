@@ -24,7 +24,8 @@ const (
 
 var (
 	// KeySeparator is the separator of substore key
-	KeySeparator = "/"
+	KeySeparator      = "/"
+	PermLinkSeparator = "#"
 
 	// account substore
 	accountInfoSubstore                = []byte{0x00}
@@ -172,7 +173,7 @@ func getRewardHistoryKey(me string, bucketSlot int64) []byte {
 // post related
 //
 func getPermlink(author string, postID string) string {
-	return string(author + "#" + postID)
+	return string(author + PermLinkSeparator + postID)
 }
 
 func getUserPostInfoPrefix(me string) []byte {
