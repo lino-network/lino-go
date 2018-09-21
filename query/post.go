@@ -96,7 +96,7 @@ func (query *Query) GetPostReportOrUpvote(author, postID, user string) (*model.R
 
 // GetUserAllPosts returns all posts that a user has created.
 func (query *Query) GetUserAllPosts(username string) (map[string]*model.Post, error) {
-	resKVs, err := query.transport.QuerySubspace(getUserPostInfoPrefix(username), PostKVStoreKey)
+	resKVs, err := query.transport.QuerySubspace(append(getUserPostInfoPrefix(username), PermLinkSeparator...), PostKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
