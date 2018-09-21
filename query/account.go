@@ -576,7 +576,7 @@ func (query *Query) SignWithSha256(payload string, privKey crypto.PrivKey) ([]by
 	return privKey.Sign(signByte)
 }
 
-// GetAllFollowingMeta returns all following meta of a user.
+// VerifyUserSignatureUsingAppKey verify signature is signed from payload by user's app private key.
 func (query *Query) VerifyUserSignatureUsingAppKey(username string, payload string, signature string) (bool, error) {
 	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
 	if err != nil {
@@ -591,4 +591,21 @@ func (query *Query) VerifyUserSignatureUsingAppKey(username string, payload stri
 		return false, err
 	}
 	return info.AppKey.VerifyBytes([]byte(payload), sig), nil
+}
+
+// VerifyUserSignatureUsingTxKey verify signature is signed from payload by user's transaction private key.
+func (query *Query) VerifyUserSignatureUsingTxKey(username string, payload string, signature string) (bool, error) {
+	resp, err := query.transport.Query(getAccountInfoKey(username), AccountKVStoreKey)
+	if err != nil {
+		return false, err
+	}
+	info := new(model.AccountInfo)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
+		return false, err
+	}
+	sig, err := hex.DecodeString(signature)
+	if err != nil {
+		return false, err
+	}
+	return info.TransactionKey.VerifyBytes([]byte(payload), sig), nil
 }
