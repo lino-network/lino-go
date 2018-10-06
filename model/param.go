@@ -90,4 +90,9 @@ type AccountParam struct {
 type PostParam struct {
 	ReportOrUpvoteIntervalSec int64 `json:"report_or_upvote_interval_second"`
 	PostIntervalSec           int64 `json:"post_interval_sec"`
+	MaxReportReputation       Coin  `json:"max_report_reputation"`
+}
+
+type ReputationParam struct {
+	BestContentIndexN int `json:"best_content_index_n"`
 }

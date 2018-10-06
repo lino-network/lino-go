@@ -84,6 +84,7 @@ var (
 	bandwidthParamSubStore               = []byte{0x08}
 	accountParamSubstore                 = []byte{0x09}
 	postParamSubStore                    = []byte{0x0a}
+	reputationParamSubStore              = []byte{0x0b}
 )
 
 func getHexSubstringAfterKeySeparator(key []byte) string {
@@ -360,4 +361,8 @@ func getAccountParamKey() []byte {
 
 func getPostParamKey() []byte {
 	return postParamSubStore
+}
+
+func GetReputationParamKey() []byte {
+	return reputationParamSubStore
 }

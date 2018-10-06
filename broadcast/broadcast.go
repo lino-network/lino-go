@@ -100,15 +100,6 @@ func (broadcast *Broadcast) Claim(username, privKeyHex string, seq int64) error 
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
 
-// ClaimInterest claims interest of a certain user.
-// It composes ClaimInterestMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ClaimInterest(username, privKeyHex string, seq int64) error {
-	msg := model.ClaimInterestMsg{
-		Username: username,
-	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
-}
-
 // UpdateAccount updates account related info in jsonMeta which are not
 // included in AccountInfo or AccountBank.
 // It composes UpdateAccountMsg and then broadcasts the transaction to blockchain.
@@ -341,6 +332,15 @@ func (broadcast *Broadcast) DelegatorWithdraw(delegator, voter, amount, privKeyH
 		Delegator: delegator,
 		Voter:     voter,
 		Amount:    amount,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
+}
+
+// ClaimInterest claims interest of a certain user.
+// It composes ClaimInterestMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) ClaimInterest(username, privKeyHex string, seq int64) error {
+	msg := model.ClaimInterestMsg{
+		Username: username,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
