@@ -363,6 +363,6 @@ func getPostParamKey() []byte {
 	return postParamSubStore
 }
 
-func GetReputationParamKey() []byte {
+func getReputationParamKey() []byte {
 	return reputationParamSubStore
 }
