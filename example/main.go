@@ -136,11 +136,11 @@ func main() {
 	ctx := context.Background()
 	api := api.NewLinoAPIFromArgs("test-chain-oS6Ywt", "localhost:26657")
 	seq, _ := api.GetSeqNumber(ctx, "lino")
-	err := api.Register(ctx, "lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B20D8C47F0A23DE7A2D8FDA7BF2886C3D8EC8A2DEF7F0395C38AEFAA13B452FE241", seq)
+	_, err := api.Register(ctx, "lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B20D8C47F0A23DE7A2D8FDA7BF2886C3D8EC8A2DEF7F0395C38AEFAA13B452FE241", seq)
 	if err != nil {
 		panic(err)
 	}
-	err = api.GrantPermission(ctx, newUser, "lino", 7*24*60*60, model.AppPermission, hex.EncodeToString(newUserTxKey.Bytes()), 0)
+	_, err = api.GrantPermission(ctx, newUser, "lino", 7*24*60*60, model.AppPermission, hex.EncodeToString(newUserTxKey.Bytes()), 0)
 	if err != nil {
 		panic(err)
 	}

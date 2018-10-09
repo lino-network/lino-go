@@ -346,3 +346,7 @@ type BlockTx struct {
 	Height int64       `json:"height"`
 	Tx     Transaction `json:"tx"`
 }
+
+type BroadcastReponse struct {
+	commitHash string `json:"commit_hash"`
+}
