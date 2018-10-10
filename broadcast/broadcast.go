@@ -37,15 +37,15 @@ func (broadcast *Broadcast) Register(referrer, registerFee, username, resetPubKe
 	transactionPubKeyHex, appPubKeyHex, referrerPrivKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	resetPubKey, err := transport.GetPubKeyFromHex(resetPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get Reset pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get Reset pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(transactionPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
 	}
 	appPubKey, err := transport.GetPubKeyFromHex(appPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get App pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get App pub key").AddCause(err)
 	}
 
 	msg := model.RegisterMsg{
@@ -122,15 +122,15 @@ func (broadcast *Broadcast) Recover(username, newResetPubKeyHex,
 	newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	resetPubKey, err := transport.GetPubKeyFromHex(newResetPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Reset pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHexf("Recover: failed to get Reset pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(newTransactionPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Tx pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHexf("Recover: failed to get Tx pub key").AddCause(err)
 	}
 	appPubKey, err := transport.GetPubKeyFromHex(newAppPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get App pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHexf("Recover: failed to get App pub key").AddCause(err)
 	}
 
 	msg := model.RecoverMsg{
@@ -263,7 +263,7 @@ func (broadcast *Broadcast) ValidatorDeposit(username, deposit,
 	validatorPubKey, link, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	valPubKey, err := transport.GetPubKeyFromHex(validatorPubKey)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("ValidatorDeposit: failed to get Val pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHexf("ValidatorDeposit: failed to get Val pub key").AddCause(err)
 	}
 	msg := model.ValidatorDepositMsg{
 		Username:  username,
@@ -435,7 +435,7 @@ func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string,
 	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	pubKey, err := transport.GetPubKeyFromHex(pubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get pub key").AddCause(err)
 	}
 
 	msg := model.RevokePermissionMsg{

@@ -348,5 +348,5 @@ type BlockTx struct {
 }
 
 type BroadcastReponse struct {
-	commitHash string `json:"commit_hash"`
+	CommitHash string `json:"commit_hash"`
 }

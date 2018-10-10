@@ -171,6 +171,14 @@
   revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
+  digest = "1:7336397e4b1c82c7220edddbfa707f0781a312f4049dd25219232040778f4637"
+  name = "github.com/lino-network/lino"
+  packages = ["types"]
+  pruneopts = "UT"
+  revision = "ca8781aacce44e888111b29fe401c7134cf7f969"
+  version = "v0.1.4"
+
+[[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
   name = "github.com/magiconair/properties"
   packages = ["."]
@@ -525,6 +533,7 @@
   input-imports = [
     "github.com/cosmos/cosmos-sdk/types",
     "github.com/cosmos/cosmos-sdk/wire",
+    "github.com/lino-network/lino/types",
     "github.com/spf13/viper",
     "github.com/tendermint/tendermint/crypto",
     "github.com/tendermint/tendermint/crypto/encoding/amino",
