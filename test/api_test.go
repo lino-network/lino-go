@@ -1,13 +1,10 @@
 package test
 
 import (
-	"encoding/hex"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/lino-network/lino-go/api"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 var (
@@ -53,35 +50,35 @@ func setup(t *testing.T) {
 // 	t.Errorf(">>res: %v", res)
 // }
 
-func TestBasic(t *testing.T) {
-	setup(t)
+// func TestBasic(t *testing.T) {
+// 	setup(t)
 
-	resetPriv := secp256k1.GenPrivKey()
-	txPriv := secp256k1.GenPrivKey()
-	appPriv := secp256k1.GenPrivKey()
+// 	resetPriv := secp256k1.GenPrivKey()
+// 	txPriv := secp256k1.GenPrivKey()
+// 	appPriv := secp256k1.GenPrivKey()
 
-	t.Errorf("reset private key is: %s", strings.ToUpper(hex.EncodeToString(resetPriv.Bytes())))
-	t.Errorf("transaction private key is: %s", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
-	t.Errorf("app private key is: %s", strings.ToUpper(hex.EncodeToString(appPriv.Bytes())))
+// 	t.Errorf("reset private key is: %s", strings.ToUpper(hex.EncodeToString(resetPriv.Bytes())))
+// 	t.Errorf("transaction private key is: %s", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
+// 	t.Errorf("app private key is: %s", strings.ToUpper(hex.EncodeToString(appPriv.Bytes())))
 
-	resetPub := resetPriv.PubKey()
-	txPub := txPriv.PubKey()
-	appPub := appPriv.PubKey()
+// 	resetPub := resetPriv.PubKey()
+// 	txPub := txPriv.PubKey()
+// 	appPub := appPriv.PubKey()
 
-	resetPubHex := hex.EncodeToString(resetPub.Bytes())
-	txPubHex := hex.EncodeToString(txPub.Bytes())
-	appPubHex := hex.EncodeToString(appPub.Bytes())
+// 	resetPubHex := hex.EncodeToString(resetPub.Bytes())
+// 	txPubHex := hex.EncodeToString(txPub.Bytes())
+// 	appPubHex := hex.EncodeToString(appPub.Bytes())
 
-	seq, err := testAPI.GetSeqNumber(referrer)
-	if err != nil {
-		t.Errorf("failed to get seq: %v", err)
-	}
+// 	seq, err := testAPI.GetSeqNumber(referrer)
+// 	if err != nil {
+// 		t.Errorf("failed to get seq: %v", err)
+// 	}
 
-	_, err = testAPI.Register(referrer, registerFee, myUser, resetPubHex, txPubHex, appPubHex, referrerTxPrivKey, seq)
-	if err != nil {
-		t.Errorf("failed to register: %v", err)
-	}
-}
+// 	_, err = testAPI.Register(referrer, registerFee, myUser, resetPubHex, txPubHex, appPubHex, referrerTxPrivKey, seq)
+// 	if err != nil {
+// 		t.Errorf("failed to register: %v", err)
+// 	}
+// }
 
 func TestAccount(t *testing.T) {
 	setup(t)
