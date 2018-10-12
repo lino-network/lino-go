@@ -13,13 +13,13 @@ import (
 var (
 	chainID = "lino-testnet"
 	// nodeURL = "http://localhost:26657"
-	nodeURL = "http://54.193.126.219:26657"
+	nodeURL = "http://fullnode.linovalidator.io:80"
 
-	referrer          = "linowallet-7"
-	registerFee       = "100"
-	referrerTxPrivKey = "E1B0F79B20CFD61D55BD37DC67198E722F4B1F2721D5A0AB3B11F9F6F7B975293F083608FE"
+	referrer          = "lino"
+	registerFee       = "10000000"
+	referrerTxPrivKey = "E1B0F79B200D44E9B233AB277047A86D4DC3F247E213AEC15185EFE15DF6E1C19B90EB1AEE"
 
-	myUser    = "myuser111"
+	myUser    = "myuser1"
 	txPrivHex = "E1B0F79B20801B33B99F73D134AF828874A2B9716A5F15B562115930414BC398EB96807F7A"
 
 	post1 = "post1"
