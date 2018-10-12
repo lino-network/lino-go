@@ -638,7 +638,6 @@ func (broadcast *Broadcast) broadcastTransaction(msg model.Msg, privKeyHex strin
 	finishChan := make(chan bool)
 	go func() {
 		res, err = broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq, memo)
-		broadcastResp.CommitHash = string(res.Hash)
 		finishChan <- true
 	}()
 
@@ -664,6 +663,9 @@ func (broadcast *Broadcast) broadcastTransaction(msg model.Msg, privKeyHex strin
 	if res.DeliverTx.Code != uint32(0) {
 		return nil, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
 	}
+
+	broadcastResp.CommitHash = string(res.Hash)
+
 	return broadcastResp, nil
 }
 

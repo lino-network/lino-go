@@ -2,22 +2,24 @@ package test
 
 import (
 	"encoding/hex"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/lino-network/lino-go/api"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 var (
 	chainID = "lino-testnet"
 	// nodeURL = "http://localhost:26657"
-	nodeURL = "http://fullnode.linovalidator.io:80"
+	nodeURL = "http://54.193.126.219:26657"
 
-	referrer          = "lino"
-	registerFee       = "10000000"
-	referrerTxPrivKey = "E1B0F79B200D44E9B233AB277047A86D4DC3F247E213AEC15185EFE15DF6E1C19B90EB1AEE"
+	referrer          = "linowallet-7"
+	registerFee       = "100"
+	referrerTxPrivKey = "E1B0F79B20CFD61D55BD37DC67198E722F4B1F2721D5A0AB3B11F9F6F7B975293F083608FE"
 
-	myUser    = "myuser1"
+	myUser    = "myuser111"
 	txPrivHex = "E1B0F79B20801B33B99F73D134AF828874A2B9716A5F15B562115930414BC398EB96807F7A"
 
 	post1 = "post1"
@@ -34,52 +36,52 @@ func setup(t *testing.T) {
 	testAPI = api.NewLinoAPIFromArgs(chainID, nodeURL, options)
 }
 
-func TestGetByCommitHash(t *testing.T) {
-	setup(t)
-
-	commitHash := "AB6B3BF21032E135C23A4F47DC1D36393483B339"
-
-	b, err := hex.DecodeString(commitHash)
-	if err != nil {
-		t.Errorf("decode err: %v", err)
-	}
-
-	res, err := testAPI.GetTx(b)
-	if err != nil {
-		t.Errorf("err: %v", err)
-	}
-	t.Errorf(">>res: %v", res)
-}
-
-// func TestBasic(t *testing.T) {
+// func TestGetByCommitHash(t *testing.T) {
 // 	setup(t)
 
-// 	resetPriv := secp256k1.GenPrivKey()
-// 	txPriv := secp256k1.GenPrivKey()
-// 	appPriv := secp256k1.GenPrivKey()
+// 	commitHash := "AB6B3BF21032E135C23A4F47DC1D36393483B339"
 
-// 	t.Errorf("reset private key is: %s", strings.ToUpper(hex.EncodeToString(resetPriv.Bytes())))
-// 	t.Errorf("transaction private key is: %s", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
-// 	t.Errorf("app private key is: %s", strings.ToUpper(hex.EncodeToString(appPriv.Bytes())))
-
-// 	resetPub := resetPriv.PubKey()
-// 	txPub := txPriv.PubKey()
-// 	appPub := appPriv.PubKey()
-
-// 	resetPubHex := hex.EncodeToString(resetPub.Bytes())
-// 	txPubHex := hex.EncodeToString(txPub.Bytes())
-// 	appPubHex := hex.EncodeToString(appPub.Bytes())
-
-// 	seq, err := testAPI.GetSeqNumber(referrer)
+// 	b, err := hex.DecodeString(commitHash)
 // 	if err != nil {
-// 		t.Errorf("failed to get seq: %v", err)
+// 		t.Errorf("decode err: %v", err)
 // 	}
 
-// 	err = testAPI.Register(referrer, registerFee, myUser, resetPubHex, txPubHex, appPubHex, referrerTxPrivKey, seq)
+// 	res, err := testAPI.GetTx(b)
 // 	if err != nil {
-// 		t.Errorf("failed to register: %v", err)
+// 		t.Errorf("err: %v", err)
 // 	}
+// 	t.Errorf(">>res: %v", res)
 // }
+
+func TestBasic(t *testing.T) {
+	setup(t)
+
+	resetPriv := secp256k1.GenPrivKey()
+	txPriv := secp256k1.GenPrivKey()
+	appPriv := secp256k1.GenPrivKey()
+
+	t.Errorf("reset private key is: %s", strings.ToUpper(hex.EncodeToString(resetPriv.Bytes())))
+	t.Errorf("transaction private key is: %s", strings.ToUpper(hex.EncodeToString(txPriv.Bytes())))
+	t.Errorf("app private key is: %s", strings.ToUpper(hex.EncodeToString(appPriv.Bytes())))
+
+	resetPub := resetPriv.PubKey()
+	txPub := txPriv.PubKey()
+	appPub := appPriv.PubKey()
+
+	resetPubHex := hex.EncodeToString(resetPub.Bytes())
+	txPubHex := hex.EncodeToString(txPub.Bytes())
+	appPubHex := hex.EncodeToString(appPub.Bytes())
+
+	seq, err := testAPI.GetSeqNumber(referrer)
+	if err != nil {
+		t.Errorf("failed to get seq: %v", err)
+	}
+
+	_, err = testAPI.Register(referrer, registerFee, myUser, resetPubHex, txPubHex, appPubHex, referrerTxPrivKey, seq)
+	if err != nil {
+		t.Errorf("failed to register: %v", err)
+	}
+}
 
 func TestAccount(t *testing.T) {
 	setup(t)
