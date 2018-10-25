@@ -4,6 +4,8 @@ package broadcast
 
 import (
 	"context"
+	"encoding/hex"
+	"strings"
 	"time"
 
 	"github.com/lino-network/lino-go/errors"
@@ -664,7 +666,8 @@ func (broadcast *Broadcast) broadcastTransaction(msg model.Msg, privKeyHex strin
 		return nil, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
 	}
 
-	broadcastResp.CommitHash = string(res.Hash)
+	commitHash := hex.EncodeToString(res.Hash)
+	broadcastResp.CommitHash = strings.ToUpper(commitHash)
 
 	return broadcastResp, nil
 }

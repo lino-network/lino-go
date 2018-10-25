@@ -3,10 +3,9 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
+	"time"
 
 	"github.com/lino-network/lino-go/api"
-	"github.com/lino-network/lino-go/model"
-	"github.com/lino-network/lino-go/transport"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
@@ -130,27 +129,35 @@ func main() {
 	newUserResetKey := secp256k1.GenPrivKey()
 	newUserTxKey := secp256k1.GenPrivKey()
 	newUserAppKey := secp256k1.GenPrivKey()
-	newUser := "test3"
+	newUser := "ffsssds"
 
-	api := api.NewLinoAPIFromArgs("test-chain-oS6Ywt", "localhost:26657", api.TimeoutOptions{})
+	options := api.TimeoutOptions{
+		QueryTimeout:     1 * time.Second,
+		BroadcastTimeout: 6 * time.Second,
+	}
+	api := api.NewLinoAPIFromArgs("lino-staging", "http://18.222.11.221:26657", options)
 	seq, _ := api.GetSeqNumber("lino")
-	_, err := api.Register("lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B20D8C47F0A23DE7A2D8FDA7BF2886C3D8EC8A2DEF7F0395C38AEFAA13B452FE241", seq)
+	resp, err := api.Register("lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B202FDC4DB4ED428384A06E9A6562527A0A0E85203508700E1BFA96CAB458D899B1", seq)
 	if err != nil {
 		panic(err)
 	}
-	_, err = api.GrantPermission(newUser, "lino", 7*24*60*60, model.AppPermission, hex.EncodeToString(newUserTxKey.Bytes()), 0)
-	if err != nil {
-		panic(err)
-	}
-	pub, _ := api.GetAppPubKey("lino")
-	fmt.Println(pub)
-	info, _ := api.GetGrantPubKey(newUser, pub)
-	fmt.Printf("%+v\n", info)
-	privKey, _ := transport.GetPrivKeyFromHex("E1B0F79B20490005A517EB5CA5C8BE22FB7865ADD64F01AAF9797440DE18F0260A2421E633")
-	sig, err := api.Query.SignWithSha256("wpbqekqjaa", privKey)
-	fmt.Println(sig)
-	res, err := api.Query.VerifyUserSignatureUsingAppKey("lino", "qdgnouryic", "3045022100c359dd4753ff29ce5a67dbabc14ae5ecacdb4ac8d0a4ca944b766b0922dc2fd602203899e2e5f41f740859b58685d2d48284d41fa8daf480d2172877a74b86933794")
-	fmt.Printf("verify sig result: %+v, %+v\n", res, err)
+
+	fmt.Println(">>resp: ", resp.CommitHash)
+
+	// _, err = api.GrantPermission(newUser, "lino", 7*24*60*60, model.AppPermission, hex.EncodeToString(newUserTxKey.Bytes()), 0)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// pub, _ := api.GetAppPubKey("lino")
+	// fmt.Println(pub)
+	// info, _ := api.GetGrantPubKey(newUser, pub)
+	// fmt.Printf("%+v\n", info)
+	// privKey, _ := transport.GetPrivKeyFromHex("E1B0F79B20490005A517EB5CA5C8BE22FB7865ADD64F01AAF9797440DE18F0260A2421E633")
+	// sig, err := api.Query.SignWithSha256("wpbqekqjaa", privKey)
+	// fmt.Println(sig)
+	// res, err := api.Query.VerifyUserSignatureUsingAppKey("lino", "qdgnouryic", "3045022100c359dd4753ff29ce5a67dbabc14ae5ecacdb4ac8d0a4ca944b766b0922dc2fd602203899e2e5f41f740859b58685d2d48284d41fa8daf480d2172877a74b86933794")
+	// fmt.Printf("verify sig result: %+v, %+v\n", res, err)
+
 	// addr := resetPub.Address()
 
 	// addrHex := strings.ToUpper(hex.EncodeToString(addr))
