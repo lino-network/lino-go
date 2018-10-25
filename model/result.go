@@ -3,7 +3,6 @@ package model
 import (
 	"time"
 
-	"github.com/lino-network/lino/types"
 	crypto "github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -232,12 +231,12 @@ type ValidatorList struct {
 // vote related struct
 //
 type Voter struct {
-	Username          string     `json:"username"`
-	LinoStake         Coin       `json:"lino_stake"`
-	DelegatedPower    Coin       `json:"delegated_power"`
-	DelegateToOthers  types.Coin `json:"delegate_to_others"`
-	LastPowerChangeAt int64      `json:"last_power_change_at"`
-	Interest          types.Coin `json:"interest"`
+	Username          string `json:"username"`
+	LinoStake         Coin   `json:"lino_stake"`
+	DelegatedPower    Coin   `json:"delegated_power"`
+	DelegateToOthers  Coin   `json:"delegate_to_others"`
+	LastPowerChangeAt int64  `json:"last_power_change_at"`
+	Interest          Coin   `json:"interest"`
 }
 
 type Vote struct {
@@ -346,4 +345,8 @@ type Txs []Transaction
 type BlockTx struct {
 	Height int64       `json:"height"`
 	Tx     Transaction `json:"tx"`
+}
+
+type BroadcastReponse struct {
+	CommitHash string `json:"commit_hash"`
 }

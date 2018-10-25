@@ -1,7 +1,6 @@
 package test
 
 import (
-	"encoding/hex"
 	"testing"
 	"time"
 
@@ -34,22 +33,22 @@ func setup(t *testing.T) {
 	testAPI = api.NewLinoAPIFromArgs(chainID, nodeURL, options)
 }
 
-func TestGetByCommitHash(t *testing.T) {
-	setup(t)
+// func TestGetByCommitHash(t *testing.T) {
+// 	setup(t)
 
-	commitHash := "AB6B3BF21032E135C23A4F47DC1D36393483B339"
+// 	commitHash := "AB6B3BF21032E135C23A4F47DC1D36393483B339"
 
-	b, err := hex.DecodeString(commitHash)
-	if err != nil {
-		t.Errorf("decode err: %v", err)
-	}
+// 	b, err := hex.DecodeString(commitHash)
+// 	if err != nil {
+// 		t.Errorf("decode err: %v", err)
+// 	}
 
-	res, err := testAPI.GetTx(b)
-	if err != nil {
-		t.Errorf("err: %v", err)
-	}
-	t.Errorf(">>res: %v", res)
-}
+// 	res, err := testAPI.GetTx(b)
+// 	if err != nil {
+// 		t.Errorf("err: %v", err)
+// 	}
+// 	t.Errorf(">>res: %v", res)
+// }
 
 // func TestBasic(t *testing.T) {
 // 	setup(t)
@@ -75,7 +74,7 @@ func TestGetByCommitHash(t *testing.T) {
 // 		t.Errorf("failed to get seq: %v", err)
 // 	}
 
-// 	err = testAPI.Register(referrer, registerFee, myUser, resetPubHex, txPubHex, appPubHex, referrerTxPrivKey, seq)
+// 	_, err = testAPI.Register(referrer, registerFee, myUser, resetPubHex, txPubHex, appPubHex, referrerTxPrivKey, seq)
 // 	if err != nil {
 // 		t.Errorf("failed to register: %v", err)
 // 	}

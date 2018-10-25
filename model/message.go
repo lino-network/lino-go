@@ -36,10 +36,6 @@ type ClaimMsg struct {
 	Username string `json:"username"`
 }
 
-type ClaimInterestMsg struct {
-	Username string `json:"username"`
-}
-
 type RecoverMsg struct {
 	Username             string        `json:"username"`
 	NewResetPubKey       crypto.PubKey `json:"new_reset_public_key"`
@@ -157,6 +153,10 @@ type DelegatorWithdrawMsg struct {
 	Delegator string `json:"delegator"`
 	Voter     string `json:"voter"`
 	Amount    string `json:"amount"`
+}
+
+type ClaimInterestMsg struct {
+	Username string `json:"username"`
 }
 
 //

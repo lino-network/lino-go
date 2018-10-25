@@ -4,6 +4,8 @@ package broadcast
 
 import (
 	"context"
+	"encoding/hex"
+	"strings"
 	"time"
 
 	"github.com/lino-network/lino-go/errors"
@@ -34,18 +36,18 @@ func NewBroadcast(transport *transport.Transport, timeout time.Duration) *Broadc
 // Register registers a new user on blockchain.
 // It composes RegisterMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Register(referrer, registerFee, username, resetPubKeyHex,
-	transactionPubKeyHex, appPubKeyHex, referrerPrivKeyHex string, seq int64) error {
+	transactionPubKeyHex, appPubKeyHex, referrerPrivKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	resetPubKey, err := transport.GetPubKeyFromHex(resetPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get Reset pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get Reset pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(transactionPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
 	}
 	appPubKey, err := transport.GetPubKeyFromHex(appPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get App pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get App pub key").AddCause(err)
 	}
 
 	msg := model.RegisterMsg{
@@ -61,7 +63,8 @@ func (broadcast *Broadcast) Register(referrer, registerFee, username, resetPubKe
 
 // Transfer sends a certain amount of LINO token from the sender to the receiver.
 // It composes TransferMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Transfer(sender, receiver, amount, memo, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Transfer(sender, receiver, amount, memo,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.TransferMsg{
 		Sender:   sender,
 		Receiver: receiver,
@@ -73,7 +76,8 @@ func (broadcast *Broadcast) Transfer(sender, receiver, amount, memo, privKeyHex 
 
 // Follow creates a social relationship between follower and followee.
 // It composes FollowMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Follow(follower, followee, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Follow(follower, followee,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.FollowMsg{
 		Follower: follower,
 		Followee: followee,
@@ -83,7 +87,8 @@ func (broadcast *Broadcast) Follow(follower, followee, privKeyHex string, seq in
 
 // Unfollow revokes the social relationship between follower and followee.
 // It composes UnfollowMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Unfollow(follower, followee, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Unfollow(follower, followee,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.UnfollowMsg{
 		Follower: follower,
 		Followee: followee,
@@ -93,17 +98,9 @@ func (broadcast *Broadcast) Unfollow(follower, followee, privKeyHex string, seq 
 
 // Claim claims rewards of a certain user.
 // It composes ClaimMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Claim(username, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Claim(username,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ClaimMsg{
-		Username: username,
-	}
-	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
-}
-
-// ClaimInterest claims interest of a certain user.
-// It composes ClaimInterestMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ClaimInterest(username, privKeyHex string, seq int64) error {
-	msg := model.ClaimInterestMsg{
 		Username: username,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
@@ -112,7 +109,8 @@ func (broadcast *Broadcast) ClaimInterest(username, privKeyHex string, seq int64
 // UpdateAccount updates account related info in jsonMeta which are not
 // included in AccountInfo or AccountBank.
 // It composes UpdateAccountMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) UpdateAccount(username, jsonMeta, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) UpdateAccount(username, jsonMeta,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.UpdateAccountMsg{
 		Username: username,
 		JSONMeta: jsonMeta,
@@ -123,18 +121,18 @@ func (broadcast *Broadcast) UpdateAccount(username, jsonMeta, privKeyHex string,
 // Recover recovers all keys of a user in case of losing or compromising.
 // It composes RecoverMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Recover(username, newResetPubKeyHex,
-	newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex string, seq int64) error {
+	newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	resetPubKey, err := transport.GetPubKeyFromHex(newResetPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Reset pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHexf("Recover: failed to get Reset pub key").AddCause(err)
 	}
 	txPubKey, err := transport.GetPubKeyFromHex(newTransactionPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get Tx pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHexf("Recover: failed to get Tx pub key").AddCause(err)
 	}
 	appPubKey, err := transport.GetPubKeyFromHex(newAppPubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("Recover: failed to get App pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHexf("Recover: failed to get App pub key").AddCause(err)
 	}
 
 	msg := model.RecoverMsg{
@@ -153,7 +151,8 @@ func (broadcast *Broadcast) Recover(username, newResetPubKeyHex,
 // CreatePost creates a new post on blockchain.
 // It composes CreatePostMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) CreatePost(author, postID, title, content, parentAuthor, parentPostID,
-	sourceAuthor, sourcePostID, redistributionSplitRate string, links map[string]string, privKeyHex string, seq int64) error {
+	sourceAuthor, sourcePostID, redistributionSplitRate string,
+	links map[string]string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	var mLinks []model.IDToURLMapping
 	if links == nil || len(links) == 0 {
 		mLinks = nil
@@ -181,7 +180,7 @@ func (broadcast *Broadcast) CreatePost(author, postID, title, content, parentAut
 // Donate adds a money donation to a post by a user.
 // It composes DonateMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Donate(username, author,
-	amount, postID, fromApp, memo string, privKeyHex string, seq int64) error {
+	amount, postID, fromApp, memo string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.DonateMsg{
 		Username: username,
 		Amount:   amount,
@@ -196,7 +195,7 @@ func (broadcast *Broadcast) Donate(username, author,
 // ReportOrUpvote adds a report or upvote action to a post.
 // It composes ReportOrUpvoteMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ReportOrUpvote(username, author,
-	postID string, isReport bool, privKeyHex string, seq int64) error {
+	postID string, isReport bool, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ReportOrUpvoteMsg{
 		Username: username,
 		Author:   author,
@@ -210,7 +209,8 @@ func (broadcast *Broadcast) ReportOrUpvote(username, author,
 // remove the post from the blockchain, instead it sets IsDeleted to true
 // and clears all the other data.
 // It composes DeletePostMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) DeletePost(author, postID, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) DeletePost(author, postID,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.DeletePostMsg{
 		Author: author,
 		PostID: postID,
@@ -220,7 +220,8 @@ func (broadcast *Broadcast) DeletePost(author, postID, privKeyHex string, seq in
 
 // View increases the view count of a post by one.
 // It composes ViewMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) View(username, author, postID, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) View(username, author, postID,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ViewMsg{
 		Username: username,
 		Author:   author,
@@ -232,7 +233,7 @@ func (broadcast *Broadcast) View(username, author, postID, privKeyHex string, se
 // UpdatePost updates post info with new data.
 // It composes UpdatePostMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) UpdatePost(author, title, postID, content string,
-	links map[string]string, privKeyHex string, seq int64) error {
+	links map[string]string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	var mLinks []model.IDToURLMapping
 	if links == nil || len(links) == 0 {
 		mLinks = nil
@@ -261,10 +262,10 @@ func (broadcast *Broadcast) UpdatePost(author, title, postID, content string,
 // has to be a voter.
 // It composes ValidatorDepositMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ValidatorDeposit(username, deposit,
-	validatorPubKey, link, privKeyHex string, seq int64) error {
+	validatorPubKey, link, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	valPubKey, err := transport.GetPubKeyFromHex(validatorPubKey)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHexf("ValidatorDeposit: failed to get Val pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHexf("ValidatorDeposit: failed to get Val pub key").AddCause(err)
 	}
 	msg := model.ValidatorDepositMsg{
 		Username:  username,
@@ -278,7 +279,8 @@ func (broadcast *Broadcast) ValidatorDeposit(username, deposit,
 // ValidatorWithdraw withdraws part of LINO token from a validator's deposit,
 // while still keep being a validator.
 // It composes ValidatorDepositMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ValidatorWithdraw(username, amount, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ValidatorWithdraw(username, amount,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ValidatorWithdrawMsg{
 		Username: username,
 		Amount:   amount,
@@ -289,7 +291,8 @@ func (broadcast *Broadcast) ValidatorWithdraw(username, amount, privKeyHex strin
 // ValidatorRevoke revokes all deposited LINO token of a validator
 // so that the user will not be a validator anymore.
 // It composes ValidatorRevokeMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ValidatorRevoke(username, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) ValidatorRevoke(username,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ValidatorRevokeMsg{
 		Username: username,
 	}
@@ -303,7 +306,8 @@ func (broadcast *Broadcast) ValidatorRevoke(username, privKeyHex string, seq int
 // StakeIn deposits a certain amount of LINO token for a user
 // in order to become a voter.
 // It composes StakeInMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) StakeIn(username, deposit, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) StakeIn(username, deposit,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.StakeInMsg{
 		Username: username,
 		Deposit:  deposit,
@@ -313,7 +317,8 @@ func (broadcast *Broadcast) StakeIn(username, deposit, privKeyHex string, seq in
 
 // StakeOut withdraws part of LINO token from a voter's deposit.
 // It composes StakeOutMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) StakeOut(username, amount, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) StakeOut(username, amount,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.StakeOutMsg{
 		Username: username,
 		Amount:   amount,
@@ -324,7 +329,8 @@ func (broadcast *Broadcast) StakeOut(username, amount, privKeyHex string, seq in
 // Delegate delegates a certain amount of LINO token of delegator to a voter, so
 // the voter will have more voting power.
 // It composes DelegateMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) Delegate(delegator, voter, amount, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) Delegate(delegator, voter, amount,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.DelegateMsg{
 		Delegator: delegator,
 		Voter:     voter,
@@ -336,11 +342,21 @@ func (broadcast *Broadcast) Delegate(delegator, voter, amount, privKeyHex string
 // DelegatorWithdraw withdraws part of delegated LINO token of a delegator
 // to a voter, while the delegation still exists.
 // It composes DelegatorWithdrawMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) DelegatorWithdraw(delegator, voter, amount, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) DelegatorWithdraw(delegator, voter, amount,
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.DelegatorWithdrawMsg{
 		Delegator: delegator,
 		Voter:     voter,
 		Amount:    amount,
+	}
+	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
+}
+
+// ClaimInterest claims interest of a certain user.
+// It composes ClaimInterestMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) ClaimInterest(username, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
+	msg := model.ClaimInterestMsg{
+		Username: username,
 	}
 	return broadcast.broadcastTransaction(msg, privKeyHex, seq, "")
 }
@@ -352,7 +368,7 @@ func (broadcast *Broadcast) DelegatorWithdraw(delegator, voter, amount, privKeyH
 // DeveloperRegsiter registers a developer with a certain amount of LINO token on blockchain.
 // It composes DeveloperRegisterMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) DeveloperRegister(username, deposit, website,
-	description, appMetaData, privKeyHex string, seq int64) error {
+	description, appMetaData, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.DeveloperRegisterMsg{
 		Username:    username,
 		Deposit:     deposit,
@@ -366,7 +382,7 @@ func (broadcast *Broadcast) DeveloperRegister(username, deposit, website,
 // DeveloperUpdate updates a developer  info on blockchain.
 // It composes DeveloperUpdateMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) DeveloperUpdate(username, website,
-	description, appMetaData, privKeyHex string, seq int64) error {
+	description, appMetaData, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.DeveloperUpdateMsg{
 		Username:    username,
 		Website:     website,
@@ -379,7 +395,7 @@ func (broadcast *Broadcast) DeveloperUpdate(username, website,
 // DeveloperRevoke reovkes all deposited LINO token of a developer
 // so the user will not be a developer anymore.
 // It composes DeveloperRevokeMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int64) error {
+func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.DeveloperRevokeMsg{
 		Username: username,
 	}
@@ -390,7 +406,7 @@ func (broadcast *Broadcast) DeveloperRevoke(username, privKeyHex string, seq int
 // an authorized app with a certain period of time.
 // It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) GrantPermission(username, authorizedApp string,
-	validityPeriodSec int64, grantLevel model.Permission, privKeyHex string, seq int64) error {
+	validityPeriodSec int64, grantLevel model.Permission, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.GrantPermissionMsg{
 		Username:          username,
 		AuthorizedApp:     authorizedApp,
@@ -404,7 +420,7 @@ func (broadcast *Broadcast) GrantPermission(username, authorizedApp string,
 // an authorzied app with a certain period of time.
 // It composes PreAuthorizationMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) PreAuthorizationPermission(username, authorizedApp string,
-	validityPeriodSec int64, amount string, privKeyHex string, seq int64) error {
+	validityPeriodSec int64, amount string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.PreAuthorizationMsg{
 		Username:          username,
 		AuthorizedApp:     authorizedApp,
@@ -418,10 +434,10 @@ func (broadcast *Broadcast) PreAuthorizationPermission(username, authorizedApp s
 // RevokePermission revokes the permission given previously to a app.
 // It composes RevokePermissionMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string,
-	privKeyHex string, seq int64) error {
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	pubKey, err := transport.GetPubKeyFromHex(pubKeyHex)
 	if err != nil {
-		return errors.FailedToGetPubKeyFromHex("Register: failed to get pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get pub key").AddCause(err)
 	}
 
 	msg := model.RevokePermissionMsg{
@@ -438,7 +454,7 @@ func (broadcast *Broadcast) RevokePermission(username, pubKeyHex string,
 // ProviderReport reports infra usage of a infra provider in order to get infra inflation.
 // It composes ProviderReportMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ProviderReport(username string, usage int64,
-	privKeyHex string, seq int64) error {
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ProviderReportMsg{
 		Username: username,
 		Usage:    usage,
@@ -453,7 +469,7 @@ func (broadcast *Broadcast) ProviderReport(username string, usage int64,
 // ChangeEvaluateOfContentValueParam changes EvaluateOfContentValueParam with new value.
 // It composes ChangeEvaluateOfContentValueParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(creator string,
-	parameter model.EvaluateOfContentValueParam, reason string, privKeyHex string, seq int64) error {
+	parameter model.EvaluateOfContentValueParam, reason string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ChangeEvaluateOfContentValueParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
@@ -465,7 +481,7 @@ func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(creator string,
 // ChangeGlobalAllocationParam changes GlobalAllocationParam with new value.
 // It composes ChangeGlobalAllocationParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeGlobalAllocationParam(creator string,
-	parameter model.GlobalAllocationParam, reason string, privKeyHex string, seq int64) error {
+	parameter model.GlobalAllocationParam, reason string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ChangeGlobalAllocationParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
@@ -477,7 +493,8 @@ func (broadcast *Broadcast) ChangeGlobalAllocationParam(creator string,
 // ChangeInfraInternalAllocationParam changes InfraInternalAllocationParam with new value.
 // It composes ChangeInfraInternalAllocationParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeInfraInternalAllocationParam(creator string,
-	parameter model.InfraInternalAllocationParam, reason string, privKeyHex string, seq int64) error {
+	parameter model.InfraInternalAllocationParam,
+	reason string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ChangeInfraInternalAllocationParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
@@ -489,7 +506,7 @@ func (broadcast *Broadcast) ChangeInfraInternalAllocationParam(creator string,
 // ChangeVoteParam changes VoteParam with new value.
 // It composes ChangeVoteParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeVoteParam(creator string,
-	parameter model.VoteParam, reason string, privKeyHex string, seq int64) error {
+	parameter model.VoteParam, reason string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ChangeVoteParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
@@ -501,7 +518,7 @@ func (broadcast *Broadcast) ChangeVoteParam(creator string,
 // ChangeProposalParam changes ProposalParam with new value.
 // It composes ChangeProposalParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeProposalParam(creator string,
-	parameter model.ProposalParam, reason string, privKeyHex string, seq int64) error {
+	parameter model.ProposalParam, reason string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ChangeProposalParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
@@ -513,7 +530,7 @@ func (broadcast *Broadcast) ChangeProposalParam(creator string,
 // ChangeDeveloperParam changes DeveloperParam with new value.
 // It composes ChangeDeveloperParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeDeveloperParam(creator string,
-	parameter model.DeveloperParam, reason string, privKeyHex string, seq int64) error {
+	parameter model.DeveloperParam, reason string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ChangeDeveloperParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
@@ -525,7 +542,7 @@ func (broadcast *Broadcast) ChangeDeveloperParam(creator string,
 // ChangeValidatorParam changes ValidatorParam with new value.
 // It composes ChangeValidatorParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeValidatorParam(creator string,
-	parameter model.ValidatorParam, reason string, privKeyHex string, seq int64) error {
+	parameter model.ValidatorParam, reason string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ChangeValidatorParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
@@ -537,7 +554,7 @@ func (broadcast *Broadcast) ChangeValidatorParam(creator string,
 // ChangeBandwidthParam changes BandwidthParam with new value.
 // It composes ChangeBandwidthParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeBandwidthParam(creator string,
-	parameter model.BandwidthParam, reason string, privKeyHex string, seq int64) error {
+	parameter model.BandwidthParam, reason string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ChangeBandwidthParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
@@ -549,7 +566,7 @@ func (broadcast *Broadcast) ChangeBandwidthParam(creator string,
 // ChangeAccountParam changes AccountParam with new value.
 // It composes ChangeAccountParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeAccountParam(creator string,
-	parameter model.AccountParam, reason string, privKeyHex string, seq int64) error {
+	parameter model.AccountParam, reason string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ChangeAccountParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
@@ -561,7 +578,7 @@ func (broadcast *Broadcast) ChangeAccountParam(creator string,
 // ChangePostParam changes PostParam with new value.
 // It composes ChangePostParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangePostParam(creator string,
-	parameter model.PostParam, reason string, privKeyHex string, seq int64) error {
+	parameter model.PostParam, reason string, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.ChangePostParamMsg{
 		Creator:   creator,
 		Parameter: parameter,
@@ -574,7 +591,7 @@ func (broadcast *Broadcast) ChangePostParam(creator string,
 // for content censorship.
 // It composes DeletePostContentMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) DeletePostContent(creator, postAuthor,
-	postID, reason, privKeyHex string, seq int64) error {
+	postID, reason, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	permlink := string(string(postAuthor) + "#" + postID)
 	msg := model.DeletePostContentMsg{
 		Creator:  creator,
@@ -587,7 +604,7 @@ func (broadcast *Broadcast) DeletePostContent(creator, postAuthor,
 // VoteProposal adds a vote to a certain proposal with agree/disagree.
 // It composes VoteProposalMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) VoteProposal(voter, proposalID string,
-	result bool, privKeyHex string, seq int64) error {
+	result bool, privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.VoteProposalMsg{
 		Voter:      voter,
 		ProposalID: proposalID,
@@ -599,7 +616,7 @@ func (broadcast *Broadcast) VoteProposal(voter, proposalID string,
 // UpgradeProtocol upgrades the protocol.
 // It composes UpgradeProtocolMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) UpgradeProtocol(creator, link, reason string,
-	privKeyHex string, seq int64) error {
+	privKeyHex string, seq int64) (*model.BroadcastReponse, error) {
 	msg := model.UpgradeProtocolMsg{
 		Creator: creator,
 		Link:    link,
@@ -611,9 +628,12 @@ func (broadcast *Broadcast) UpgradeProtocol(creator, link, reason string,
 //
 // internal helper functions
 //
-func (broadcast *Broadcast) broadcastTransaction(msg model.Msg, privKeyHex string, seq int64, memo string) error {
+func (broadcast *Broadcast) broadcastTransaction(msg model.Msg, privKeyHex string,
+	seq int64, memo string) (*model.BroadcastReponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), broadcast.timeout)
 	defer cancel()
+
+	broadcastResp := &model.BroadcastReponse{}
 
 	var res *ctypes.ResultBroadcastTxCommit
 	var err error
@@ -627,25 +647,29 @@ func (broadcast *Broadcast) broadcastTransaction(msg model.Msg, privKeyHex strin
 	case <-finishChan:
 		break
 	case <-ctx.Done():
-		return errors.Timeoutf("msg timeout: %v", msg).AddCause(ctx.Err())
+		return nil, errors.Timeoutf("msg timeout: %v", msg).AddCause(ctx.Err())
 	}
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	code := retrieveCodeFromBlockChainCode(res.CheckTx.Code)
 	if err == nil && code == model.InvalidSeqErrCode {
-		return errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
+		return nil, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
 	}
 
 	if res.CheckTx.Code != uint32(0) {
-		return errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
+		return nil, errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
 	}
 	if res.DeliverTx.Code != uint32(0) {
-		return errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
+		return nil, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
 	}
-	return nil
+
+	commitHash := hex.EncodeToString(res.Hash)
+	broadcastResp.CommitHash = strings.ToUpper(commitHash)
+
+	return broadcastResp, nil
 }
 
 func retrieveCodeFromBlockChainCode(bcCode uint32) uint32 {
