@@ -5,7 +5,6 @@ package transport
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/lino-network/lino-go/errors"
@@ -20,15 +19,14 @@ import (
 
 // Transport is a wrapper of tendermint rpc client and codec.
 type Transport struct {
-	chainId      string
-	nodeUrl      string
-	client       rpcclient.Client
-	Cdc          *wire.Codec
-	queryTimeout time.Duration
+	chainId string
+	nodeUrl string
+	client  rpcclient.Client
+	Cdc     *wire.Codec
 }
 
 // NewTransportFromConfig initiates an instance of Transport from config files.
-func NewTransportFromConfig(queryTimeout time.Duration) *Transport {
+func NewTransportFromConfig() *Transport {
 	v := viper.New()
 	viper.SetConfigType("json")
 	v.SetConfigName("config")
@@ -42,34 +40,29 @@ func NewTransportFromConfig(queryTimeout time.Duration) *Transport {
 	}
 	rpc := rpcclient.NewHTTP(nodeUrl, "/websocket")
 	return &Transport{
-		chainId:      v.GetString("chain_id"),
-		nodeUrl:      nodeUrl,
-		client:       rpc,
-		Cdc:          MakeCodec(),
-		queryTimeout: queryTimeout,
+		chainId: v.GetString("chain_id"),
+		nodeUrl: nodeUrl,
+		client:  rpc,
+		Cdc:     MakeCodec(),
 	}
 }
 
 // NewTransportFromArgs initiates an instance of Transport from parameters passed in.
-func NewTransportFromArgs(chainID, nodeUrl string, queryTimeout time.Duration) *Transport {
+func NewTransportFromArgs(chainID, nodeUrl string) *Transport {
 	if nodeUrl == "" {
 		nodeUrl = "localhost:26657"
 	}
 	rpc := rpcclient.NewHTTP(nodeUrl, "/websocket")
 	return &Transport{
-		chainId:      chainID,
-		nodeUrl:      nodeUrl,
-		client:       rpc,
-		Cdc:          MakeCodec(),
-		queryTimeout: queryTimeout,
+		chainId: chainID,
+		nodeUrl: nodeUrl,
+		client:  rpc,
+		Cdc:     MakeCodec(),
 	}
 }
 
 // Query from Tendermint with the provided key and storename
-func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
-	defer cancel()
-
+func (t Transport) Query(ctx context.Context, key cmn.HexBytes, storeName string) (res []byte, err error) {
 	finishChan := make(chan bool)
 	go func() {
 		res, err = t.query(key, storeName, "key", 0)
@@ -87,10 +80,7 @@ func (t Transport) Query(key cmn.HexBytes, storeName string) (res []byte, err er
 }
 
 // Query from Tendermint with the provided key and storename at certain height
-func (t Transport) QueryAtHeight(key cmn.HexBytes, storeName string, height int64) (res []byte, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
-	defer cancel()
-
+func (t Transport) QueryAtHeight(ctx context.Context, key cmn.HexBytes, storeName string, height int64) (res []byte, err error) {
 	finishChan := make(chan bool)
 	go func() {
 		res, err = t.query(key, storeName, "key", height)
@@ -108,10 +98,7 @@ func (t Transport) QueryAtHeight(key cmn.HexBytes, storeName string, height int6
 }
 
 // Query from Tendermint with the provided subspace and storename
-func (t Transport) QuerySubspace(subspace []byte, storeName string) (res []sdk.KVPair, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
-	defer cancel()
-
+func (t Transport) QuerySubspace(ctx context.Context, subspace []byte, storeName string) (res []sdk.KVPair, err error) {
 	var resRaw []byte
 	finishChan := make(chan bool)
 	go func() {
@@ -163,14 +150,11 @@ func (t Transport) query(key cmn.HexBytes, storeName, endPath string, height int
 }
 
 // QueryBlock queries a block with a certain height from blockchain.
-func (t Transport) QueryBlock(height int64) (res *ctypes.ResultBlock, err error) {
+func (t Transport) QueryBlock(ctx context.Context, height int64) (res *ctypes.ResultBlock, err error) {
 	node, err := t.GetNode()
 	if err != nil {
 		return res, err
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
-	defer cancel()
 
 	finishChan := make(chan bool)
 	go func() {
@@ -189,14 +173,11 @@ func (t Transport) QueryBlock(height int64) (res *ctypes.ResultBlock, err error)
 }
 
 // QueryBlockStatus queries block status from blockchain.
-func (t Transport) QueryBlockStatus() (res *ctypes.ResultStatus, err error) {
+func (t Transport) QueryBlockStatus(ctx context.Context) (res *ctypes.ResultStatus, err error) {
 	node, err := t.GetNode()
 	if err != nil {
 		return res, err
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
-	defer cancel()
 
 	finishChan := make(chan bool)
 	go func() {
@@ -215,14 +196,11 @@ func (t Transport) QueryBlockStatus() (res *ctypes.ResultStatus, err error) {
 }
 
 // QueryTx queries tx from blockchain.
-func (t Transport) QueryTx(hash []byte) (res *ctypes.ResultTx, err error) {
+func (t Transport) QueryTx(ctx context.Context, hash []byte) (res *ctypes.ResultTx, err error) {
 	node, err := t.GetNode()
 	if err != nil {
 		return res, err
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), t.queryTimeout)
-	defer cancel()
 
 	finishChan := make(chan bool)
 	go func() {
