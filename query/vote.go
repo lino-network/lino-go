@@ -1,13 +1,15 @@
 package query
 
 import (
+	"context"
+
 	"github.com/lino-network/lino-go/model"
 )
 
 // GetDelegation returns the delegation relationship between
 // a voter and a delegator from blockchain.
-func (query *Query) GetDelegation(voter, delegator string) (*model.Delegation, error) {
-	resp, err := query.transport.Query(getDelegationKey(voter, delegator), VoteKVStoreKey)
+func (query *Query) GetDelegation(ctx context.Context, voter, delegator string) (*model.Delegation, error) {
+	resp, err := query.transport.Query(ctx, getDelegationKey(voter, delegator), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -19,8 +21,8 @@ func (query *Query) GetDelegation(voter, delegator string) (*model.Delegation, e
 }
 
 // GetVoterAllDelegation returns all delegations that are delegated to a voter.
-func (query *Query) GetVoterAllDelegation(voter string) ([]*model.Delegation, error) {
-	resKVs, err := query.transport.QuerySubspace(getDelegationPrefix(voter), VoteKVStoreKey)
+func (query *Query) GetVoterAllDelegation(ctx context.Context, voter string) ([]*model.Delegation, error) {
+	resKVs, err := query.transport.QuerySubspace(ctx, getDelegationPrefix(voter), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +40,8 @@ func (query *Query) GetVoterAllDelegation(voter string) ([]*model.Delegation, er
 }
 
 // GetDelegatorAllDelegation returns all delegations that a delegator has delegated to.
-func (query *Query) GetDelegatorAllDelegation(delegatorName string) (map[string]*model.Delegation, error) {
-	resKVs, err := query.transport.QuerySubspace(getDelegateePrefix(delegatorName), VoteKVStoreKey)
+func (query *Query) GetDelegatorAllDelegation(ctx context.Context, delegatorName string) (map[string]*model.Delegation, error) {
+	resKVs, err := query.transport.QuerySubspace(ctx, getDelegateePrefix(delegatorName), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -57,8 +59,8 @@ func (query *Query) GetDelegatorAllDelegation(delegatorName string) (map[string]
 }
 
 // GetVoter returns voter info given a voter name from blockchain.
-func (query *Query) GetVoter(voterName string) (*model.Voter, error) {
-	resp, err := query.transport.Query(getVoterKey(voterName), VoteKVStoreKey)
+func (query *Query) GetVoter(ctx context.Context, voterName string) (*model.Voter, error) {
+	resp, err := query.transport.Query(ctx, getVoterKey(voterName), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -70,8 +72,8 @@ func (query *Query) GetVoter(voterName string) (*model.Voter, error) {
 }
 
 // GetVote returns a vote performed by a voter for a given proposal.
-func (query *Query) GetVote(proposalID, voter string) (*model.Vote, error) {
-	resp, err := query.transport.Query(getVoteKey(proposalID, voter), VoteKVStoreKey)
+func (query *Query) GetVote(ctx context.Context, proposalID, voter string) (*model.Vote, error) {
+	resp, err := query.transport.Query(ctx, getVoteKey(proposalID, voter), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -83,8 +85,8 @@ func (query *Query) GetVote(proposalID, voter string) (*model.Vote, error) {
 }
 
 // GetProposalAllVotes returns all votes of a given proposal.
-func (query *Query) GetProposalAllVotes(prposalID string) ([]*model.Vote, error) {
-	resKVs, err := query.transport.QuerySubspace(getVotePrefix(prposalID), VoteKVStoreKey)
+func (query *Query) GetProposalAllVotes(ctx context.Context, prposalID string) ([]*model.Vote, error) {
+	resKVs, err := query.transport.QuerySubspace(ctx, getVotePrefix(prposalID), VoteKVStoreKey)
 	if err != nil {
 		return nil, err
 	}

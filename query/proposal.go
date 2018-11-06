@@ -1,12 +1,14 @@
 package query
 
 import (
+	"context"
+
 	"github.com/lino-network/lino-go/model"
 )
 
 // GetOngoingProposal returns one ongoing proposal.
-func (query *Query) GetOngoingProposal(proposalID string) (*model.Proposal, error) {
-	resp, err := query.transport.Query(getOngoingProposalKey(proposalID), ProposalKVStoreKey)
+func (query *Query) GetOngoingProposal(ctx context.Context, proposalID string) (*model.Proposal, error) {
+	resp, err := query.transport.Query(ctx, getOngoingProposalKey(proposalID), ProposalKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -19,8 +21,8 @@ func (query *Query) GetOngoingProposal(proposalID string) (*model.Proposal, erro
 }
 
 // GetOngoingProposalList returns all ongoing proposals
-func (query *Query) GetOngoingProposalList() ([]*model.Proposal, error) {
-	resKVs, err := query.transport.QuerySubspace(getOngoingProposalSubstoreKey(), ProposalKVStoreKey)
+func (query *Query) GetOngoingProposalList(ctx context.Context) ([]*model.Proposal, error) {
+	resKVs, err := query.transport.QuerySubspace(ctx, getOngoingProposalSubstoreKey(), ProposalKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +40,8 @@ func (query *Query) GetOngoingProposalList() ([]*model.Proposal, error) {
 }
 
 // GetExpiredProposal returns one expired past proposal.
-func (query *Query) GetExpiredProposal(proposalID string) (*model.Proposal, error) {
-	resp, err := query.transport.Query(getExpiredProposalKey(proposalID), ProposalKVStoreKey)
+func (query *Query) GetExpiredProposal(ctx context.Context, proposalID string) (*model.Proposal, error) {
+	resp, err := query.transport.Query(ctx, getExpiredProposalKey(proposalID), ProposalKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +54,8 @@ func (query *Query) GetExpiredProposal(proposalID string) (*model.Proposal, erro
 }
 
 // GetExpiredProposalList returns all expired proposals
-func (query *Query) GetExpiredProposalList() ([]*model.Proposal, error) {
-	resKVs, err := query.transport.QuerySubspace(getExpiredProposalSubstoreKey(), ProposalKVStoreKey)
+func (query *Query) GetExpiredProposalList(ctx context.Context) ([]*model.Proposal, error) {
+	resKVs, err := query.transport.QuerySubspace(ctx, getExpiredProposalSubstoreKey(), ProposalKVStoreKey)
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +73,8 @@ func (query *Query) GetExpiredProposalList() ([]*model.Proposal, error) {
 }
 
 // GetProposal returns proposal info of a specific proposalID.
-func (query *Query) GetNextProposalID() (*model.NextProposalID, error) {
-	resp, err := query.transport.Query(getNextProposalIDKey(), ProposalKVStoreKey)
+func (query *Query) GetNextProposalID(ctx context.Context) (*model.NextProposalID, error) {
+	resp, err := query.transport.Query(ctx, getNextProposalIDKey(), ProposalKVStoreKey)
 	if err != nil {
 		return nil, err
 	}

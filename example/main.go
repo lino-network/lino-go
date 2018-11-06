@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
-	"time"
 
 	"github.com/lino-network/lino-go/api"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -129,15 +129,11 @@ func main() {
 	newUserResetKey := secp256k1.GenPrivKey()
 	newUserTxKey := secp256k1.GenPrivKey()
 	newUserAppKey := secp256k1.GenPrivKey()
-	newUser := "ffsssds"
+	newUser := "ffsffssds"
 
-	options := api.TimeoutOptions{
-		QueryTimeout:     1 * time.Second,
-		BroadcastTimeout: 6 * time.Second,
-	}
-	api := api.NewLinoAPIFromArgs("lino-staging", "http://18.222.11.221:26657", options)
-	seq, _ := api.GetSeqNumber("lino")
-	resp, err := api.Register("lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B202FDC4DB4ED428384A06E9A6562527A0A0E85203508700E1BFA96CAB458D899B1", seq)
+	api := api.NewLinoAPIFromArgs("lino-staging", "http://18.222.11.221:26657")
+	seq, _ := api.GetSeqNumber(context.Background(), "lino")
+	resp, err := api.Register(context.Background(), "lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B202FDC4DB4ED428384A06E9A6562527A0A0E85203508700E1BFA96CAB458D899B1", seq)
 	if err != nil {
 		panic(err)
 	}

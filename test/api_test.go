@@ -2,7 +2,6 @@ package test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/lino-network/lino-go/api"
 )
@@ -25,12 +24,7 @@ var (
 )
 
 func setup(t *testing.T) {
-	options := api.TimeoutOptions{
-		QueryTimeout:     1 * time.Second,
-		BroadcastTimeout: 4 * time.Second,
-	}
-
-	testAPI = api.NewLinoAPIFromArgs(chainID, nodeURL, options)
+	testAPI = api.NewLinoAPIFromArgs(chainID, nodeURL)
 }
 
 // func TestGetByCommitHash(t *testing.T) {
