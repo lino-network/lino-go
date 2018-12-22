@@ -55,7 +55,7 @@ func (broadcast *Broadcast) Register(ctx context.Context, referrer, registerFee,
 		NewTransactionPubKey: txPubKey,
 		NewAppPubKey:         appPubKey,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, referrerPrivKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, referrerPrivKeyHex, seq, "", false)
 }
 
 // Transfer sends a certain amount of LINO token from the sender to the receiver.
@@ -68,7 +68,7 @@ func (broadcast *Broadcast) Transfer(ctx context.Context, sender, receiver, amou
 		Amount:   amount,
 		Memo:     memo,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // Follow creates a social relationship between follower and followee.
@@ -79,7 +79,7 @@ func (broadcast *Broadcast) Follow(ctx context.Context, follower, followee,
 		Follower: follower,
 		Followee: followee,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // Unfollow revokes the social relationship between follower and followee.
@@ -90,7 +90,7 @@ func (broadcast *Broadcast) Unfollow(ctx context.Context, follower, followee,
 		Follower: follower,
 		Followee: followee,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // Claim claims rewards of a certain user.
@@ -100,7 +100,7 @@ func (broadcast *Broadcast) Claim(ctx context.Context, username,
 	msg := model.ClaimMsg{
 		Username: username,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // UpdateAccount updates account related info in jsonMeta which are not
@@ -112,7 +112,7 @@ func (broadcast *Broadcast) UpdateAccount(ctx context.Context, username, jsonMet
 		Username: username,
 		JSONMeta: jsonMeta,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // Recover recovers all keys of a user in case of losing or compromising.
@@ -138,7 +138,7 @@ func (broadcast *Broadcast) Recover(ctx context.Context, username, newResetPubKe
 		NewTransactionPubKey: txPubKey,
 		NewAppPubKey:         appPubKey,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 //
@@ -171,7 +171,36 @@ func (broadcast *Broadcast) CreatePost(ctx context.Context, author, postID, titl
 		Links:        mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
+}
+
+// CreatePost creates a new post on blockchain.
+// It composes CreatePostMsg and then broadcasts the transaction to blockchain return when checkTx pass.
+func (broadcast *Broadcast) CreatePostSync(ctx context.Context, author, postID, title, content,
+	parentAuthor, parentPostID, sourceAuthor, sourcePostID, redistributionSplitRate string,
+	links map[string]string, privKeyHex string, seq int64) (*model.BroadcastResponse, error) {
+	var mLinks []model.IDToURLMapping
+	if links == nil || len(links) == 0 {
+		mLinks = nil
+	} else {
+		for k, v := range links {
+			mLinks = append(mLinks, model.IDToURLMapping{k, v})
+		}
+	}
+
+	msg := model.CreatePostMsg{
+		Author:       author,
+		PostID:       postID,
+		Title:        title,
+		Content:      content,
+		ParentAuthor: parentAuthor,
+		ParentPostID: parentPostID,
+		SourceAuthor: sourceAuthor,
+		SourcePostID: sourcePostID,
+		Links:        mLinks,
+		RedistributionSplitRate: redistributionSplitRate,
+	}
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", true)
 }
 
 // Donate adds a money donation to a post by a user.
@@ -186,7 +215,22 @@ func (broadcast *Broadcast) Donate(ctx context.Context, username, author,
 		FromApp:  fromApp,
 		Memo:     memo,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
+}
+
+// Donate adds a money donation to a post by a user.
+// It composes DonateMsg and then broadcasts the transaction to blockchain return after pass checkTx.
+func (broadcast *Broadcast) DonateSync(ctx context.Context, username, author,
+	amount, postID, fromApp, memo string, privKeyHex string, seq int64) (*model.BroadcastResponse, error) {
+	msg := model.DonateMsg{
+		Username: username,
+		Amount:   amount,
+		Author:   author,
+		PostID:   postID,
+		FromApp:  fromApp,
+		Memo:     memo,
+	}
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", true)
 }
 
 // ReportOrUpvote adds a report or upvote action to a post.
@@ -199,7 +243,7 @@ func (broadcast *Broadcast) ReportOrUpvote(ctx context.Context, username, author
 		PostID:   postID,
 		IsReport: isReport,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // DeletePost deletes a post from the blockchain. It doesn't actually
@@ -212,7 +256,7 @@ func (broadcast *Broadcast) DeletePost(ctx context.Context, author, postID,
 		Author: author,
 		PostID: postID,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // View increases the view count of a post by one.
@@ -224,7 +268,7 @@ func (broadcast *Broadcast) View(ctx context.Context, username, author, postID,
 		Author:   author,
 		PostID:   postID,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // UpdatePost updates post info with new data.
@@ -247,7 +291,7 @@ func (broadcast *Broadcast) UpdatePost(ctx context.Context, author, title, postI
 		Content: content,
 		Links:   mLinks,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 //
@@ -270,7 +314,7 @@ func (broadcast *Broadcast) ValidatorDeposit(ctx context.Context, username, depo
 		ValPubKey: valPubKey,
 		Link:      link,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ValidatorWithdraw withdraws part of LINO token from a validator's deposit,
@@ -282,7 +326,7 @@ func (broadcast *Broadcast) ValidatorWithdraw(ctx context.Context, username, amo
 		Username: username,
 		Amount:   amount,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ValidatorRevoke revokes all deposited LINO token of a validator
@@ -293,7 +337,7 @@ func (broadcast *Broadcast) ValidatorRevoke(ctx context.Context, username,
 	msg := model.ValidatorRevokeMsg{
 		Username: username,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 //
@@ -309,7 +353,7 @@ func (broadcast *Broadcast) StakeIn(ctx context.Context, username, deposit,
 		Username: username,
 		Deposit:  deposit,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // StakeOut withdraws part of LINO token from a voter's deposit.
@@ -320,7 +364,7 @@ func (broadcast *Broadcast) StakeOut(ctx context.Context, username, amount,
 		Username: username,
 		Amount:   amount,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // Delegate delegates a certain amount of LINO token of delegator to a voter, so
@@ -333,7 +377,7 @@ func (broadcast *Broadcast) Delegate(ctx context.Context, delegator, voter, amou
 		Voter:     voter,
 		Amount:    amount,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // DelegatorWithdraw withdraws part of delegated LINO token of a delegator
@@ -346,7 +390,7 @@ func (broadcast *Broadcast) DelegatorWithdraw(ctx context.Context, delegator, vo
 		Voter:     voter,
 		Amount:    amount,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ClaimInterest claims interest of a certain user.
@@ -356,7 +400,7 @@ func (broadcast *Broadcast) ClaimInterest(ctx context.Context, username,
 	msg := model.ClaimInterestMsg{
 		Username: username,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 //
@@ -374,7 +418,7 @@ func (broadcast *Broadcast) DeveloperRegister(ctx context.Context, username, dep
 		Description: description,
 		AppMetaData: appMetaData,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // DeveloperUpdate updates a developer  info on blockchain.
@@ -387,7 +431,7 @@ func (broadcast *Broadcast) DeveloperUpdate(ctx context.Context, username, websi
 		Description: description,
 		AppMetaData: appMetaData,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // DeveloperRevoke reovkes all deposited LINO token of a developer
@@ -398,7 +442,7 @@ func (broadcast *Broadcast) DeveloperRevoke(ctx context.Context, username,
 	msg := model.DeveloperRevokeMsg{
 		Username: username,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // GrantPermission grants a certain (e.g. App) permission to
@@ -412,7 +456,7 @@ func (broadcast *Broadcast) GrantPermission(ctx context.Context, username, autho
 		ValidityPeriodSec: validityPeriodSec,
 		GrantLevel:        grantLevel,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // PreAuthorizationPermission grants a PreAuthorization permission to
@@ -427,7 +471,7 @@ func (broadcast *Broadcast) PreAuthorizationPermission(ctx context.Context, user
 		Amount:            amount,
 	}
 
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // RevokePermission revokes the permission given previously to a app.
@@ -443,7 +487,7 @@ func (broadcast *Broadcast) RevokePermission(ctx context.Context, username, pubK
 		Username: username,
 		PubKey:   pubKey,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 //
@@ -458,7 +502,7 @@ func (broadcast *Broadcast) ProviderReport(ctx context.Context, username string,
 		Username: username,
 		Usage:    usage,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 //
@@ -474,7 +518,7 @@ func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(ctx context.Contex
 		Parameter: parameter,
 		Reason:    reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ChangeGlobalAllocationParam changes GlobalAllocationParam with new value.
@@ -486,7 +530,7 @@ func (broadcast *Broadcast) ChangeGlobalAllocationParam(ctx context.Context, cre
 		Parameter: parameter,
 		Reason:    reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ChangeInfraInternalAllocationParam changes InfraInternalAllocationParam with new value.
@@ -499,7 +543,7 @@ func (broadcast *Broadcast) ChangeInfraInternalAllocationParam(ctx context.Conte
 		Parameter: parameter,
 		Reason:    reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ChangeVoteParam changes VoteParam with new value.
@@ -511,7 +555,7 @@ func (broadcast *Broadcast) ChangeVoteParam(ctx context.Context, creator string,
 		Parameter: parameter,
 		Reason:    reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ChangeProposalParam changes ProposalParam with new value.
@@ -523,7 +567,7 @@ func (broadcast *Broadcast) ChangeProposalParam(ctx context.Context, creator str
 		Parameter: parameter,
 		Reason:    reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ChangeDeveloperParam changes DeveloperParam with new value.
@@ -535,7 +579,7 @@ func (broadcast *Broadcast) ChangeDeveloperParam(ctx context.Context, creator st
 		Parameter: parameter,
 		Reason:    reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ChangeValidatorParam changes ValidatorParam with new value.
@@ -547,7 +591,7 @@ func (broadcast *Broadcast) ChangeValidatorParam(ctx context.Context, creator st
 		Parameter: parameter,
 		Reason:    reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ChangeBandwidthParam changes BandwidthParam with new value.
@@ -559,7 +603,7 @@ func (broadcast *Broadcast) ChangeBandwidthParam(ctx context.Context, creator st
 		Parameter: parameter,
 		Reason:    reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ChangeAccountParam changes AccountParam with new value.
@@ -571,7 +615,7 @@ func (broadcast *Broadcast) ChangeAccountParam(ctx context.Context, creator stri
 		Parameter: parameter,
 		Reason:    reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // ChangePostParam changes PostParam with new value.
@@ -583,7 +627,7 @@ func (broadcast *Broadcast) ChangePostParam(ctx context.Context, creator string,
 		Parameter: parameter,
 		Reason:    reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // DeletePostContent deletes the content of a post on blockchain, which is used
@@ -597,7 +641,7 @@ func (broadcast *Broadcast) DeletePostContent(ctx context.Context, creator, post
 		Permlink: permlink,
 		Reason:   reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // VoteProposal adds a vote to a certain proposal with agree/disagree.
@@ -609,7 +653,7 @@ func (broadcast *Broadcast) VoteProposal(ctx context.Context, voter, proposalID 
 		ProposalID: proposalID,
 		Result:     result,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 // UpgradeProtocol upgrades the protocol.
@@ -621,21 +665,21 @@ func (broadcast *Broadcast) UpgradeProtocol(ctx context.Context, creator, link, 
 		Link:    link,
 		Reason:  reason,
 	}
-	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "")
+	return broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, "", false)
 }
 
 //
 // internal helper functions
 //
 func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg model.Msg, privKeyHex string,
-	seq int64, memo string) (*model.BroadcastResponse, error) {
+	seq int64, memo string, checkTxOnly bool) (*model.BroadcastResponse, error) {
 	broadcastResp := &model.BroadcastResponse{}
 
-	var res *ctypes.ResultBroadcastTxCommit
+	var res interface{}
 	var err error
 	finishChan := make(chan bool)
 	go func() {
-		res, err = broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq, memo)
+		res, err = broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq, memo, checkTxOnly)
 		finishChan <- true
 	}()
 
@@ -650,20 +694,43 @@ func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg model.
 		return nil, err
 	}
 
-	code := retrieveCodeFromBlockChainCode(res.CheckTx.Code)
-	if err == nil && code == model.InvalidSeqErrCode {
-		return nil, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
-	}
+	if checkTxOnly {
+		res, ok := res.(*ctypes.ResultBroadcastTx)
+		if !ok {
+			return nil, errors.FailedToBroadcast("error to parse the broadcast response")
+		}
+		code := retrieveCodeFromBlockChainCode(res.Code)
+		if err == nil && code == model.InvalidSeqErrCode {
+			return nil, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
+		}
 
-	if res.CheckTx.Code != uint32(0) {
-		return nil, errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
-	}
-	if res.DeliverTx.Code != uint32(0) {
-		return nil, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
-	}
+		if res.Code != uint32(0) {
+			return nil, errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
+		}
+		if res.Code != uint32(0) {
+			return nil, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
+		}
+		commitHash := hex.EncodeToString(res.Hash)
+		broadcastResp.CommitHash = strings.ToUpper(commitHash)
+	} else {
+		res, ok := res.(*ctypes.ResultBroadcastTxCommit)
+		if !ok {
+			return nil, errors.FailedToBroadcast("error to parse the broadcast response")
+		}
+		code := retrieveCodeFromBlockChainCode(res.CheckTx.Code)
+		if err == nil && code == model.InvalidSeqErrCode {
+			return nil, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
+		}
 
-	commitHash := hex.EncodeToString(res.Hash)
-	broadcastResp.CommitHash = strings.ToUpper(commitHash)
+		if res.CheckTx.Code != uint32(0) {
+			return nil, errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
+		}
+		if res.DeliverTx.Code != uint32(0) {
+			return nil, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
+		}
+		commitHash := hex.EncodeToString(res.Hash)
+		broadcastResp.CommitHash = strings.ToUpper(commitHash)
+	}
 
 	return broadcastResp, nil
 }

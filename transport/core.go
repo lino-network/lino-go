@@ -219,24 +219,21 @@ func (t Transport) QueryTx(ctx context.Context, hash []byte) (res *ctypes.Result
 }
 
 // BroadcastTx broadcasts a transcation to blockchain.
-func (t Transport) BroadcastTx(tx []byte) (*ctypes.ResultBroadcastTxCommit, error) {
+func (t Transport) BroadcastTx(tx []byte, checkTxOnly bool) (interface{}, error) {
 	node, err := t.GetNode()
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := node.BroadcastTxCommit(tx)
-	if err != nil {
-		return nil, err
+	if checkTxOnly {
+		return node.BroadcastTxSync(tx)
 	}
-
-	return res, nil
+	return node.BroadcastTxCommit(tx)
 }
 
 // SignBuildBroadcast signs msg with private key and then broadcasts
 // the transaction to blockchain.
-func (t Transport) SignBuildBroadcast(msg model.Msg,
-	privKeyHex string, seq int64, memo string) (*ctypes.ResultBroadcastTxCommit, error) {
+func (t Transport) SignBuildBroadcast(msg model.Msg, privKeyHex string, seq int64, memo string, checkTxOnly bool) (interface{}, error) {
 	msgs := []model.Msg{msg}
 
 	privKey, err := GetPrivKeyFromHex(privKeyHex)
@@ -261,7 +258,7 @@ func (t Transport) SignBuildBroadcast(msg model.Msg,
 	}
 
 	// broadcast
-	return t.BroadcastTx(txByte)
+	return t.BroadcastTx(txByte, checkTxOnly)
 }
 
 // GetNote returns the Tendermint rpc client node.
