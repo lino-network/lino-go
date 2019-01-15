@@ -5,7 +5,6 @@ package broadcast
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -681,11 +680,10 @@ func (broadcast *Broadcast) UpgradeProtocol(ctx context.Context, creator, link, 
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
 }
 
-func (broadcast *Broadcast) retry(
-	ctx context.Context, msg model.Msg, privKeyHex string, seq int64, memo string, checkTxOnly bool, attempts int64, sleep time.Duration) (*model.BroadcastResponse, errors.Error) {
+func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex string, seq int64, memo string, checkTxOnly bool, attempts int64, sleep time.Duration) (*model.BroadcastResponse, errors.Error) {
 	res, err := broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, memo, checkTxOnly)
+	// fmt.Println(res, err)
 	if err != nil {
-		fmt.Println("retry with err", err)
 		if attempts--; attempts > 0 {
 			if strings.Contains(err.Error(), "Tx already exists in cache") {
 				// if tx already exists in cache
