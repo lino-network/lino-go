@@ -781,6 +781,7 @@ func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg model.
 		}
 		commitHash := hex.EncodeToString(res.Hash)
 		broadcastResp.CommitHash = strings.ToUpper(commitHash)
+		broadcastResp.Height = res.Height
 	}
 
 	return broadcastResp, nil
