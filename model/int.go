@@ -6,12 +6,12 @@ import (
 )
 
 type Int struct {
-	i *big.Int
+	I *big.Int
 }
 
 // BigInt converts Int to big.Int
 func (i Int) BigInt() *big.Int {
-	return new(big.Int).Set(i.i)
+	return new(big.Int).Set(i.I)
 }
 
 // NewIntFromString constructs Int from string
@@ -30,34 +30,34 @@ func NewIntFromString(s string) (res Int, ok bool) {
 
 // IsZero returns true if Int is zero
 func (i Int) IsZero() bool {
-	return i.i.Sign() == 0
+	return i.I.Sign() == 0
 }
 
 // Sign returns sign of Int
 func (i Int) Sign() int {
-	return i.i.Sign()
+	return i.I.Sign()
 }
 
 // Equal compares two Ints
 func (i Int) Equal(i2 Int) bool {
-	return equal(i.i, i2.i)
+	return equal(i.I, i2.I)
 }
 
 // GT returns true if first Int is greater than second
 func (i Int) GT(i2 Int) bool {
-	return gt(i.i, i2.i)
+	return gt(i.I, i2.I)
 }
 
 // LT returns true if first Int is lesser than second
 func (i Int) LT(i2 Int) bool {
-	return lt(i.i, i2.i)
+	return lt(i.I, i2.I)
 }
 
 // Add adds Int from another
 func (i Int) Add(i2 Int) (res Int) {
-	res = Int{add(i.i, i2.i)}
+	res = Int{add(i.I, i2.I)}
 	// Check overflow
-	if res.i.BitLen() > 255 {
+	if res.I.BitLen() > 255 {
 		panic("Int overflow")
 	}
 	return
@@ -65,9 +65,9 @@ func (i Int) Add(i2 Int) (res Int) {
 
 // Sub subtracts Int from another
 func (i Int) Sub(i2 Int) (res Int) {
-	res = Int{sub(i.i, i2.i)}
+	res = Int{sub(i.I, i2.I)}
 	// Check overflow
-	if res.i.BitLen() > 255 {
+	if res.I.BitLen() > 255 {
 		panic("Int overflow")
 	}
 	return
@@ -76,12 +76,12 @@ func (i Int) Sub(i2 Int) (res Int) {
 // Mul multiples two Ints
 func (i Int) Mul(i2 Int) (res Int) {
 	// Check overflow
-	if i.i.BitLen()+i2.i.BitLen()-1 > 255 {
+	if i.I.BitLen()+i2.I.BitLen()-1 > 255 {
 		panic("Int overflow")
 	}
-	res = Int{mul(i.i, i2.i)}
+	res = Int{mul(i.I, i2.I)}
 	// Check overflow if sign of both are same
-	if res.i.BitLen() > 255 {
+	if res.I.BitLen() > 255 {
 		panic("Int overflow")
 	}
 	return
@@ -90,15 +90,15 @@ func (i Int) Mul(i2 Int) (res Int) {
 // Div divides Int with Int
 func (i Int) Div(i2 Int) (res Int) {
 	// Check division-by-zero
-	if i2.i.Sign() == 0 {
+	if i2.I.Sign() == 0 {
 		panic("Division by zero")
 	}
-	return Int{div(i.i, i2.i)}
+	return Int{div(i.I, i2.I)}
 }
 
 // Neg negates Int
 func (i Int) Neg() (res Int) {
-	return Int{neg(i.i)}
+	return Int{neg(i.I)}
 }
 
 // Return the minimum of the ints
@@ -107,7 +107,7 @@ func MinInt(i1, i2 Int) Int {
 }
 
 func (i Int) String() string {
-	return i.i.String()
+	return i.I.String()
 }
 
 func newIntegerFromString(s string) (*big.Int, bool) {
@@ -173,32 +173,32 @@ func unmarshalJSON(i *big.Int, bz []byte) error {
 
 // MarshalAmino defines custom encoding scheme
 func (i Int) MarshalAmino() (string, error) {
-	if i.i == nil { // Necessary since default Uint initialization has i.i as nil
-		i.i = new(big.Int)
+	if i.I == nil { // Necessary since default Uint initialization has i.I as nil
+		i.I = new(big.Int)
 	}
-	return marshalAmino(i.i)
+	return marshalAmino(i.I)
 }
 
 // UnmarshalAmino defines custom decoding scheme
 func (i *Int) UnmarshalAmino(text string) error {
-	if i.i == nil { // Necessary since default Int initialization has i.i as nil
-		i.i = new(big.Int)
+	if i.I == nil { // Necessary since default Int initialization has i.I as nil
+		i.I = new(big.Int)
 	}
-	return unmarshalAmino(i.i, text)
+	return unmarshalAmino(i.I, text)
 }
 
 // MarshalJSON defines custom encoding scheme
 func (i Int) MarshalJSON() ([]byte, error) {
-	if i.i == nil { // Necessary since default Uint initialization has i.i as nil
-		i.i = new(big.Int)
+	if i.I == nil { // Necessary since default Uint initialization has i.I as nil
+		i.I = new(big.Int)
 	}
-	return marshalJSON(i.i)
+	return marshalJSON(i.I)
 }
 
 // UnmarshalJSON defines custom decoding scheme
 func (i *Int) UnmarshalJSON(bz []byte) error {
-	if i.i == nil { // Necessary since default Int initialization has i.i as nil
-		i.i = new(big.Int)
+	if i.I == nil { // Necessary since default Int initialization has i.I as nil
+		i.I = new(big.Int)
 	}
-	return unmarshalJSON(i.i, bz)
+	return unmarshalJSON(i.I, bz)
 }

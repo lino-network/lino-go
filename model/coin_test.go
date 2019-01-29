@@ -29,6 +29,11 @@ func TestCoinToLNO(t *testing.T) {
 			expectCoinStr: "12300000",
 			expectLino:    "123",
 		},
+		"lino with some 0, coin with some zeros": {
+			inputLino:     "100.00023",
+			expectCoinStr: "10000023",
+			expectLino:    "100.00023",
+		},
 		"lino with one 0, coin with more than 5 zeros": {
 			inputLino:     "1230",
 			expectCoinStr: "123000000",
@@ -48,6 +53,11 @@ func TestCoinToLNO(t *testing.T) {
 			inputLino:     "0.00123",
 			expectCoinStr: "123",
 			expectLino:    "0.00123",
+		},
+		"lino with 3 zero, coin with no zero": {
+			inputLino:     "100082.92819",
+			expectCoinStr: "10008292819",
+			expectLino:    "100082.92819",
 		},
 	}
 
