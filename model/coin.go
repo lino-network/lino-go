@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"math/big"
 	"strings"
 )
@@ -16,32 +17,17 @@ func NewCoinFromString(amount string) (Coin, bool) {
 }
 
 func (c Coin) CoinToLNO() string {
-	amountStr := c.Amount.String()
-
-	numZero := strings.Count(amountStr, "0")
-	if numZero >= 5 {
-		index := len(amountStr) - 5
-		return amountStr[:index]
-	} else {
-		numOfRemainZero := 5 - numZero
-		amountStr = strings.TrimRight(amountStr, "0")
-
-		if len(amountStr) > numOfRemainZero {
-			index := len(amountStr) - numOfRemainZero
-			return amountStr[:index] + "." + amountStr[index:]
-		} else {
-			numOfAddingZero := numOfRemainZero - len(amountStr)
-			res := "0."
-			for numOfAddingZero > 0 {
-				res += "0"
-				numOfAddingZero--
-			}
-
-			return res + amountStr
-		}
+	amountStr := "00000" + c.Amount.String()
+	length := len(amountStr)
+	converted := fmt.Sprintf("%s.%s", amountStr[:length-5], amountStr[length-5:])
+	converted = strings.Trim(converted, "0")
+	if converted[0] == '.' {
+		converted = "0" + converted
 	}
-
-	return ""
+	if converted[len(converted)-1] == '.' {
+		converted = converted[:len(converted)-1]
+	}
+	return converted
 }
 
 // IsZero returns if this represents no money
