@@ -10,6 +10,7 @@ import (
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
+	util "github.com/lino-network/lino-go/utils"
 	"github.com/tendermint/tendermint/crypto"
 )
 
@@ -230,7 +231,7 @@ func (query *Query) GetBalanceHistoryFromTo(ctx context.Context, username string
 
 		var startIndex int64
 		if bucketSlot == targetBucketOfTo {
-			startIndex = indexOfTo
+			startIndex = util.Min(indexOfTo, int64(len(balanceHistory.Details)-1))
 		} else {
 			startIndex = int64(len(balanceHistory.Details) - 1)
 		}
@@ -415,7 +416,7 @@ func (query *Query) GetRewardHistoryFromTo(ctx context.Context, username string,
 
 		var startIndex int64
 		if bucketSlot == targetBucketOfTo {
-			startIndex = indexOfTo
+			startIndex = util.Min(indexOfTo, int64(len(rewardHistory.Details)-1))
 		} else {
 			startIndex = int64(len(rewardHistory.Details) - 1)
 		}
