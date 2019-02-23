@@ -141,3 +141,13 @@ func Timeout(msg string) Error {
 func Timeoutf(format string, args ...interface{}) Error {
 	return newError(CodeTimeout, fmt.Sprintf(format, args...))
 }
+
+//Timeout creates an error with CodeBroadcastTimeout
+func BroadcastTimeout(msg string) Error {
+	return newError(CodeBroadcastTimeout, msg)
+}
+
+//Timeoutf creates an error with CodeBroadcastTimeout and formatted message
+func BroadcastTimeoutf(format string, args ...interface{}) Error {
+	return newError(CodeBroadcastTimeout, fmt.Sprintf(format, args...))
+}

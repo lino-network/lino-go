@@ -23,15 +23,17 @@ type Broadcast struct {
 	transport          *transport.Transport
 	maxAttempts        int64
 	initSleepTime      time.Duration
+	timeout            time.Duration
 	exponentialBackoff bool
 	backoffRandomness  bool
 }
 
 // NewBroadcast returns an instance of Broadcast.
-func NewBroadcast(transport *transport.Transport, maxAttempts int64, initSleepTime time.Duration, exponentialBackoff bool, backoffRandomness bool) *Broadcast {
+func NewBroadcast(transport *transport.Transport, maxAttempts int64, initSleepTime time.Duration, timeout time.Duration, exponentialBackoff bool, backoffRandomness bool) *Broadcast {
 	return &Broadcast{
 		transport:          transport,
 		maxAttempts:        maxAttempts,
+		timeout:            timeout,
 		initSleepTime:      initSleepTime,
 		exponentialBackoff: exponentialBackoff,
 		backoffRandomness:  backoffRandomness,
@@ -521,18 +523,6 @@ func (broadcast *Broadcast) ProviderReport(ctx context.Context, username string,
 // proposal related tx
 //
 
-// ChangeEvaluateOfContentValueParam changes EvaluateOfContentValueParam with new value.
-// It composes ChangeEvaluateOfContentValueParamMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) ChangeEvaluateOfContentValueParam(ctx context.Context, creator string,
-	parameter model.EvaluateOfContentValueParam, reason string, privKeyHex string, seq int64) (*model.BroadcastResponse, errors.Error) {
-	msg := model.ChangeEvaluateOfContentValueParamMsg{
-		Creator:   creator,
-		Parameter: parameter,
-		Reason:    reason,
-	}
-	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
-}
-
 // ChangeGlobalAllocationParam changes GlobalAllocationParam with new value.
 // It composes ChangeGlobalAllocationParamMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) ChangeGlobalAllocationParam(ctx context.Context, creator string,
@@ -682,17 +672,29 @@ func (broadcast *Broadcast) UpgradeProtocol(ctx context.Context, creator, link, 
 
 func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex string, seq int64, memo string, checkTxOnly bool, attempts int64, sleep time.Duration) (*model.BroadcastResponse, errors.Error) {
 	res, err := broadcast.broadcastTransaction(ctx, msg, privKeyHex, seq, memo, checkTxOnly)
-	// fmt.Println(res, err)
 	if err != nil {
 		if attempts--; attempts > 0 {
-			if strings.Contains(err.Error(), "Tx already exists in cache") {
+			if strings.Contains(err.Error(), "Tx already exists in cache") || err.CodeType() == errors.CodeTimeout {
 				// if tx already exists in cache
 				return nil, err
 			}
-			if err.CodeType() == errors.CodeTimeout ||
-				err.CodeType() == errors.CodeCheckTxFail ||
+			if err.CodeType() == errors.CodeCheckTxFail ||
 				err.CodeType() == errors.CodeDeliverTxFail {
-				return nil, err
+				if err.BlockChainCode() != 155 {
+					return nil, err
+				} else {
+					// sign byte error, replace sequence number with correct one
+					lo := err.BlockChainLog()
+					sub := util.SubstringAfterStr(lo, "sequence:")
+					i := strings.Index(sub, "\"")
+					if i != -1 {
+						seqStr := sub[:i]
+						correctSeq, err := strconv.ParseInt(seqStr, 10, 64)
+						if err == nil {
+							seq = correctSeq
+						}
+					}
+				}
 			}
 			time.Sleep(sleep)
 			if broadcast.backoffRandomness {
@@ -702,16 +704,7 @@ func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex
 			if broadcast.exponentialBackoff {
 				sleep += sleep
 			}
-			lo := err.BlockChainLog()
-			sub := util.SubstringAfterStr(lo, "expected ")
-			i := strings.Index(sub, "\"")
-			if i != -1 {
-				seqStr := sub[:i]
-				correctSeq, err := strconv.ParseInt(seqStr, 10, 64)
-				if err == nil {
-					seq = correctSeq
-				}
-			}
+
 			// Add some randomness to prevent creating a Thundering Herd
 			return broadcast.retry(ctx, msg, privKeyHex, seq, memo, checkTxOnly, attempts, sleep)
 		}
@@ -729,6 +722,10 @@ func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg model.
 	var res interface{}
 	var err error
 	finishChan := make(chan bool)
+
+	broadcastCtx, cancel := context.WithTimeout(context.Background(), broadcast.timeout)
+	defer cancel()
+
 	go func() {
 		res, err = broadcast.transport.SignBuildBroadcast(msg, privKeyHex, seq, memo, checkTxOnly)
 		finishChan <- true
@@ -739,6 +736,8 @@ func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg model.
 		break
 	case <-ctx.Done():
 		return nil, errors.Timeoutf("msg timeout: %v", msg).AddCause(ctx.Err())
+	case <-broadcastCtx.Done():
+		return nil, errors.BroadcastTimeoutf("broadcast timeout: %v", msg).AddCause(ctx.Err())
 	}
 
 	if err != nil {

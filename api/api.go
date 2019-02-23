@@ -25,8 +25,21 @@ type Options struct {
 	NodeURL            string        `json:"node_url"`
 	MaxAttempts        int64         `json:"max_attempts"`
 	InitSleepTime      time.Duration `json:"init_sleep_time"`
+	Timeout            time.Duration `json:"timeout"`
 	ExponentialBackoff bool          `json:"exponential_back_off"`
 	BackoffRandomness  bool          `json:"backoff_randomness"`
+}
+
+func (opt *Options) init() {
+	if opt.MaxAttempts == 0 {
+		opt.MaxAttempts = 3
+	}
+	if opt.InitSleepTime == 0 {
+		opt.InitSleepTime = time.Second * 3
+	}
+	if opt.Timeout == 0 {
+		opt.Timeout = time.Second * 10
+	}
 }
 
 // NewLinoAPIFromConfig initiates an instance of API using
@@ -57,10 +70,11 @@ func NewLinoAPIFromConfig() *API {
 
 // NewLinoAPIFromArgs initiates an instance of API using
 // chainID and nodeUrl that are passed in.
-func NewLinoAPIFromArgs(options *Options) *API {
-	transport := transport.NewTransportFromArgs(options.ChainID, options.NodeURL)
+func NewLinoAPIFromArgs(opt *Options) *API {
+	opt.init()
+	transport := transport.NewTransportFromArgs(opt.ChainID, opt.NodeURL)
 	return &API{
 		Query:     query.NewQuery(transport),
-		Broadcast: broadcast.NewBroadcast(transport, options.MaxAttempts, options.InitSleepTime, options.ExponentialBackoff, options.BackoffRandomness),
+		Broadcast: broadcast.NewBroadcast(transport, opt.MaxAttempts, opt.InitSleepTime, opt.Timeout, opt.ExponentialBackoff, opt.BackoffRandomness),
 	}
 }

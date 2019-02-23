@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/wire"
+	wire "github.com/cosmos/cosmos-sdk/codec"
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/spf13/viper"
@@ -129,8 +129,8 @@ func (t Transport) query(key cmn.HexBytes, storeName, endPath string, height int
 	}
 
 	opts := rpcclient.ABCIQueryOptions{
-		Height:  height,
-		Trusted: true,
+		Height: height,
+		Prove:  false,
 	}
 	result, err := node.ABCIQueryWithOptions(path, key, opts)
 	if err != nil {

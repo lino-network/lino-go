@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
-	"github.com/cosmos/cosmos-sdk/wire"
+	wire "github.com/cosmos/cosmos-sdk/codec"
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 
@@ -20,7 +20,7 @@ var ZeroFee = model.Fee{
 
 // MakeCodec returns all interface and messages to Tendermint.
 func MakeCodec() *wire.Codec {
-	cdc := wire.NewCodec()
+	cdc := wire.New()
 
 	cdc.RegisterInterface((*model.Msg)(nil), nil)
 	cdc.RegisterInterface((*model.Tx)(nil), nil)

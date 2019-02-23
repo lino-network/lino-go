@@ -12,6 +12,7 @@ const (
 	CodeInvalidArg
 	CodeInvalidNodeURL
 	CodeInvalidSequenceNumber
-	CodeEmptyResponse // 10
-	CodeTimeout
+	CodeEmptyResponse    // 10
+	CodeTimeout          // time out for one tx
+	CodeBroadcastTimeout // time out for each single broadcast
 )
