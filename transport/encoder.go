@@ -71,7 +71,6 @@ func MakeCodec() *wire.Codec {
 	cdc.RegisterConcrete(model.DeletePostContentMsg{}, "lino/deletePostContent", nil)
 	cdc.RegisterConcrete(model.UpgradeProtocolMsg{}, "lino/upgradeProtocol", nil)
 	cdc.RegisterConcrete(model.ChangeGlobalAllocationParamMsg{}, "lino/changeGlobalAllocation", nil)
-	cdc.RegisterConcrete(model.ChangeEvaluateOfContentValueParamMsg{}, "lino/changeEvaluation", nil)
 	cdc.RegisterConcrete(model.ChangeInfraInternalAllocationParamMsg{}, "lino/changeInfraAllocation", nil)
 	cdc.RegisterConcrete(model.ChangeVoteParamMsg{}, "lino/changeVoteParam", nil)
 	cdc.RegisterConcrete(model.ChangeProposalParamMsg{}, "lino/changeProposalParam", nil)

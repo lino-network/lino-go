@@ -3,15 +3,16 @@ package model
 import (
 	"errors"
 	"math"
-	"math/big"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
-	LowerBoundRat = big.NewRat(1, Decimals)
-	UpperBoundRat = big.NewRat(math.MaxInt64/Decimals, 1)
+	// LowerBoundRat - the lower bound of Rat
+	LowerBoundRat = NewDecFromRat(1, Decimals)
+	// UpperBoundRat - the upper bound of Rat
+	UpperBoundRat = sdk.NewDec(math.MaxInt64 / Decimals)
 )
 
 const (
@@ -82,32 +83,23 @@ func TestCoinToLNO(t *testing.T) {
 // helper function
 //
 
+// NewCoinFromInt64 - return int64 amount of Coin
 func NewCoinFromInt64(amount int64) Coin {
-	return Coin{
-		Amount: Int{big.NewInt(amount)},
-	}
+	// return Coin{big.NewInt(amount)}
+	return Coin{sdk.NewInt(amount)}
 }
 
-func NewCoinFromBigInt(amount *big.Int) Coin {
-	return Coin{
-		Amount: Int{amount},
-	}
-}
-
+// LinoToCoin - convert 1 LNO to 10^5 Coin
 func LinoToCoin(lino string) (Coin, error) {
-	num, success := new(big.Rat).SetString(lino)
-	if !success {
-		return NewCoinFromInt64(0), errors.New("illegal")
+	rat, err := sdk.NewDecFromStr(lino)
+	if err != nil {
+		return NewCoinFromInt64(0), errors.New("Illegal LNO")
 	}
-	if num.Cmp(UpperBoundRat) > 0 {
-		return NewCoinFromInt64(0), errors.New("overflow")
+	if rat.GT(UpperBoundRat) {
+		return NewCoinFromInt64(0), errors.New("LNO overflow")
 	}
-	if num.Cmp(LowerBoundRat) < 0 {
-		return NewCoinFromInt64(0), errors.New("underflow")
+	if rat.LT(LowerBoundRat) {
+		return NewCoinFromInt64(0), errors.New("LNO can't be less than lower bound")
 	}
-	return RatToCoin(sdk.Rat{new(big.Rat).Mul(num, big.NewRat(Decimals, 1))}), nil
-}
-
-func RatToCoin(rat sdk.Rat) Coin {
-	return NewCoinFromBigInt(rat.EvaluateBig())
+	return DecToCoin(rat.Mul(sdk.NewDec(Decimals))), nil
 }

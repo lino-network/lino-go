@@ -64,20 +64,6 @@ func (query *Query) GetPostView(ctx context.Context, author, postID, viewUser st
 	return view, nil
 }
 
-// GetPostDonations returns all donations that a user has given to a post.
-func (query *Query) GetPostDonations(ctx context.Context, author, postID, donateUser string) (*model.Donations, error) {
-	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostDonationsKey(permlink, donateUser), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-	donations := new(model.Donations)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, donations); err != nil {
-		return nil, err
-	}
-	return donations, nil
-}
-
 // GetPostReportOrUpvote returns report or upvote that a user has given to a post.
 func (query *Query) GetPostReportOrUpvote(ctx context.Context, author, postID, user string) (*model.ReportOrUpvote, error) {
 	permlink := getPermlink(author, postID)
@@ -182,26 +168,6 @@ func (query *Query) GetPostAllViews(ctx context.Context, author, postID string) 
 	}
 
 	return userToViewMap, nil
-}
-
-// GetPostAllDonations returns all donations that a post has received.
-func (query *Query) GetPostAllDonations(ctx context.Context, author, postID string) (map[string]*model.Donations, error) {
-	permlink := getPermlink(author, postID)
-	resKVs, err := query.transport.QuerySubspace(ctx, getPostDonationsPrefix(permlink), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-
-	userToDonationsMap := make(map[string]*model.Donations)
-	for _, KV := range resKVs {
-		donations := new(model.Donations)
-		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, donations); err != nil {
-			return nil, err
-		}
-		userToDonationsMap[getSubstringAfterKeySeparator(KV.Key)] = donations
-	}
-
-	return userToDonationsMap, nil
 }
 
 // GetPostAllReportOrUpvotes returns all reports or upvotes that a post has received.

@@ -6,20 +6,6 @@ import (
 	"github.com/lino-network/lino-go/model"
 )
 
-// GetEvaluateOfContentValueParam returns the EvaluateOfContentValueParam.
-func (query *Query) GetEvaluateOfContentValueParam(ctx context.Context) (*model.EvaluateOfContentValueParam, error) {
-	resp, err := query.transport.Query(ctx, getEvaluateOfContentValueParamKey(), ParamKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
-
-	param := new(model.EvaluateOfContentValueParam)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
-		return nil, err
-	}
-	return param, nil
-}
-
 // GetGlobalAllocationParam returns the GlobalAllocationParam.
 func (query *Query) GetGlobalAllocationParam(ctx context.Context) (*model.GlobalAllocationParam, error) {
 	resp, err := query.transport.Query(ctx, getGlobalAllocationParamKey(), ParamKVStoreKey)

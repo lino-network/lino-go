@@ -186,6 +186,7 @@ type GrantPermissionMsg struct {
 	AuthorizedApp     string     `json:"authorized_app"`
 	ValidityPeriodSec int64      `json:"validity_period_second"`
 	GrantLevel        Permission `json:"grant_level"`
+	Amount            string     `json:"amount"`
 }
 
 type RevokePermissionMsg struct {
@@ -227,12 +228,6 @@ type ChangeGlobalAllocationParamMsg struct {
 	Creator   string                `json:"creator"`
 	Parameter GlobalAllocationParam `json:"parameter"`
 	Reason    string                `json:"reason"`
-}
-
-type ChangeEvaluateOfContentValueParamMsg struct {
-	Creator   string                      `json:"creator"`
-	Parameter EvaluateOfContentValueParam `json:"parameter"`
-	Reason    string                      `json:"reason"`
 }
 
 type ChangeInfraInternalAllocationParamMsg struct {

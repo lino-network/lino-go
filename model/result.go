@@ -67,53 +67,12 @@ type AccountMeta struct {
 	LastPostAt           int64  `json:"last_post_at"`
 }
 
-type FollowerMeta struct {
-	CreatedAt    int64  `json:"created_at"`
-	FollowerName string `json:"follower_name"`
-}
-
-type FollowingMeta struct {
-	CreatedAt     int64  `json:"created_at"`
-	FollowingName string `json:"following_name"`
-}
-
 type Reward struct {
 	TotalIncome     Coin `json:"total_income"`
 	OriginalIncome  Coin `json:"original_income"`
 	FrictionIncome  Coin `json:"friction_income"`
 	InflationIncome Coin `json:"inflation_income"`
 	UnclaimReward   Coin `json:"unclaim_reward"`
-}
-
-type RewardDetail struct {
-	OriginalDonation Coin   `json:"original_donation"`
-	FrictionDonation Coin   `json:"friction_donation"`
-	ActualReward     Coin   `json:"actual_reward"`
-	Consumer         string `json:"consumer"`
-	PostAuthor       string `json:"post_author"`
-	PostID           string `json:"post_id`
-}
-
-type RewardHistory struct {
-	Details []RewardDetail `json:"details"`
-}
-
-type Relationship struct {
-	DonationTimes int64 `json:"donation_times"`
-}
-
-type BalanceHistory struct {
-	Details []Detail `json:"details"`
-}
-
-type Detail struct {
-	DetailType DetailType `json:"detail_type"`
-	From       string     `json:"from"`
-	To         string     `json:"to"`
-	Amount     Coin       `json:"amount"`
-	Balance    Coin       `json:"balance"`
-	CreatedAt  int64      `json:"created_at"`
-	Memo       string     `json:"memo"`
 }
 
 //
@@ -187,12 +146,6 @@ type View struct {
 	Username   string `json:"username"`
 	LastViewAt int64  `json:"last_view_at"`
 	Times      int64  `jons:"times"`
-}
-
-type Donations struct {
-	Username string `json:"username"`
-	Times    int64  `json:"times"`
-	Amount   Coin   `json:"amount"`
 }
 
 //

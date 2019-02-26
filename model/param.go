@@ -5,15 +5,6 @@ import "github.com/lino-network/lino/types"
 // parameters can be changed by proposal
 type Parameter interface{}
 
-type EvaluateOfContentValueParam struct {
-	ConsumptionTimeAdjustBase      int64 `json:"consumption_time_adjust_base"`
-	ConsumptionTimeAdjustOffset    int64 `json:"consumption_time_adjust_offset"`
-	NumOfConsumptionOnAuthorOffset int64 `json:"num_of_consumption_on_author_offset"`
-	TotalAmountOfConsumptionBase   int64 `json:"total_amount_of_consumption_base"`
-	TotalAmountOfConsumptionOffset int64 `json:"total_amount_of_consumption_offset"`
-	AmountOfConsumptionExponent    Rat   `json:"amount_of_consumption_exponent"`
-}
-
 type GlobalAllocationParam struct {
 	GlobalGrowthRate         Rat `json:"global_growth_rate"`
 	InfraAllocation          Rat `json:"infra_allocation"`
