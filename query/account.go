@@ -15,7 +15,7 @@ import (
 
 // GetAccountInfo returns account info for a specific user.
 func (query *Query) GetAccountInfo(ctx context.Context, username string) (*model.AccountInfo, error) {
-	resp, err := query.transport.Query(ctx, getAccountInfoKey(username), AccountKVStoreKey)
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountInfoSubStore, []string{username})
 	if err != nil {
 		return nil, err
 	}
@@ -28,27 +28,21 @@ func (query *Query) GetAccountInfo(ctx context.Context, username string) (*model
 
 // GetTransactionPubKey returns string format transaction public key.
 func (query *Query) GetTransactionPubKey(ctx context.Context, username string) (string, error) {
-	resp, err := query.transport.Query(ctx, getAccountInfoKey(username), AccountKVStoreKey)
+	info, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
 		return "", err
 	}
-	info := new(model.AccountInfo)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
-		return "", err
-	}
+
 	return strings.ToUpper(hex.EncodeToString(info.TransactionKey.Bytes())), nil
 }
 
 // GetAppPubKey returns string format app public key.
 func (query *Query) GetAppPubKey(ctx context.Context, username string) (string, error) {
-	resp, err := query.transport.Query(ctx, getAccountInfoKey(username), AccountKVStoreKey)
+	info, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
 		return "", err
 	}
-	info := new(model.AccountInfo)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
-		return "", err
-	}
+
 	return strings.ToUpper(hex.EncodeToString(info.AppKey.Bytes())), nil
 }
 
@@ -100,11 +94,12 @@ func (query *Query) DoesUsernameMatchAppPrivKey(ctx context.Context, username, a
 
 // GetAccountBank returns account bank info for a specific user.
 func (query *Query) GetAccountBank(ctx context.Context, username string) (*model.AccountBank, error) {
-	resp, err := query.transport.Query(ctx, getAccountBankKey(username), AccountKVStoreKey)
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountBankSubStore, []string{username})
 	if err != nil {
 		return nil, err
 	}
 	bank := new(model.AccountBank)
+	fmt.Println(string(resp))
 	if err := query.transport.Cdc.UnmarshalJSON(resp, bank); err != nil {
 		return nil, err
 	}
@@ -113,7 +108,7 @@ func (query *Query) GetAccountBank(ctx context.Context, username string) (*model
 
 // GetAccountMeta returns account meta info for a specific user.
 func (query *Query) GetAccountMeta(ctx context.Context, username string) (*model.AccountMeta, error) {
-	resp, err := query.transport.Query(ctx, getAccountMetaKey(username), AccountKVStoreKey)
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountMetaSubStore, []string{username})
 	if err != nil {
 		return nil, err
 	}
@@ -137,12 +132,7 @@ func (query *Query) GetSeqNumber(ctx context.Context, username string) (int64, e
 // GetGrantPubKey returns the specific granted pubkey info of a user
 // that has given to the pubKey.
 func (query *Query) GetGrantPubKey(ctx context.Context, username string, pubKeyHex string) (*model.GrantPubKey, error) {
-	pubKey, err := transport.GetPubKeyFromHex(pubKeyHex)
-	if err != nil {
-		return nil, errors.FailedToGetPubKeyFromHex("GetGrantPubKey: failed to get pub key").AddCause(err)
-	}
-
-	resp, err := query.transport.Query(ctx, getGrantPubKeyKey(username, pubKey), AccountKVStoreKey)
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountGrantPubKeySubStore, []string{username, pubKeyHex})
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +146,7 @@ func (query *Query) GetGrantPubKey(ctx context.Context, username string, pubKeyH
 
 // GetReward returns rewards of a user.
 func (query *Query) GetReward(ctx context.Context, username string) (*model.Reward, error) {
-	resp, err := query.transport.Query(ctx, getRewardKey(username), AccountKVStoreKey)
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountRewardSubStore, []string{username})
 	if err != nil {
 		return nil, err
 	}
@@ -195,17 +185,14 @@ func (query *Query) GetRewardAtHeight(ctx context.Context, username string, heig
 
 // GetAllGrantPubKeys returns a list of all granted public keys of a user.
 func (query *Query) GetAllGrantPubKeys(ctx context.Context, username string) (map[string]*model.GrantPubKey, error) {
-	resKVs, err := query.transport.QuerySubspace(ctx, getGrantPubKeyPrefix(username), AccountKVStoreKey)
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountAllGrantPubKeys, []string{username})
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(resp))
 	pubKeyToGrantPubKeyMap := make(map[string]*model.GrantPubKey)
-	for _, KV := range resKVs {
-		grantPubKey := new(model.GrantPubKey)
-		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, grantPubKey); err != nil {
-			return nil, err
-		}
-		pubKeyToGrantPubKeyMap[getHexSubstringAfterKeySeparator(KV.Key)] = grantPubKey
+	if err := query.transport.Cdc.UnmarshalJSON(resp, &pubKeyToGrantPubKeyMap); err != nil {
+		return nil, err
 	}
 
 	return pubKeyToGrantPubKeyMap, nil
@@ -221,12 +208,8 @@ func (query *Query) SignWithSha256(ctx context.Context, payload string, privKey 
 
 // VerifyUserSignatureUsingAppKey verify signature is signed from payload by user's app private key.
 func (query *Query) VerifyUserSignatureUsingAppKey(ctx context.Context, username string, payload string, signature string) (bool, error) {
-	resp, err := query.transport.Query(ctx, getAccountInfoKey(username), AccountKVStoreKey)
+	info, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
-		return false, err
-	}
-	info := new(model.AccountInfo)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
 		return false, err
 	}
 	sig, err := hex.DecodeString(signature)
@@ -238,12 +221,8 @@ func (query *Query) VerifyUserSignatureUsingAppKey(ctx context.Context, username
 
 // VerifyUserSignatureUsingTxKey verify signature is signed from payload by user's transaction private key.
 func (query *Query) VerifyUserSignatureUsingTxKey(ctx context.Context, username string, payload string, signature string) (bool, error) {
-	resp, err := query.transport.Query(ctx, getAccountInfoKey(username), AccountKVStoreKey)
+	info, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
-		return false, err
-	}
-	info := new(model.AccountInfo)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, info); err != nil {
 		return false, err
 	}
 	sig, err := hex.DecodeString(signature)

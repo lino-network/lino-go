@@ -62,10 +62,10 @@ func NewTransportFromArgs(chainID, nodeUrl string) *Transport {
 }
 
 // Query from Tendermint with the provided key and storename
-func (t Transport) Query(ctx context.Context, key cmn.HexBytes, storeName string) (res []byte, err error) {
+func (t Transport) Query(ctx context.Context, storeName, subStore string, keys []string) (res []byte, err error) {
 	finishChan := make(chan bool)
 	go func() {
-		res, err = t.query(key, storeName, "key", 0)
+		res, err = t.query(keys, storeName, subStore, 0)
 		finishChan <- true
 	}()
 
@@ -83,7 +83,7 @@ func (t Transport) Query(ctx context.Context, key cmn.HexBytes, storeName string
 func (t Transport) QueryAtHeight(ctx context.Context, key cmn.HexBytes, storeName string, height int64) (res []byte, err error) {
 	finishChan := make(chan bool)
 	go func() {
-		res, err = t.query(key, storeName, "key", height)
+		res, err = t.query([]string{string(key)}, storeName, "key", height)
 		finishChan <- true
 	}()
 
@@ -102,7 +102,7 @@ func (t Transport) QuerySubspace(ctx context.Context, subspace []byte, storeName
 	var resRaw []byte
 	finishChan := make(chan bool)
 	go func() {
-		resRaw, err = t.query(subspace, storeName, "subspace", 0)
+		resRaw, err = t.query([]string{string(subspace)}, storeName, "subspace", 0)
 		finishChan <- true
 	}()
 
@@ -121,8 +121,11 @@ func (t Transport) QuerySubspace(ctx context.Context, subspace []byte, storeName
 	return
 }
 
-func (t Transport) query(key cmn.HexBytes, storeName, endPath string, height int64) (res []byte, err error) {
-	path := fmt.Sprintf("/store/%s/%s", storeName, endPath)
+func (t Transport) query(keys []string, storeName, substore string, height int64) (res []byte, err error) {
+	path := fmt.Sprintf("/custom/%s/%s", storeName, substore)
+	for _, key := range keys {
+		path += ("/" + key)
+	}
 	node, err := t.GetNode()
 	if err != nil {
 		return res, err
@@ -132,7 +135,7 @@ func (t Transport) query(key cmn.HexBytes, storeName, endPath string, height int
 		Height: height,
 		Prove:  false,
 	}
-	result, err := node.ABCIQueryWithOptions(path, key, opts)
+	result, err := node.ABCIQueryWithOptions(path, []byte{}, opts)
 	if err != nil {
 		return res, err
 	}

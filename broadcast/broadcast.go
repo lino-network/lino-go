@@ -85,6 +85,19 @@ func (broadcast *Broadcast) Transfer(ctx context.Context, sender, receiver, amou
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
 }
 
+// Transfer sends a certain amount of LINO token from the sender to the receiver.
+// It composes TransferMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) TransferSync(ctx context.Context, sender, receiver, amount, memo,
+	privKeyHex string, seq int64) (*model.BroadcastResponse, errors.Error) {
+	msg := model.TransferMsg{
+		Sender:   sender,
+		Receiver: receiver,
+		Amount:   amount,
+		Memo:     memo,
+	}
+	return broadcast.retry(ctx, msg, privKeyHex, seq, "", true, broadcast.maxAttempts, broadcast.initSleepTime)
+}
+
 // Follow creates a social relationship between follower and followee.
 // It composes FollowMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) Follow(ctx context.Context, follower, followee,
@@ -473,15 +486,31 @@ func (broadcast *Broadcast) GrantPermission(ctx context.Context, username, autho
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
 }
 
-// PreAuthorizationPermission grants a PreAuthorization permission to
-// an authorzied app with a certain period of time.
-// It composes PreAuthorizationMsg and then broadcasts the transaction to blockchain.
-func (broadcast *Broadcast) PreAuthorizationPermission(ctx context.Context, username, authorizedApp string,
+// GrantAppAndPreAuthPermission grants both app and preauth permission to
+// an authorized app with a certain period of time.
+// It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) GrantAppAndPreAuthPermission(ctx context.Context, username, authorizedApp string,
 	validityPeriodSec int64, amount string, privKeyHex string, seq int64) (*model.BroadcastResponse, errors.Error) {
-	msg := model.PreAuthorizationMsg{
+	msg := model.GrantPermissionMsg{
 		Username:          username,
 		AuthorizedApp:     authorizedApp,
 		ValidityPeriodSec: validityPeriodSec,
+		GrantLevel:        model.AppAndPreAuthorizationPermission,
+		Amount:            amount,
+	}
+	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
+}
+
+// PreAuthorizationPermission grants a PreAuthorization permission to
+// an authorzied app with a certain period of time.
+// It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
+func (broadcast *Broadcast) PreAuthorizationPermission(ctx context.Context, username, authorizedApp string,
+	validityPeriodSec int64, amount string, privKeyHex string, seq int64) (*model.BroadcastResponse, errors.Error) {
+	msg := model.GrantPermissionMsg{
+		Username:          username,
+		AuthorizedApp:     authorizedApp,
+		ValidityPeriodSec: validityPeriodSec,
+		GrantLevel:        model.PreAuthorizationPermission,
 		Amount:            amount,
 	}
 
@@ -685,7 +714,7 @@ func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex
 				} else {
 					// sign byte error, replace sequence number with correct one
 					lo := err.BlockChainLog()
-					sub := util.SubstringAfterStr(lo, "sequence:")
+					sub := util.SubstringAfterStr(lo, "seq:")
 					i := strings.Index(sub, "\"")
 					if i != -1 {
 						seqStr := sub[:i]

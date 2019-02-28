@@ -8,7 +8,7 @@ import (
 
 // GetInfraProvider returns the infra provider info such as usage.
 func (query *Query) GetInfraProvider(ctx context.Context, providerName string) (*model.InfraProvider, error) {
-	resp, err := query.transport.Query(ctx, getInfraProviderKey(providerName), InfraKVStoreKey)
+	resp, err := query.transport.Query(ctx, InfraKVStoreKey, InfraProviderSubStore, []string{providerName})
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func (query *Query) GetInfraProvider(ctx context.Context, providerName string) (
 
 // GetInfraProviders returns a list of all infra providers.
 func (query *Query) GetInfraProviders(ctx context.Context) (*model.InfraProviderList, error) {
-	resp, err := query.transport.Query(ctx, getInfraProviderListKey(), InfraKVStoreKey)
+	resp, err := query.transport.Query(ctx, InfraKVStoreKey, InfraListSubStore, []string{})
 	if err != nil {
 		return nil, err
 	}

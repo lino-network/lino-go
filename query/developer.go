@@ -8,7 +8,7 @@ import (
 
 // GetDeveloper returns a specific developer info from blockchain.
 func (query *Query) GetDeveloper(ctx context.Context, developerName string) (*model.Developer, error) {
-	resp, err := query.transport.Query(ctx, getDeveloperKey(developerName), DeveloperKVStoreKey)
+	resp, err := query.transport.Query(ctx, DeveloperKVStoreKey, DeveloperSubStore, []string{developerName})
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func (query *Query) GetDeveloper(ctx context.Context, developerName string) (*mo
 
 // GetDevelopers returns a list of all developers.
 func (query *Query) GetDevelopers(ctx context.Context) (*model.DeveloperList, error) {
-	resp, err := query.transport.Query(ctx, getDeveloperListKey(), DeveloperKVStoreKey)
+	resp, err := query.transport.Query(ctx, DeveloperKVStoreKey, DeveloperListSubStore, []string{})
 	if err != nil {
 		return nil, err
 	}

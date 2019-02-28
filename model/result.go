@@ -22,8 +22,6 @@ type AccountBank struct {
 	Saving          Coin          `json:"saving"`
 	CoinDay         Coin          `json:"coin_day"`
 	FrozenMoneyList []FrozenMoney `json:"frozen_money_list"`
-	NumOfTx         int64         `json:"number_of_transaction"`
-	NumOfReward     int64         `json:"number_of_reward"`
 }
 
 type FrozenMoney struct {

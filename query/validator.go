@@ -8,7 +8,7 @@ import (
 
 // GetValidator returns validator info given a validator name from blockchain.
 func (query *Query) GetValidator(ctx context.Context, username string) (*model.Validator, error) {
-	resp, err := query.transport.Query(ctx, getValidatorKey(username), ValidatorKVStoreKey)
+	resp, err := query.transport.Query(ctx, ValidatorKVStoreKey, ValidatorSubStore, []string{username})
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func (query *Query) GetValidator(ctx context.Context, username string) (*model.V
 
 // GetAllValidators returns all oncall validators from blockchain.
 func (query *Query) GetAllValidators(ctx context.Context) (*model.ValidatorList, error) {
-	resp, err := query.transport.Query(ctx, getValidatorListKey(), ValidatorKVStoreKey)
+	resp, err := query.transport.Query(ctx, ValidatorKVStoreKey, ValidatorListSubStore, []string{})
 	if err != nil {
 		return nil, err
 	}

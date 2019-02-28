@@ -8,7 +8,7 @@ import (
 
 // GetOngoingProposal returns one ongoing proposal.
 func (query *Query) GetOngoingProposal(ctx context.Context, proposalID string) (*model.Proposal, error) {
-	resp, err := query.transport.Query(ctx, getOngoingProposalKey(proposalID), ProposalKVStoreKey)
+	resp, err := query.transport.Query(ctx, ProposalKVStoreKey, OngoingProposalSubStore, []string{proposalID})
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (query *Query) GetOngoingProposalList(ctx context.Context) ([]*model.Propos
 
 // GetExpiredProposal returns one expired past proposal.
 func (query *Query) GetExpiredProposal(ctx context.Context, proposalID string) (*model.Proposal, error) {
-	resp, err := query.transport.Query(ctx, getExpiredProposalKey(proposalID), ProposalKVStoreKey)
+	resp, err := query.transport.Query(ctx, ProposalKVStoreKey, ExpiredProposalSubStore, []string{proposalID})
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (query *Query) GetExpiredProposalList(ctx context.Context) ([]*model.Propos
 
 // GetProposal returns proposal info of a specific proposalID.
 func (query *Query) GetNextProposalID(ctx context.Context) (*model.NextProposalID, error) {
-	resp, err := query.transport.Query(ctx, getNextProposalIDKey(), ProposalKVStoreKey)
+	resp, err := query.transport.Query(ctx, ProposalKVStoreKey, NextProposalIDSubStore, []string{})
 	if err != nil {
 		return nil, err
 	}

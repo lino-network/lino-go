@@ -9,7 +9,7 @@ import (
 // GetDelegation returns the delegation relationship between
 // a voter and a delegator from blockchain.
 func (query *Query) GetDelegation(ctx context.Context, voter, delegator string) (*model.Delegation, error) {
-	resp, err := query.transport.Query(ctx, getDelegationKey(voter, delegator), VoteKVStoreKey)
+	resp, err := query.transport.Query(ctx, VoteKVStoreKey, ValidatorListSubStore, []string{voter, delegator})
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (query *Query) GetDelegatorAllDelegation(ctx context.Context, delegatorName
 
 // GetVoter returns voter info given a voter name from blockchain.
 func (query *Query) GetVoter(ctx context.Context, voterName string) (*model.Voter, error) {
-	resp, err := query.transport.Query(ctx, getVoterKey(voterName), VoteKVStoreKey)
+	resp, err := query.transport.Query(ctx, VoteKVStoreKey, VoterSubStore, []string{voterName})
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (query *Query) GetVoter(ctx context.Context, voterName string) (*model.Vote
 
 // GetVote returns a vote performed by a voter for a given proposal.
 func (query *Query) GetVote(ctx context.Context, proposalID, voter string) (*model.Vote, error) {
-	resp, err := query.transport.Query(ctx, getVoteKey(proposalID, voter), VoteKVStoreKey)
+	resp, err := query.transport.Query(ctx, VoteKVStoreKey, VoteSubStore, []string{proposalID, voter})
 	if err != nil {
 		return nil, err
 	}

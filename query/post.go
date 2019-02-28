@@ -9,7 +9,7 @@ import (
 // GetPostInfo returns post info given a permlink(author#postID).
 func (query *Query) GetPostInfo(ctx context.Context, author, postID string) (*model.PostInfo, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostInfoKey(permlink), PostKVStoreKey)
+	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostInfoSubStore, []string{permlink})
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (query *Query) GetPostInfo(ctx context.Context, author, postID string) (*mo
 // GetPostMeta returns post meta given a permlink.
 func (query *Query) GetPostMeta(ctx context.Context, author, postID string) (*model.PostMeta, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostMetaKey(permlink), PostKVStoreKey)
+	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostMetaSubStore, []string{permlink})
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (query *Query) GetPostMeta(ctx context.Context, author, postID string) (*mo
 // and comment permlink.
 func (query *Query) GetPostComment(ctx context.Context, author, postID, commentPermlink string) (*model.Comment, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostCommentKey(permlink, commentPermlink), PostKVStoreKey)
+	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostCommentSubStore, []string{permlink})
 
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (query *Query) GetPostComment(ctx context.Context, author, postID, commentP
 // GetPostView returns a view of a post performed by a user.
 func (query *Query) GetPostView(ctx context.Context, author, postID, viewUser string) (*model.View, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostViewKey(permlink, viewUser), PostKVStoreKey)
+	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostViewSubStore, []string{permlink})
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (query *Query) GetPostView(ctx context.Context, author, postID, viewUser st
 // GetPostReportOrUpvote returns report or upvote that a user has given to a post.
 func (query *Query) GetPostReportOrUpvote(ctx context.Context, author, postID, user string) (*model.ReportOrUpvote, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, getPostReportOrUpvoteKey(permlink, user), PostKVStoreKey)
+	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostReportOrUpvoteSubStore, []string{permlink})
 	if err != nil {
 		return nil, err
 	}
