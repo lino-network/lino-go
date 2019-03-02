@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/lino-network/lino-go/errors"
@@ -73,7 +73,6 @@ func (query *Query) DoesUsernameMatchTxPrivKey(ctx context.Context, username, tx
 		return false, e
 	}
 
-	fmt.Println(hex.EncodeToString(txPrivKey.PubKey().Bytes()))
 	return accInfo.TransactionKey.Equals(txPrivKey.PubKey()), nil
 }
 
@@ -99,11 +98,23 @@ func (query *Query) GetAccountBank(ctx context.Context, username string) (*model
 		return nil, err
 	}
 	bank := new(model.AccountBank)
-	fmt.Println(string(resp))
 	if err := query.transport.Cdc.UnmarshalJSON(resp, bank); err != nil {
 		return nil, err
 	}
 	return bank, nil
+}
+
+// GetAccountBank returns account bank info for a specific user.
+func (query *Query) GetPendingCoinDay(ctx context.Context, username string) (*model.PendingCoinDayQueue, error) {
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountPendingCoinDaySubStore, []string{username})
+	if err != nil {
+		return nil, err
+	}
+	pendingCoinDay := new(model.PendingCoinDayQueue)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, pendingCoinDay); err != nil {
+		return nil, err
+	}
+	return pendingCoinDay, nil
 }
 
 // GetAccountMeta returns account meta info for a specific user.
@@ -131,8 +142,8 @@ func (query *Query) GetSeqNumber(ctx context.Context, username string) (int64, e
 
 // GetGrantPubKey returns the specific granted pubkey info of a user
 // that has given to the pubKey.
-func (query *Query) GetGrantPubKey(ctx context.Context, username string, pubKeyHex string) (*model.GrantPubKey, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountGrantPubKeySubStore, []string{username, pubKeyHex})
+func (query *Query) GetGrantPubKey(ctx context.Context, username string, grantTo string, permission model.Permission) (*model.GrantPubKey, error) {
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountGrantPubKeySubStore, []string{username, grantTo, strconv.Itoa(int(permission))})
 	if err != nil {
 		return nil, err
 	}
@@ -184,18 +195,17 @@ func (query *Query) GetRewardAtHeight(ctx context.Context, username string, heig
 //
 
 // GetAllGrantPubKeys returns a list of all granted public keys of a user.
-func (query *Query) GetAllGrantPubKeys(ctx context.Context, username string) (map[string]*model.GrantPubKey, error) {
+func (query *Query) GetAllGrantPubKeys(ctx context.Context, username string) ([]*model.GrantPubKey, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountAllGrantPubKeys, []string{username})
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(resp))
-	pubKeyToGrantPubKeyMap := make(map[string]*model.GrantPubKey)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, &pubKeyToGrantPubKeyMap); err != nil {
+	grantPubKeyList := make([]*model.GrantPubKey, 0)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, &grantPubKeyList); err != nil {
 		return nil, err
 	}
 
-	return pubKeyToGrantPubKeyMap, nil
+	return grantPubKeyList, nil
 }
 
 // GetAllFollowingMeta returns all following meta of a user.

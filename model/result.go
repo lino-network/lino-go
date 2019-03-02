@@ -49,7 +49,7 @@ type PendingCoinDay struct {
 // end unused
 
 type GrantPubKey struct {
-	Username   string     `json:"username"`
+	GrantTo    string     `json:"grant_to"`
 	Permission Permission `json:"permission"`
 	CreatedAt  int64      `json:"created_at"`
 	ExpiresAt  int64      `json:"expires_at"`

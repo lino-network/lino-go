@@ -15,4 +15,5 @@ const (
 	CodeEmptyResponse    // 10
 	CodeTimeout          // time out for one tx
 	CodeBroadcastTimeout // time out for each single broadcast
+	CodeInvalidSignature // invalid sign bytes
 )

@@ -719,9 +719,13 @@ func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex
 					if i != -1 {
 						seqStr := sub[:i]
 						correctSeq, err := strconv.ParseInt(seqStr, 10, 64)
-						if err == nil {
-							seq = correctSeq
+						if err != nil {
+							return nil, errors.InvalidArg("invalid sequence number format")
 						}
+						if correctSeq == seq {
+							return nil, errors.InvalidSignature("invalid signature")
+						}
+						seq = correctSeq
 					}
 				}
 			}
