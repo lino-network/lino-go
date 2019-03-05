@@ -28,6 +28,10 @@
   name = "github.com/cosmos/cosmos-sdk"
   version = "=0.32.0"
 
+[[constraint]]
+  name = "github.com/tendermint/tendermint"
+  revision = "v0.30.0"
+
 [[override]]
   name = "github.com/golang/protobuf"
   version = "=1.1.0"
@@ -35,7 +39,3 @@
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  name = "github.com/lino-network/lino-app-proto"
-  branch = "master"
