@@ -4,31 +4,17 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Coin is the same struct used in Lino blockchain.
 type Coin struct {
-	Amount sdk.Int `json:"amount"`
+	Amount Int `json:"amount"`
 }
 
 // NewCoinFromString - return string amount of Coin
 func NewCoinFromString(amount string) (Coin, bool) {
-	res, ok := sdk.NewIntFromString(amount)
+	res, ok := NewIntFromString(amount)
 	return Coin{res}, ok
-}
-
-// NewCoinFromBigInt - return big.Int amount of Coin
-func NewCoinFromBigInt(amount *big.Int) Coin {
-	sdkInt := sdk.NewIntFromBigInt(amount)
-	return Coin{sdkInt}
-}
-
-// DecToCoin - convert sdk.Dec to LNO coin
-// XXX(yumin): the unit of @p rat must be coin.
-func DecToCoin(rat sdk.Dec) Coin {
-	return NewCoinFromBigInt(rat.RoundInt().BigInt())
 }
 
 func (c Coin) CoinToLNO() string {
