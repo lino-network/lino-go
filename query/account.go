@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"strconv"
 	"strings"
 
 	"github.com/lino-network/lino-go/errors"
@@ -142,8 +141,8 @@ func (query *Query) GetSeqNumber(ctx context.Context, username string) (int64, e
 
 // GetGrantPubKey returns the specific granted pubkey info of a user
 // that has given to the pubKey.
-func (query *Query) GetGrantPubKey(ctx context.Context, username string, grantTo string, permission model.Permission) (*model.GrantPubKey, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountGrantPubKeySubStore, []string{username, grantTo, strconv.Itoa(int(permission))})
+func (query *Query) GetGrantPubKey(ctx context.Context, username string, grantTo string) (*model.GrantPubKey, error) {
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountGrantPubKeySubStore, []string{username, grantTo})
 	if err != nil {
 		return nil, err
 	}
