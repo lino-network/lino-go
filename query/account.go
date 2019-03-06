@@ -141,17 +141,22 @@ func (query *Query) GetSeqNumber(ctx context.Context, username string) (int64, e
 
 // GetGrantPubKey returns the specific granted pubkey info of a user
 // that has given to the pubKey.
-func (query *Query) GetGrantPubKey(ctx context.Context, username string, grantTo string) (*model.GrantPubKey, error) {
+func (query *Query) GetGrantPubKey(ctx context.Context, username string, grantTo string, permission model.Permission) (*model.GrantPubKey, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountGrantPubKeySubStore, []string{username, grantTo})
 	if err != nil {
 		return nil, err
 	}
 
-	grantPubKey := new(model.GrantPubKey)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, grantPubKey); err != nil {
-		return grantPubKey, err
+	grantPubKeyList := make([]*model.GrantPubKey, 0)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, &grantPubKeyList); err != nil {
+		return nil, err
 	}
-	return grantPubKey, nil
+	for _, grantPubKey := range grantPubKeyList {
+		if grantPubKey.Permission == permission {
+			return grantPubKey, nil
+		}
+	}
+	return nil, errors.QueryFail("grant pub key not found")
 }
 
 // GetReward returns rewards of a user.
