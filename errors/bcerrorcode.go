@@ -38,7 +38,7 @@ const (
 	CodeAccountMetaNotFound                BCCodeType = 301
 	CodeAccountInfoNotFound                BCCodeType = 302
 	CodeAccountBankNotFound                BCCodeType = 303
-	CodePendingStakeQueueNotFound          BCCodeType = 304
+	CodePendingCoinDayQueueNotFound        BCCodeType = 304
 	CodeGrantPubKeyNotFound                BCCodeType = 305
 	CodeFailedToMarshalAccountInfo         BCCodeType = 306
 	CodeFailedToMarshalAccountBank         BCCodeType = 307

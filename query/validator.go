@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 
+	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 )
 
@@ -10,6 +11,10 @@ import (
 func (query *Query) GetValidator(ctx context.Context, username string) (*model.Validator, error) {
 	resp, err := query.transport.Query(ctx, ValidatorKVStoreKey, ValidatorSubStore, []string{username})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodeValidatorNotFound) {
+			return nil, errors.EmptyResponse("validator is not found")
+		}
 		return nil, err
 	}
 	validator := new(model.Validator)

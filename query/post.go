@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 
+	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 )
 
@@ -11,6 +12,10 @@ func (query *Query) GetPostInfo(ctx context.Context, author, postID string) (*mo
 	permlink := getPermlink(author, postID)
 	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostInfoSubStore, []string{permlink})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodePostNotFound) {
+			return nil, errors.EmptyResponse("post is not found")
+		}
 		return nil, err
 	}
 	postInfo := new(model.PostInfo)
@@ -25,6 +30,10 @@ func (query *Query) GetPostMeta(ctx context.Context, author, postID string) (*mo
 	permlink := getPermlink(author, postID)
 	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostMetaSubStore, []string{permlink})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodePostMetaNotFound) {
+			return nil, errors.EmptyResponse("post meta is not found")
+		}
 		return nil, err
 	}
 	postMeta := new(model.PostMeta)
@@ -39,7 +48,6 @@ func (query *Query) GetPostMeta(ctx context.Context, author, postID string) (*mo
 func (query *Query) GetPostComment(ctx context.Context, author, postID, commentPermlink string) (*model.Comment, error) {
 	permlink := getPermlink(author, postID)
 	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostCommentSubStore, []string{permlink})
-
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +75,12 @@ func (query *Query) GetPostView(ctx context.Context, author, postID, viewUser st
 // GetPostReportOrUpvote returns report or upvote that a user has given to a post.
 func (query *Query) GetPostReportOrUpvote(ctx context.Context, author, postID, user string) (*model.ReportOrUpvote, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostReportOrUpvoteSubStore, []string{permlink})
+	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostReportOrUpvoteSubStore, []string{permlink, user})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodePostReportOrUpvoteNotFound) {
+			return nil, errors.EmptyResponse("post is not found")
+		}
 		return nil, err
 	}
 	reportOrUpvote := new(model.ReportOrUpvote)
@@ -82,110 +94,110 @@ func (query *Query) GetPostReportOrUpvote(ctx context.Context, author, postID, u
 // Range query
 //
 
-// GetUserAllPosts returns all posts that a user has created.
-func (query *Query) GetUserAllPosts(ctx context.Context, username string) (map[string]*model.Post, error) {
-	resKVs, err := query.transport.QuerySubspace(ctx, append(getUserPostInfoPrefix(username), PermLinkSeparator...), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
+// // GetUserAllPosts returns all posts that a user has created.
+// func (query *Query) GetUserAllPosts(ctx context.Context, username string) (map[string]*model.Post, error) {
+// 	resKVs, err := query.transport.QuerySubspace(ctx, append(getUserPostInfoPrefix(username), PermLinkSeparator...), PostKVStoreKey)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	permlinkToPostMap := make(map[string]*model.Post)
-	for _, KV := range resKVs {
-		postInfo := new(model.PostInfo)
-		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, postInfo); err != nil {
-			return nil, err
-		}
+// 	permlinkToPostMap := make(map[string]*model.Post)
+// 	for _, KV := range resKVs {
+// 		postInfo := new(model.PostInfo)
+// 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, postInfo); err != nil {
+// 			return nil, err
+// 		}
 
-		pm, err := query.GetPostMeta(ctx, postInfo.Author, postInfo.PostID)
-		if err != nil {
-			return nil, err
-		}
+// 		pm, err := query.GetPostMeta(ctx, postInfo.Author, postInfo.PostID)
+// 		if err != nil {
+// 			return nil, err
+// 		}
 
-		post := &model.Post{
-			PostID:                  postInfo.PostID,
-			Title:                   postInfo.Title,
-			Content:                 postInfo.Content,
-			Author:                  postInfo.Author,
-			ParentAuthor:            postInfo.ParentAuthor,
-			ParentPostID:            postInfo.ParentPostID,
-			SourceAuthor:            postInfo.SourceAuthor,
-			SourcePostID:            postInfo.SourcePostID,
-			Links:                   postInfo.Links,
-			CreatedAt:               pm.CreatedAt,
-			LastUpdatedAt:           pm.LastUpdatedAt,
-			LastActivityAt:          pm.LastActivityAt,
-			AllowReplies:            pm.AllowReplies,
-			IsDeleted:               pm.IsDeleted,
-			TotalDonateCount:        pm.TotalDonateCount,
-			TotalReportCoinDay:      pm.TotalReportCoinDay,
-			TotalUpvoteCoinDay:      pm.TotalUpvoteCoinDay,
-			TotalViewCount:          pm.TotalViewCount,
-			TotalReward:             pm.TotalReward,
-			RedistributionSplitRate: pm.RedistributionSplitRate,
-		}
-		permlinkToPostMap[getSubstringAfterSubstore(KV.Key)] = post
-	}
+// 		post := &model.Post{
+// 			PostID:                  postInfo.PostID,
+// 			Title:                   postInfo.Title,
+// 			Content:                 postInfo.Content,
+// 			Author:                  postInfo.Author,
+// 			ParentAuthor:            postInfo.ParentAuthor,
+// 			ParentPostID:            postInfo.ParentPostID,
+// 			SourceAuthor:            postInfo.SourceAuthor,
+// 			SourcePostID:            postInfo.SourcePostID,
+// 			Links:                   postInfo.Links,
+// 			CreatedAt:               pm.CreatedAt,
+// 			LastUpdatedAt:           pm.LastUpdatedAt,
+// 			LastActivityAt:          pm.LastActivityAt,
+// 			AllowReplies:            pm.AllowReplies,
+// 			IsDeleted:               pm.IsDeleted,
+// 			TotalDonateCount:        pm.TotalDonateCount,
+// 			TotalReportCoinDay:      pm.TotalReportCoinDay,
+// 			TotalUpvoteCoinDay:      pm.TotalUpvoteCoinDay,
+// 			TotalViewCount:          pm.TotalViewCount,
+// 			TotalReward:             pm.TotalReward,
+// 			RedistributionSplitRate: pm.RedistributionSplitRate,
+// 		}
+// 		permlinkToPostMap[getSubstringAfterSubstore(KV.Key)] = post
+// 	}
 
-	return permlinkToPostMap, nil
-}
+// 	return permlinkToPostMap, nil
+// }
 
-// GetPostAllComments returns all comments that a post has.
-func (query *Query) GetPostAllComments(ctx context.Context, author, postID string) (map[string]*model.Comment, error) {
-	permlink := getPermlink(author, postID)
-	resKVs, err := query.transport.QuerySubspace(ctx, getPostCommentPrefix(permlink), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
+// // GetPostAllComments returns all comments that a post has.
+// func (query *Query) GetPostAllComments(ctx context.Context, author, postID string) (map[string]*model.Comment, error) {
+// 	permlink := getPermlink(author, postID)
+// 	resKVs, err := query.transport.QuerySubspace(ctx, getPostCommentPrefix(permlink), PostKVStoreKey)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	var permlinkToCommentsMap = make(map[string]*model.Comment)
-	for _, KV := range resKVs {
-		comment := new(model.Comment)
-		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, comment); err != nil {
-			return nil, err
-		}
+// 	var permlinkToCommentsMap = make(map[string]*model.Comment)
+// 	for _, KV := range resKVs {
+// 		comment := new(model.Comment)
+// 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, comment); err != nil {
+// 			return nil, err
+// 		}
 
-		permlinkToCommentsMap[getSubstringAfterKeySeparator(KV.Key)] = comment
-	}
+// 		permlinkToCommentsMap[getSubstringAfterKeySeparator(KV.Key)] = comment
+// 	}
 
-	return permlinkToCommentsMap, nil
-}
+// 	return permlinkToCommentsMap, nil
+// }
 
-// GetPostAllViews returns all views that a post has.
-func (query *Query) GetPostAllViews(ctx context.Context, author, postID string) (map[string]*model.View, error) {
-	permlink := getPermlink(author, postID)
-	resKVs, err := query.transport.QuerySubspace(ctx, getPostViewPrefix(permlink), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
+// // GetPostAllViews returns all views that a post has.
+// func (query *Query) GetPostAllViews(ctx context.Context, author, postID string) (map[string]*model.View, error) {
+// 	permlink := getPermlink(author, postID)
+// 	resKVs, err := query.transport.QuerySubspace(ctx, getPostViewPrefix(permlink), PostKVStoreKey)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	userToViewMap := make(map[string]*model.View)
-	for _, KV := range resKVs {
-		view := new(model.View)
-		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, view); err != nil {
-			return nil, err
-		}
-		userToViewMap[getSubstringAfterKeySeparator(KV.Key)] = view
-	}
+// 	userToViewMap := make(map[string]*model.View)
+// 	for _, KV := range resKVs {
+// 		view := new(model.View)
+// 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, view); err != nil {
+// 			return nil, err
+// 		}
+// 		userToViewMap[getSubstringAfterKeySeparator(KV.Key)] = view
+// 	}
 
-	return userToViewMap, nil
-}
+// 	return userToViewMap, nil
+// }
 
-// GetPostAllReportOrUpvotes returns all reports or upvotes that a post has received.
-func (query *Query) GetPostAllReportOrUpvotes(ctx context.Context, author, postID string) (map[string]*model.ReportOrUpvote, error) {
-	permlink := getPermlink(author, postID)
-	resKVs, err := query.transport.QuerySubspace(ctx, getPostReportOrUpvotePrefix(permlink), PostKVStoreKey)
-	if err != nil {
-		return nil, err
-	}
+// // GetPostAllReportOrUpvotes returns all reports or upvotes that a post has received.
+// func (query *Query) GetPostAllReportOrUpvotes(ctx context.Context, author, postID string) (map[string]*model.ReportOrUpvote, error) {
+// 	permlink := getPermlink(author, postID)
+// 	resKVs, err := query.transport.QuerySubspace(ctx, getPostReportOrUpvotePrefix(permlink), PostKVStoreKey)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	userToReportOrUpvotesMap := make(map[string]*model.ReportOrUpvote)
-	for _, KV := range resKVs {
-		reportOrUpvote := new(model.ReportOrUpvote)
-		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, reportOrUpvote); err != nil {
-			return nil, err
-		}
-		userToReportOrUpvotesMap[getSubstringAfterKeySeparator(KV.Key)] = reportOrUpvote
-	}
+// 	userToReportOrUpvotesMap := make(map[string]*model.ReportOrUpvote)
+// 	for _, KV := range resKVs {
+// 		reportOrUpvote := new(model.ReportOrUpvote)
+// 		if err := query.transport.Cdc.UnmarshalJSON(KV.Value, reportOrUpvote); err != nil {
+// 			return nil, err
+// 		}
+// 		userToReportOrUpvotesMap[getSubstringAfterKeySeparator(KV.Key)] = reportOrUpvote
+// 	}
 
-	return userToReportOrUpvotesMap, nil
-}
+// 	return userToReportOrUpvotesMap, nil
+// }

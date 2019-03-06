@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 
+	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 )
 
@@ -62,6 +63,10 @@ func (query *Query) GetDelegatorAllDelegation(ctx context.Context, delegatorName
 func (query *Query) GetVoter(ctx context.Context, voterName string) (*model.Voter, error) {
 	resp, err := query.transport.Query(ctx, VoteKVStoreKey, VoterSubStore, []string{voterName})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodeVoterNotFound) {
+			return nil, errors.EmptyResponse("voter is not found")
+		}
 		return nil, err
 	}
 	voter := new(model.Voter)
@@ -75,6 +80,10 @@ func (query *Query) GetVoter(ctx context.Context, voterName string) (*model.Vote
 func (query *Query) GetVote(ctx context.Context, proposalID, voter string) (*model.Vote, error) {
 	resp, err := query.transport.Query(ctx, VoteKVStoreKey, VoteSubStore, []string{proposalID, voter})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodeVoteNotFound) {
+			return nil, errors.EmptyResponse("voter is not found")
+		}
 		return nil, err
 	}
 	vote := new(model.Vote)

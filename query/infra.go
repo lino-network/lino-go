@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 
+	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 )
 
@@ -10,6 +11,10 @@ import (
 func (query *Query) GetInfraProvider(ctx context.Context, providerName string) (*model.InfraProvider, error) {
 	resp, err := query.transport.Query(ctx, InfraKVStoreKey, InfraProviderSubStore, []string{providerName})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodeInfraProviderNotFound) {
+			return nil, errors.EmptyResponse("developer is not found")
+		}
 		return nil, err
 	}
 	provider := new(model.InfraProvider)

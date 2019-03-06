@@ -16,6 +16,10 @@ import (
 func (query *Query) GetAccountInfo(ctx context.Context, username string) (*model.AccountInfo, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountInfoSubStore, []string{username})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodeAccountInfoNotFound) {
+			return nil, errors.EmptyResponse("account info is not found")
+		}
 		return nil, err
 	}
 	info := new(model.AccountInfo)
@@ -31,7 +35,6 @@ func (query *Query) GetTransactionPubKey(ctx context.Context, username string) (
 	if err != nil {
 		return "", err
 	}
-
 	return strings.ToUpper(hex.EncodeToString(info.TransactionKey.Bytes())), nil
 }
 
@@ -94,6 +97,10 @@ func (query *Query) DoesUsernameMatchAppPrivKey(ctx context.Context, username, a
 func (query *Query) GetAccountBank(ctx context.Context, username string) (*model.AccountBank, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountBankSubStore, []string{username})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodeAccountBankNotFound) {
+			return nil, errors.EmptyResponse("account bank is not found")
+		}
 		return nil, err
 	}
 	bank := new(model.AccountBank)
@@ -107,6 +114,10 @@ func (query *Query) GetAccountBank(ctx context.Context, username string) (*model
 func (query *Query) GetPendingCoinDay(ctx context.Context, username string) (*model.PendingCoinDayQueue, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountPendingCoinDaySubStore, []string{username})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodePendingCoinDayQueueNotFound) {
+			return nil, errors.EmptyResponse("account pending coin day is not found")
+		}
 		return nil, err
 	}
 	pendingCoinDay := new(model.PendingCoinDayQueue)
@@ -120,6 +131,10 @@ func (query *Query) GetPendingCoinDay(ctx context.Context, username string) (*mo
 func (query *Query) GetAccountMeta(ctx context.Context, username string) (*model.AccountMeta, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountMetaSubStore, []string{username})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodeAccountMetaNotFound) {
+			return nil, errors.EmptyResponse("account meta is not found")
+		}
 		return nil, err
 	}
 	meta := new(model.AccountMeta)
@@ -144,7 +159,7 @@ func (query *Query) GetSeqNumber(ctx context.Context, username string) (int64, e
 func (query *Query) GetGrantPubKey(ctx context.Context, username string, grantTo string, permission model.Permission) (*model.GrantPubKey, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountGrantPubKeySubStore, []string{username, grantTo})
 	if err != nil {
-		return nil, err
+		return nil, errors.EmptyResponse("grant pubkey is not found or err")
 	}
 
 	grantPubKeyList := make([]*model.GrantPubKey, 0)
@@ -156,13 +171,17 @@ func (query *Query) GetGrantPubKey(ctx context.Context, username string, grantTo
 			return grantPubKey, nil
 		}
 	}
-	return nil, errors.QueryFail("grant pub key not found")
+	return nil, errors.EmptyResponse("grant pubkey is not found")
 }
 
 // GetReward returns rewards of a user.
 func (query *Query) GetReward(ctx context.Context, username string) (*model.Reward, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountRewardSubStore, []string{username})
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(errors.CodeRewardNotFound) {
+			return nil, errors.EmptyResponse("account reward is not found")
+		}
 		return nil, err
 	}
 
@@ -202,7 +221,7 @@ func (query *Query) GetRewardAtHeight(ctx context.Context, username string, heig
 func (query *Query) GetAllGrantPubKeys(ctx context.Context, username string) ([]*model.GrantPubKey, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountAllGrantPubKeys, []string{username})
 	if err != nil {
-		return nil, err
+		return nil, errors.EmptyResponse("grant pub key is not found")
 	}
 	grantPubKeyList := make([]*model.GrantPubKey, 0)
 	if err := query.transport.Cdc.UnmarshalJSON(resp, &grantPubKeyList); err != nil {
