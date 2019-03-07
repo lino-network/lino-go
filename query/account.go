@@ -192,6 +192,20 @@ func (query *Query) GetReward(ctx context.Context, username string) (*model.Rewa
 	return reward, nil
 }
 
+// GetReward returns rewards of a user.
+func (query *Query) GetReputation(ctx context.Context, username string) (*model.Coin, error) {
+	resp, err := query.transport.Query(ctx, ReputationKVStore, UserReputation, []string{username})
+	if err != nil {
+		return nil, err
+	}
+
+	reward := new(model.Coin)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, reward); err != nil {
+		return reward, err
+	}
+	return reward, nil
+}
+
 // GetRewardAtHeight returns rewards of a user at certain height.
 func (query *Query) GetRewardAtHeight(ctx context.Context, username string, height int64) (*model.Reward, error) {
 	resp, err := query.transport.QueryAtHeight(ctx, getRewardKey(username), AccountKVStoreKey, height)
@@ -207,7 +221,7 @@ func (query *Query) GetRewardAtHeight(ctx context.Context, username string, heig
 	}
 
 	reward := new(model.Reward)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, reward); err != nil {
+	if err := query.transport.Cdc.UnmarshalBinaryLengthPrefixed(resp, reward); err != nil {
 		return reward, err
 	}
 	return reward, nil

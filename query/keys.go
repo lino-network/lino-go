@@ -20,6 +20,7 @@ const (
 	DeveloperKVStoreKey = "developer"
 	ParamKVStoreKey     = "param"
 	ProposalKVStoreKey  = "proposal"
+	ReputationKVStore   = "reputation"
 
 	AccountInfoSubStore           = "info"
 	AccountBankSubStore           = "bank"
@@ -72,6 +73,7 @@ const (
 	AccountParamSubStore                 = "account"
 	PostParamSubStore                    = "post"
 	ReputationParamSubStore              = "reputation"
+	UserReputation                       = "rep"
 )
 
 var (
@@ -83,9 +85,7 @@ var (
 	accountInfoSubstore                = []byte{0x00}
 	accountBankSubstore                = []byte{0x01}
 	accountMetaSubstore                = []byte{0x02}
-	accountFollowerSubstore            = []byte{0x03}
-	accountFollowingSubstore           = []byte{0x04}
-	accountRewardSubstore              = []byte{0x05}
+	accountRewardSubstore              = []byte{0x03}
 	accountPendingCoinDayQueueSubstore = []byte{0x06}
 	accountRelationshipSubstore        = []byte{0x07}
 	accountBalanceHistorySubstore      = []byte{0x08}
@@ -164,22 +164,6 @@ func getAccountBankKey(accKey string) []byte {
 
 func getAccountMetaKey(accKey string) []byte {
 	return append(accountMetaSubstore, accKey...)
-}
-
-func getFollowerKey(me string, myFollower string) []byte {
-	return append(getFollowerPrefix(me), myFollower...)
-}
-
-func getFollowerPrefix(me string) []byte {
-	return append(append(accountFollowerSubstore, me...), KeySeparator...)
-}
-
-func getFollowingKey(me string, myFollowing string) []byte {
-	return append(getFollowingPrefix(me), myFollowing...)
-}
-
-func getFollowingPrefix(me string) []byte {
-	return append(append(accountFollowingSubstore, me...), KeySeparator...)
 }
 
 func getRewardKey(accKey string) []byte {

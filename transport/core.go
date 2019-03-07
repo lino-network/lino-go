@@ -83,7 +83,7 @@ func (t Transport) Query(ctx context.Context, storeName, subStore string, keys [
 func (t Transport) QueryAtHeight(ctx context.Context, key cmn.HexBytes, storeName string, height int64) (res []byte, err error) {
 	finishChan := make(chan bool)
 	go func() {
-		res, err = t.query([]string{string(key)}, storeName, "key", height)
+		res, err = t.queryByKey(key, storeName, "key", height)
 		finishChan <- true
 	}()
 
@@ -119,6 +119,34 @@ func (t Transport) QuerySubspace(ctx context.Context, subspace []byte, storeName
 
 	t.Cdc.UnmarshalJSON(resRaw, &res)
 	return
+}
+func (t Transport) queryByKey(key cmn.HexBytes, storeName, substore string, height int64) (res []byte, err error) {
+	path := fmt.Sprintf("/store/%s/key", storeName)
+	fmt.Println(path)
+	node, err := t.GetNode()
+	if err != nil {
+		return res, err
+	}
+
+	opts := rpcclient.ABCIQueryOptions{
+		Height: height,
+		Prove:  false,
+	}
+	result, err := node.ABCIQueryWithOptions(path, key, opts)
+	if err != nil {
+		return res, err
+	}
+
+	resp := result.Response
+	if resp.Code != uint32(0) {
+		return res, errors.QueryFail("Query failed").AddBlockChainCode(resp.Code).AddBlockChainLog(resp.Log)
+	}
+
+	if resp.Value == nil || len(resp.Value) == 0 {
+		return nil, errors.EmptyResponse("Empty response!")
+	}
+
+	return resp.Value, nil
 }
 
 func (t Transport) query(keys []string, storeName, substore string, height int64) (res []byte, err error) {
