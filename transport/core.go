@@ -122,7 +122,6 @@ func (t Transport) QuerySubspace(ctx context.Context, subspace []byte, storeName
 }
 func (t Transport) queryByKey(key cmn.HexBytes, storeName, substore string, height int64) (res []byte, err error) {
 	path := fmt.Sprintf("/store/%s/key", storeName)
-	fmt.Println(path)
 	node, err := t.GetNode()
 	if err != nil {
 		return res, err
