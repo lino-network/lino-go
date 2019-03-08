@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lino-network/lino-app-backend/pkg/lino-app/util"
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
@@ -714,7 +713,7 @@ func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex
 				} else {
 					// sign byte error, replace sequence number with correct one
 					lo := err.BlockChainLog()
-					sub := util.SubstringAfterStr(lo, "seq:")
+					sub := SubstringAfterStr(lo, "seq:")
 					i := strings.Index(sub, "\"")
 					if i != -1 {
 						seqStr := sub[:i]
@@ -821,4 +820,17 @@ func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg model.
 
 func retrieveCodeFromBlockChainCode(bcCode uint32) uint32 {
 	return bcCode & 0xff
+}
+
+func SubstringAfterStr(value, a string) string {
+	// Get substring after a string.
+	pos := strings.LastIndex(value, a)
+	if pos == -1 {
+		return ""
+	}
+	adjustedPos := pos + len(a)
+	if adjustedPos >= len(value) {
+		return ""
+	}
+	return value[adjustedPos:len(value)]
 }
