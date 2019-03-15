@@ -475,12 +475,13 @@ func (broadcast *Broadcast) DeveloperRevoke(ctx context.Context, username,
 // an authorized app with a certain period of time.
 // It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) GrantPermission(ctx context.Context, username, authorizedApp string,
-	validityPeriodSec int64, grantLevel model.Permission, privKeyHex string, seq int64) (*model.BroadcastResponse, errors.Error) {
+	validityPeriodSec int64, grantLevel model.Permission, amount string, privKeyHex string, seq int64) (*model.BroadcastResponse, errors.Error) {
 	msg := model.GrantPermissionMsg{
 		Username:          username,
 		AuthorizedApp:     authorizedApp,
 		ValidityPeriodSec: validityPeriodSec,
 		GrantLevel:        grantLevel,
+		Amount:            amount,
 	}
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
 }

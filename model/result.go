@@ -296,6 +296,8 @@ type Txs []Transaction
 type BlockTx struct {
 	Height int64       `json:"height"`
 	Tx     Transaction `json:"tx"`
+	Code   uint32      `json:"code"`
+	Log    string      `json:"log"`
 }
 
 type BroadcastResponse struct {

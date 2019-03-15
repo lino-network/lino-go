@@ -16,4 +16,5 @@ const (
 	CodeTimeout          // time out for one tx
 	CodeBroadcastTimeout // time out for each single broadcast
 	CodeInvalidSignature // invalid sign bytes
+	CodeTxNotFound       // tx not found
 )

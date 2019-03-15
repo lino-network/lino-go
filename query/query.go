@@ -4,6 +4,7 @@ package query
 
 import (
 	"context"
+	"strings"
 
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
@@ -63,6 +64,10 @@ func (query *Query) GetBlockStatus(ctx context.Context) (*model.BlockStatus, err
 func (query *Query) GetTx(ctx context.Context, hash []byte) (*model.BlockTx, error) {
 	resp, err := query.transport.QueryTx(ctx, hash)
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			// if tx already exists in cache
+			return nil, errors.QueryTxNotFound().AddCause(err)
+		}
 		return nil, errors.QueryFailf("GetTx err").AddCause(err)
 	}
 
@@ -74,6 +79,8 @@ func (query *Query) GetTx(ctx context.Context, hash []byte) (*model.BlockTx, err
 	bt := &model.BlockTx{
 		Height: resp.Height,
 		Tx:     tx,
+		Code:   resp.TxResult.Code,
+		Log:    resp.TxResult.Log,
 	}
 
 	return bt, nil

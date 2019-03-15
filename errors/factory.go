@@ -27,6 +27,8 @@ func CodeToDefaultMsg(code CodeType) string {
 		return "Empty Response"
 	case CodeTimeout:
 		return "timeout"
+	case CodeTxNotFound:
+		return "Tx Not Found"
 	default:
 		return fmt.Sprintf("Unknown code %d", code)
 	}
@@ -35,6 +37,11 @@ func CodeToDefaultMsg(code CodeType) string {
 //CodeQueryFail creates an error with CodeQueryFail
 func QueryFail(msg string) Error {
 	return newError(CodeQueryFail, msg)
+}
+
+//QueryTxNotFound creates an error with CodeQueryFail
+func QueryTxNotFound() Error {
+	return newError(CodeTxNotFound, "")
 }
 
 //QueryFailf creates an error with CodeQueryFail and formatted message
