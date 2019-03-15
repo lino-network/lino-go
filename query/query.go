@@ -61,7 +61,7 @@ func (query *Query) GetBlockStatus(ctx context.Context) (*model.BlockStatus, err
 	return bs, nil
 }
 
-func (query *Query) GetTx(ctx context.Context, hash []byte) (*model.BlockTx, error) {
+func (query *Query) GetTx(ctx context.Context, hash []byte) (*model.BlockTx, errors.Error) {
 	resp, err := query.transport.QueryTx(ctx, hash)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
@@ -73,7 +73,7 @@ func (query *Query) GetTx(ctx context.Context, hash []byte) (*model.BlockTx, err
 
 	var tx model.Transaction
 	if err := query.transport.Cdc.UnmarshalJSON(resp.Tx, &tx); err != nil {
-		return nil, err
+		return nil, errors.QueryFailf("Unmarshal tx err").AddCause(err)
 	}
 
 	bt := &model.BlockTx{
