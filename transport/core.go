@@ -271,7 +271,7 @@ func (t Transport) SignBuildBroadcast(msg model.Msg, privKeyHex string, seq int6
 		return nil, err
 	}
 
-	signMsgBytes, err := EncodeSignMsg(t.Cdc, msgs, t.chainId, seq)
+	signMsgBytes, err := EncodeSignMsg(t.Cdc, msgs, t.chainId, seq, memo)
 	if err != nil {
 		return nil, err
 	}

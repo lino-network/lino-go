@@ -5,6 +5,7 @@ package broadcast
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -19,6 +20,7 @@ import (
 
 // Broadcast is a wrapper of broadcasting transactions to blockchain.
 type Broadcast struct {
+	FixSequenceNumber  bool
 	transport          *transport.Transport
 	maxAttempts        int64
 	initSleepTime      time.Duration
@@ -28,7 +30,9 @@ type Broadcast struct {
 }
 
 // NewBroadcast returns an instance of Broadcast.
-func NewBroadcast(transport *transport.Transport, maxAttempts int64, initSleepTime time.Duration, timeout time.Duration, exponentialBackoff bool, backoffRandomness bool) *Broadcast {
+func NewBroadcast(
+	transport *transport.Transport, maxAttempts int64, initSleepTime time.Duration,
+	timeout time.Duration, exponentialBackoff bool, backoffRandomness bool, fixSequenceNumber bool) *Broadcast {
 	return &Broadcast{
 		transport:          transport,
 		maxAttempts:        maxAttempts,
@@ -36,6 +40,7 @@ func NewBroadcast(transport *transport.Transport, maxAttempts int64, initSleepTi
 		initSleepTime:      initSleepTime,
 		exponentialBackoff: exponentialBackoff,
 		backoffRandomness:  backoffRandomness,
+		FixSequenceNumber:  fixSequenceNumber,
 	}
 }
 
@@ -94,7 +99,7 @@ func (broadcast *Broadcast) TransferSync(ctx context.Context, sender, receiver, 
 		Amount:   amount,
 		Memo:     memo,
 	}
-	return broadcast.retry(ctx, msg, privKeyHex, seq, "", true, broadcast.maxAttempts, broadcast.initSleepTime)
+	return broadcast.retry(ctx, msg, privKeyHex, seq, strconv.FormatInt(time.Now().Unix(), 10), true, broadcast.maxAttempts, broadcast.initSleepTime)
 }
 
 // Follow creates a social relationship between follower and followee.
@@ -256,7 +261,7 @@ func (broadcast *Broadcast) DonateSync(ctx context.Context, username, author,
 		FromApp:  fromApp,
 		Memo:     memo,
 	}
-	return broadcast.retry(ctx, msg, privKeyHex, seq, "", true, broadcast.maxAttempts, broadcast.initSleepTime)
+	return broadcast.retry(ctx, msg, privKeyHex, seq, strconv.FormatInt(time.Now().Unix(), 10), true, broadcast.maxAttempts, broadcast.initSleepTime)
 }
 
 // ReportOrUpvote adds a report or upvote action to a post.
@@ -724,6 +729,10 @@ func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex
 						}
 						if correctSeq == seq {
 							return nil, errors.InvalidSignature("invalid signature")
+						}
+
+						if broadcast.FixSequenceNumber {
+							return nil, errors.InvalidSequenceNumber(fmt.Sprintf("sequence number error, use %v, expect: %v", seq, correctSeq))
 						}
 						seq = correctSeq
 					}

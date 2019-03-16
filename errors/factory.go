@@ -163,3 +163,8 @@ func BroadcastTimeoutf(format string, args ...interface{}) Error {
 func InvalidSignature(msg string) Error {
 	return newError(CodeInvalidSignature, msg)
 }
+
+//GuaranteeBroadcastFail creates an error with CodeBroadcastTimeout and formatted message
+func GuaranteeBroadcastFail(msg string) Error {
+	return newError(CodeGuaranteeBroadcastFail, msg)
+}

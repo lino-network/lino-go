@@ -12,9 +12,10 @@ const (
 	CodeInvalidArg
 	CodeInvalidNodeURL
 	CodeInvalidSequenceNumber
-	CodeEmptyResponse    // 10
-	CodeTimeout          // time out for one tx
-	CodeBroadcastTimeout // time out for each single broadcast
-	CodeInvalidSignature // invalid sign bytes
-	CodeTxNotFound       // tx not found
+	CodeEmptyResponse          // 10
+	CodeTimeout                // time out for one tx
+	CodeBroadcastTimeout       // time out for each single broadcast
+	CodeInvalidSignature       // invalid sign bytes
+	CodeTxNotFound             // tx not found
+	CodeGuaranteeBroadcastFail // guarantee broadcast fail
 )

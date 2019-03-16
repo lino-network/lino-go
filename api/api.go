@@ -4,9 +4,13 @@
 package api
 
 import (
+	"context"
+	"encoding/hex"
 	"time"
 
 	"github.com/lino-network/lino-go/broadcast"
+	"github.com/lino-network/lino-go/errors"
+	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/query"
 	"github.com/lino-network/lino-go/transport"
 	"github.com/spf13/viper"
@@ -17,17 +21,21 @@ import (
 type API struct {
 	*query.Query
 	*broadcast.Broadcast
+	checkTxConfirmInterval time.Duration
+	timeout                time.Duration
 }
 
 // Options is a wrapper of init parameters
 type Options struct {
-	ChainID            string        `json:"chain_id"`
-	NodeURL            string        `json:"node_url"`
-	MaxAttempts        int64         `json:"max_attempts"`
-	InitSleepTime      time.Duration `json:"init_sleep_time"`
-	Timeout            time.Duration `json:"timeout"`
-	ExponentialBackoff bool          `json:"exponential_back_off"`
-	BackoffRandomness  bool          `json:"backoff_randomness"`
+	ChainID                string        `json:"chain_id"`
+	NodeURL                string        `json:"node_url"`
+	MaxAttempts            int64         `json:"max_attempts"`
+	InitSleepTime          time.Duration `json:"init_sleep_time"`
+	Timeout                time.Duration `json:"timeout"`
+	ExponentialBackoff     bool          `json:"exponential_back_off"`
+	BackoffRandomness      bool          `json:"backoff_randomness"`
+	FixSequenceNumber      bool          `json:"fix_sequence_number"`
+	CheckTxConfirmInterval time.Duration `json:"check_tx_confirm_interval"`
 }
 
 func (opt *Options) init() {
@@ -39,6 +47,9 @@ func (opt *Options) init() {
 	}
 	if opt.Timeout == 0 {
 		opt.Timeout = time.Second * 10
+	}
+	if opt.CheckTxConfirmInterval == 0 {
+		opt.CheckTxConfirmInterval = time.Second
 	}
 }
 
@@ -74,7 +85,86 @@ func NewLinoAPIFromArgs(opt *Options) *API {
 	opt.init()
 	transport := transport.NewTransportFromArgs(opt.ChainID, opt.NodeURL)
 	return &API{
-		Query:     query.NewQuery(transport),
-		Broadcast: broadcast.NewBroadcast(transport, opt.MaxAttempts, opt.InitSleepTime, opt.Timeout, opt.ExponentialBackoff, opt.BackoffRandomness),
+		Query:                  query.NewQuery(transport),
+		Broadcast:              broadcast.NewBroadcast(transport, opt.MaxAttempts, opt.InitSleepTime, opt.Timeout, opt.ExponentialBackoff, opt.BackoffRandomness, opt.FixSequenceNumber),
+		checkTxConfirmInterval: opt.CheckTxConfirmInterval,
+		timeout:                opt.Timeout,
 	}
+}
+
+func (api *API) GuaranteeBroadcast(ctx context.Context, username string, f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error)) (*model.BroadcastResponse, errors.Error) {
+	if !api.Broadcast.FixSequenceNumber {
+		return nil, errors.GuaranteeBroadcastFail("only fix sequence number can guarantee broadcast")
+	}
+	seq, seqErr := api.Query.GetSeqNumber(ctx, username)
+	if seqErr != nil {
+		return nil, errors.QueryFail("query sequence number failed")
+	}
+	return api.retryHelper(ctx, username, seq, f)
+}
+
+func (api *API) retryHelper(ctx context.Context, username string, seq int64, f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error)) (*model.BroadcastResponse, errors.Error) {
+	broadcastCtx, cancel := context.WithTimeout(context.Background(), api.timeout)
+	defer cancel()
+
+	resp, err := f(broadcastCtx, seq)
+	if err != nil {
+		return nil, err
+	}
+
+	// check tx commit hash
+	commitHash, decodeErr := hex.DecodeString(resp.CommitHash)
+	if decodeErr != nil {
+		return nil, errors.GuaranteeBroadcastFail("commit hash invalid")
+	}
+	ticker := time.NewTicker(api.checkTxConfirmInterval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			tx, err := api.GetTx(ctx, commitHash)
+			if err != nil {
+				// keep retry
+				continue
+			}
+			// if code is not ok (0), report err
+			if tx.Code != 0 {
+				return nil, errors.DeliverTxFail("deliver tx failed").AddBlockChainCode(tx.Code).AddBlockChainLog(tx.Log)
+			}
+			resp.Height = tx.Height
+			return resp, nil
+		case <-broadcastCtx.Done():
+			return api.getTxAndRetry(ctx, username, commitHash, f)
+		case <-ctx.Done():
+			return nil, errors.Timeout("tx time out")
+		}
+	}
+}
+
+func (api *API) getTxAndRetry(ctx context.Context, username string, commitHash []byte, f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error)) (*model.BroadcastResponse, errors.Error) {
+	currentSeq, seqErr := api.Query.GetSeqNumber(ctx, username)
+	if seqErr != nil {
+		return nil, errors.QueryFail("query sequence number failed")
+	}
+	tx, err := api.GetTx(ctx, commitHash)
+	if err != nil {
+		if err.CodeType() == errors.CodeTxNotFound {
+			resp, err := api.retryHelper(ctx, username, currentSeq, f)
+			if err != nil && err.CodeType() == errors.CodeInvalidSequenceNumber {
+				return api.getTxAndRetry(ctx, username, commitHash, f)
+			}
+			return resp, err
+		}
+		return nil, errors.QueryFailf("query tx failed: %v", err.CodeType())
+	}
+
+	// if code is not ok (0), report err
+	if tx.Code != 0 {
+		return nil, errors.DeliverTxFail("deliver tx failed").AddBlockChainCode(tx.Code).AddBlockChainLog(tx.Log)
+	}
+	return &model.BroadcastResponse{
+		Height:     tx.Height,
+		CommitHash: hex.EncodeToString(commitHash),
+	}, nil
 }
