@@ -101,16 +101,16 @@ func NewLinoAPIFromArgs(opt *Options) *API {
 
 // GuaranteeBroadcast - gurantee broadcast succ unless ctx timeout, which status is unknown.
 func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
-	f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error),
+	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
 ) (*model.BroadcastResponse, errors.Error) {
 	if !api.Broadcast.FixSequenceNumber {
 		return nil, errors.GuaranteeBroadcastFail(
 			"only fix sequence number can guarantee broadcast")
 	}
 
-	var lastHash []byte // init: nil
+	var lastHash *string // init: nil
 	for {
-		resp, txHash, err := func() (*model.BroadcastResponse, []byte, error) {
+		resp, txHash, err := func() (*model.BroadcastResponse, *string, error) {
 			broadcastCtx, cancel := context.WithTimeout(ctx, api.timeout)
 			defer cancel()
 			return api.safeBroadcastAndWatch(broadcastCtx, username, lastHash, f)
@@ -129,36 +129,41 @@ func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
 	}
 }
 
-// this function ensure the safety of making a broadcast by doing a getSeq after getSeq.
-func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, lastHash []byte,
-	f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error),
-) (*model.BroadcastResponse, []byte, error) {
-	currentSeq, seqErr := api.Query.GetSeqNumber(ctx, username)
-	if seqErr != nil {
-		return nil, nil, errors.QueryFail("query sequence number failed")
-	}
-	// XXX(yumin): GetSeq then GetTx to ensure that if seq changed, the original tx is not
-	// applied, if last hash is not nil.
-	if lastHash != nil {
-		tx, err := api.GetTx(ctx, lastHash)
+// this function ensure the safety of making a broadcast by doing a getSeq after getSeq, using
+// GetTxAndSequenceNumber, if lastHash is provided.
+func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, lastHash *string,
+	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
+) (*model.BroadcastResponse, *string, error) {
+	var currentSeq uint64 // 0
+	if lastHash == nil {
+		var seqErr error
+		currentSeq, seqErr = api.Query.GetSeqNumber(ctx, username)
+		if seqErr != nil {
+			return nil, nil, errors.QueryFail("query sequence number failed")
+		}
+	} else {
+		// XXX(yumin): GetTxAndSequenceNumber does GetSeq then GetTx to ensure that if seq changed,
+		// the original tx is not applied, if last hash is not nil.
+		txSeq, seqErr := api.Query.GetTxAndSequenceNumber(ctx, username, *lastHash)
+		if seqErr != nil {
+			return nil, nil, errors.QueryFail("GetTxAndSequenceNumber failed: " + seqErr.Error())
+		}
+
 		// alreay succeeded
-		if err == nil {
+		if txSeq.Tx != nil {
 			return &model.BroadcastResponse{
-				Height:     tx.Height,
-				CommitHash: hex.EncodeToString(lastHash),
+				Height:     txSeq.Tx.Height,
+				CommitHash: txSeq.Tx.Hash,
 			}, lastHash, nil
 		}
-		if err.CodeType() == errors.CodeTxNotFound {
-			return api.broadcastAndWatch(ctx, username, currentSeq, f)
-		}
-		return nil, nil, errors.QueryFailf("query tx failed: %v", err.CodeType())
+		currentSeq = txSeq.Sequence
 	}
-	return api.broadcastAndWatch(ctx, username, currentSeq, f)
+	return api.broadcastAndWatch(ctx, currentSeq, f)
 }
 
-func (api *API) broadcastAndWatch(ctx context.Context, username string, seq int64,
-	f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error),
-) (*model.BroadcastResponse, []byte, error) {
+func (api *API) broadcastAndWatch(ctx context.Context, seq uint64,
+	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
+) (*model.BroadcastResponse, *string, error) {
 	resp, err := f(ctx, seq)
 	if err != nil {
 		// can retry.
@@ -169,7 +174,8 @@ func (api *API) broadcastAndWatch(ctx context.Context, username string, seq int6
 	}
 
 	// check tx commit hash
-	commitHash, decodeErr := hex.DecodeString(resp.CommitHash)
+	commitHash := resp.CommitHash
+	commitHashBytes, decodeErr := hex.DecodeString(resp.CommitHash)
 	if decodeErr != nil {
 		return nil, nil, errors.GuaranteeBroadcastFail("commit hash invalid")
 	}
@@ -179,21 +185,21 @@ func (api *API) broadcastAndWatch(ctx context.Context, username string, seq int6
 	for {
 		select {
 		case <-ticker.C:
-			tx, err := api.GetTx(ctx, commitHash)
+			tx, err := api.GetTx(ctx, commitHashBytes)
 			// keep retry
 			if err != nil {
 				continue
 			}
 			// if code is not ok (0), report err
 			if tx.Code != 0 {
-				return nil, commitHash, errors.DeliverTxFail(
+				return nil, &commitHash, errors.DeliverTxFail(
 					"deliver tx failed").AddBlockChainCode(tx.Code).AddBlockChainLog(tx.Log)
 			}
 			resp.Height = tx.Height
-			return resp, commitHash, nil
+			return resp, &commitHash, nil
 		case <-ctx.Done():
 			// can retry
-			return nil, commitHash, errTxWatchTimeout
+			return nil, &commitHash, errTxWatchTimeout
 		}
 	}
 }

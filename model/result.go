@@ -57,7 +57,7 @@ type GrantPubKey struct {
 }
 
 type AccountMeta struct {
-	Sequence             int64  `json:"sequence"`
+	Sequence             uint64 `json:"sequence"`
 	LastActivityAt       int64  `json:"last_activity_at"`
 	TransactionCapacity  Coin   `json:"transaction_capacity"`
 	JSONMeta             string `json:"json_meta"`

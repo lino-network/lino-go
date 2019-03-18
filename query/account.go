@@ -146,7 +146,7 @@ func (query *Query) GetAccountMeta(ctx context.Context, username string) (*model
 
 // GetSeqNumber returns the next sequence number of a user which should
 // be used for broadcast.
-func (query *Query) GetSeqNumber(ctx context.Context, username string) (int64, error) {
+func (query *Query) GetSeqNumber(ctx context.Context, username string) (uint64, error) {
 	meta, err := query.GetAccountMeta(ctx, username)
 	if err != nil {
 		return 0, err

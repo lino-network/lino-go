@@ -117,7 +117,7 @@ func sortJSON(toSortJSON []byte) ([]byte, error) {
 }
 
 // EncodeSignMsg encodes the message to the standard signed message.
-func EncodeSignMsg(cdc *wire.Codec, msgs []model.Msg, chainId string, seq int64, memo string) ([]byte, error) {
+func EncodeSignMsg(cdc *wire.Codec, msgs []model.Msg, chainId string, seq uint64, memo string) ([]byte, error) {
 	feeBytes, err := cdc.MarshalJSON(ZeroFee)
 	if err != nil {
 		return nil, err
@@ -157,7 +157,7 @@ func EncodeSignMsg(cdc *wire.Codec, msgs []model.Msg, chainId string, seq int64,
 
 // EncodeTx encodes a message to the standard transaction.
 func EncodeTx(cdc *wire.Codec, msgs []model.Msg, pubKey crypto.PubKey,
-	sig []byte, seq int64, memo string) ([]byte, error) {
+	sig []byte, seq uint64, memo string) ([]byte, error) {
 	stdSig := model.Signature{
 		PubKey:   pubKey,
 		Sig:      sig,
