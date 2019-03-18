@@ -278,3 +278,17 @@ func (query *Query) VerifyUserSignatureUsingTxKey(ctx context.Context, username 
 	}
 	return info.TransactionKey.VerifyBytes([]byte(payload), sig), nil
 }
+
+// GetTxAndSequenceNumber verify signature is signed from payload by user's transaction private key.
+func (query *Query) GetTxAndSequenceNumber(ctx context.Context, username, hash string) (*model.TxAndSequenceNumber, error) {
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountTxAndSequence, []string{username, hash})
+	if err != nil {
+		return nil, err
+	}
+
+	txAndSeq := new(model.TxAndSequenceNumber)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, txAndSeq); err != nil {
+		return txAndSeq, err
+	}
+	return txAndSeq, nil
+}
