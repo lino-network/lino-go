@@ -263,7 +263,7 @@ func (t Transport) BroadcastTx(tx []byte, checkTxOnly bool) (interface{}, error)
 
 // SignBuildBroadcast signs msg with private key and then broadcasts
 // the transaction to blockchain.
-func (t Transport) SignBuildBroadcast(msg model.Msg, privKeyHex string, seq int64, memo string, checkTxOnly bool) (interface{}, error) {
+func (t Transport) SignBuildBroadcast(msg model.Msg, privKeyHex string, seq uint64, memo string, checkTxOnly bool) (interface{}, error) {
 	msgs := []model.Msg{msg}
 
 	privKey, err := GetPrivKeyFromHex(privKeyHex)

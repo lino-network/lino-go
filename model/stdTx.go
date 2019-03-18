@@ -17,7 +17,7 @@ type Signature struct {
 	PubKey        crypto.PubKey `json:"pub_key"`
 	Sig           []byte        `json:"signature"`
 	AccountNumber int64         `json:"account_number"`
-	Sequence      int64         `json:"sequence"`
+	Sequence      uint64        `json:"sequence"`
 }
 
 type SignMsg struct {
@@ -26,7 +26,7 @@ type SignMsg struct {
 	Fee           json.RawMessage   `json:"fee"`
 	Memo          string            `json:"memo"`
 	Msgs          []json.RawMessage `json:"msgs"`
-	Sequence      int64             `json:"sequence"`
+	Sequence      uint64            `json:"sequence"`
 }
 
 type Fee struct {

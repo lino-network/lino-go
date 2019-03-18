@@ -131,7 +131,10 @@ func main() {
 	newUserAppKey := secp256k1.GenPrivKey()
 	newUser := "ffsffssds"
 
-	api := api.NewLinoAPIFromArgs("lino-staging", "http://18.222.11.221:26657")
+	api := api.NewLinoAPIFromArgs(&api.Options{
+		ChainID: "lino-staging",
+		NodeURL: "http://localhost:26657",
+	})
 	seq, _ := api.GetSeqNumber(context.Background(), "lino")
 	resp, err := api.Register(context.Background(), "lino", "100", newUser, hex.EncodeToString(newUserResetKey.PubKey().Bytes()), hex.EncodeToString(newUserTxKey.PubKey().Bytes()), hex.EncodeToString(newUserAppKey.PubKey().Bytes()), "E1B0F79B202FDC4DB4ED428384A06E9A6562527A0A0E85203508700E1BFA96CAB458D899B1", seq)
 	if err != nil {

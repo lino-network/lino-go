@@ -86,7 +86,7 @@ func TestCoinToLNO(t *testing.T) {
 // NewCoinFromInt64 - return int64 amount of Coin
 func NewCoinFromInt64(amount int64) Coin {
 	// return Coin{big.NewInt(amount)}
-	return Coin{sdk.NewInt(amount)}
+	return Coin{Int{I: sdk.NewInt(amount).BigInt()}}
 }
 
 // LinoToCoin - convert 1 LNO to 10^5 Coin
@@ -102,4 +102,10 @@ func LinoToCoin(lino string) (Coin, error) {
 		return NewCoinFromInt64(0), errors.New("LNO can't be less than lower bound")
 	}
 	return DecToCoin(rat.Mul(sdk.NewDec(Decimals))), nil
+}
+
+// DecToCoin - convert sdk.Dec to LNO coin
+// XXX(yumin): the unit of @p rat must be coin.
+func DecToCoin(rat sdk.Dec) Coin {
+	return Coin{Int{I: rat.RoundInt().BigInt()}}
 }
