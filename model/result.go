@@ -306,9 +306,9 @@ type BroadcastResponse struct {
 }
 
 type TxAndSequenceNumber struct {
-	Username string            `json:"username"`
-	Sequence uint64            `json:"sequence"`
-	Tx       TransactionResult `json:"tx"`
+	Username string             `json:"username"`
+	Sequence uint64             `json:"sequence"`
+	Tx       *TransactionResult `json:"tx"`
 }
 
 type TransactionResult struct {
