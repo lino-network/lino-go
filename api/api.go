@@ -6,6 +6,7 @@ package api
 import (
 	"context"
 	"encoding/hex"
+	goerrors "errors"
 	"time"
 
 	"github.com/lino-network/lino-go/broadcast"
@@ -14,6 +15,12 @@ import (
 	"github.com/lino-network/lino-go/query"
 	"github.com/lino-network/lino-go/transport"
 	"github.com/spf13/viper"
+)
+
+// internal errors, not exported.
+var (
+	errTxWatchTimeout = goerrors.New("errTxWatchTimeout")
+	errSeqChanged     = goerrors.New("errSeqChanged")
 )
 
 // API is a wrapper of both querying data from blockchain
@@ -92,79 +99,101 @@ func NewLinoAPIFromArgs(opt *Options) *API {
 	}
 }
 
-func (api *API) GuaranteeBroadcast(ctx context.Context, username string, f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error)) (*model.BroadcastResponse, errors.Error) {
+// GuaranteeBroadcast - gurantee broadcast succ unless ctx timeout, which status is unknown.
+func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
+	f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error),
+) (*model.BroadcastResponse, errors.Error) {
 	if !api.Broadcast.FixSequenceNumber {
-		return nil, errors.GuaranteeBroadcastFail("only fix sequence number can guarantee broadcast")
+		return nil, errors.GuaranteeBroadcastFail(
+			"only fix sequence number can guarantee broadcast")
 	}
-	seq, seqErr := api.Query.GetSeqNumber(ctx, username)
-	if seqErr != nil {
-		return nil, errors.QueryFail("query sequence number failed")
+
+	var lastHash []byte // init: nil
+	for {
+		resp, txHash, err := func() (*model.BroadcastResponse, []byte, error) {
+			broadcastCtx, cancel := context.WithTimeout(ctx, api.timeout)
+			defer cancel()
+			return api.safeBroadcastAndWatch(broadcastCtx, username, lastHash, f)
+		}()
+		// The only place that does the retry.
+		if err == errTxWatchTimeout || err == errSeqChanged {
+			lastHash = txHash
+			continue
+		}
+		linoErr, ok := err.(errors.Error)
+		if ok {
+			return resp, linoErr
+		}
+		// This case shall never happen.
+		return resp, errors.GuaranteeBroadcastFail("returned error is not typed: " + err.Error())
 	}
-	return api.retryHelper(ctx, username, seq, f)
 }
 
-func (api *API) retryHelper(ctx context.Context, username string, seq int64, f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error)) (*model.BroadcastResponse, errors.Error) {
-	broadcastCtx, cancel := context.WithTimeout(context.Background(), api.timeout)
-	defer cancel()
+// this function ensure the safety of making a broadcast by doing a getSeq after getSeq.
+func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, lastHash []byte,
+	f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error),
+) (*model.BroadcastResponse, []byte, error) {
+	currentSeq, seqErr := api.Query.GetSeqNumber(ctx, username)
+	if seqErr != nil {
+		return nil, nil, errors.QueryFail("query sequence number failed")
+	}
+	// XXX(yumin): GetSeq then GetTx to ensure that if seq changed, the original tx is not
+	// applied, if last hash is not nil.
+	if lastHash != nil {
+		tx, err := api.GetTx(ctx, lastHash)
+		// alreay succeeded
+		if err == nil {
+			return &model.BroadcastResponse{
+				Height:     tx.Height,
+				CommitHash: hex.EncodeToString(lastHash),
+			}, lastHash, nil
+		}
+		if err.CodeType() == errors.CodeTxNotFound {
+			return api.broadcastAndWatch(ctx, username, currentSeq, f)
+		}
+		return nil, nil, errors.QueryFailf("query tx failed: %v", err.CodeType())
+	}
+	return api.broadcastAndWatch(ctx, username, currentSeq, f)
+}
 
-	resp, err := f(broadcastCtx, seq)
+func (api *API) broadcastAndWatch(ctx context.Context, username string, seq int64,
+	f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error),
+) (*model.BroadcastResponse, []byte, error) {
+	resp, err := f(ctx, seq)
 	if err != nil {
-		return nil, err
+		// can retry.
+		if err.CodeType() == errors.CodeInvalidSequenceNumber {
+			return nil, nil, errSeqChanged
+		}
+		return nil, nil, err
 	}
 
 	// check tx commit hash
 	commitHash, decodeErr := hex.DecodeString(resp.CommitHash)
 	if decodeErr != nil {
-		return nil, errors.GuaranteeBroadcastFail("commit hash invalid")
+		return nil, nil, errors.GuaranteeBroadcastFail("commit hash invalid")
 	}
+
 	ticker := time.NewTicker(api.checkTxConfirmInterval)
 	defer ticker.Stop()
-
 	for {
 		select {
 		case <-ticker.C:
 			tx, err := api.GetTx(ctx, commitHash)
+			// keep retry
 			if err != nil {
-				// keep retry
 				continue
 			}
 			// if code is not ok (0), report err
 			if tx.Code != 0 {
-				return nil, errors.DeliverTxFail("deliver tx failed").AddBlockChainCode(tx.Code).AddBlockChainLog(tx.Log)
+				return nil, commitHash, errors.DeliverTxFail(
+					"deliver tx failed").AddBlockChainCode(tx.Code).AddBlockChainLog(tx.Log)
 			}
 			resp.Height = tx.Height
-			return resp, nil
-		case <-broadcastCtx.Done():
-			return api.getTxAndRetry(ctx, username, commitHash, f)
+			return resp, commitHash, nil
 		case <-ctx.Done():
-			return nil, errors.Timeout("tx time out")
+			// can retry
+			return nil, commitHash, errTxWatchTimeout
 		}
 	}
-}
-
-func (api *API) getTxAndRetry(ctx context.Context, username string, commitHash []byte, f func(ctx context.Context, seq int64) (*model.BroadcastResponse, errors.Error)) (*model.BroadcastResponse, errors.Error) {
-	currentSeq, seqErr := api.Query.GetSeqNumber(ctx, username)
-	if seqErr != nil {
-		return nil, errors.QueryFail("query sequence number failed")
-	}
-	tx, err := api.GetTx(ctx, commitHash)
-	if err != nil {
-		if err.CodeType() == errors.CodeTxNotFound {
-			resp, err := api.retryHelper(ctx, username, currentSeq, f)
-			if err != nil && err.CodeType() == errors.CodeInvalidSequenceNumber {
-				return api.getTxAndRetry(ctx, username, commitHash, f)
-			}
-			return resp, err
-		}
-		return nil, errors.QueryFailf("query tx failed: %v", err.CodeType())
-	}
-
-	// if code is not ok (0), report err
-	if tx.Code != 0 {
-		return nil, errors.DeliverTxFail("deliver tx failed").AddBlockChainCode(tx.Code).AddBlockChainLog(tx.Log)
-	}
-	return &model.BroadcastResponse{
-		Height:     tx.Height,
-		CommitHash: hex.EncodeToString(commitHash),
-	}, nil
 }

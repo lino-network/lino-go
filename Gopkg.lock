@@ -189,17 +189,6 @@
   revision = "7fa881d584b8f1c76a7fdb3485206eaa57a96e46"
 
 [[projects]]
-  digest = "1:b294a4749328da9f4efad4c1db7b57d3548d896f551d0ce817eaff910e43b214"
-  name = "github.com/lino-network/lino-app-backend"
-  packages = [
-    "pkg/lino-app/errors",
-    "pkg/lino-app/util",
-  ]
-  pruneopts = "UT"
-  revision = "02229f8cee6ee7ca01fbd59f6f441563c939ad5f"
-  version = "v0.9.26"
-
-[[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
   name = "github.com/magiconair/properties"
   packages = ["."]
@@ -439,14 +428,6 @@
   revision = "v0.30.0"
 
 [[projects]]
-  digest = "1:c08f5d8cc28ed4dccb098121d5f1f19f708bf04e3bbd4b772ce6461de6ef1ca2"
-  name = "github.com/teris-io/shortid"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "6c56cef5189ca1b3d5ef01dc07f4d611dfc0bb33"
-  version = "v1.0"
-
-[[projects]]
   digest = "1:b6621a5e9003d7d809993d49217a841d27ef85b4bc0459115d3fd1f8c1518999"
   name = "golang.org/x/crypto"
   packages = [
@@ -578,7 +559,6 @@
   input-imports = [
     "github.com/cosmos/cosmos-sdk/codec",
     "github.com/cosmos/cosmos-sdk/types",
-    "github.com/lino-network/lino-app-backend/pkg/lino-app/util",
     "github.com/lino-network/lino/types",
     "github.com/spf13/viper",
     "github.com/tendermint/tendermint/crypto",

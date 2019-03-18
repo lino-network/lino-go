@@ -86,7 +86,7 @@ func TestCoinToLNO(t *testing.T) {
 // NewCoinFromInt64 - return int64 amount of Coin
 func NewCoinFromInt64(amount int64) Coin {
 	// return Coin{big.NewInt(amount)}
-	return Coin{sdk.NewInt(amount)}
+	return Coin{*sdk.NewInt(amount).BigInt()}
 }
 
 // LinoToCoin - convert 1 LNO to 10^5 Coin
