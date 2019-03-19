@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/hex"
 	goerrors "errors"
+	"strings"
 	"time"
 
 	"github.com/lino-network/lino-go/broadcast"
@@ -19,8 +20,9 @@ import (
 
 // internal errors, not exported.
 var (
-	errTxWatchTimeout = goerrors.New("errTxWatchTimeout")
-	errSeqChanged     = goerrors.New("errSeqChanged")
+	errTxWatchTimeout   = goerrors.New("errTxWatchTimeout")
+	errSeqChanged       = goerrors.New("errSeqChanged")
+	errSeqTxQueryFailed = goerrors.New("errSeqTxQueryFailed")
 )
 
 // API is a wrapper of both querying data from blockchain
@@ -119,8 +121,10 @@ func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
 			return resp, nil
 		}
 		// The only place that does the retry.
-		if err == errTxWatchTimeout || err == errSeqChanged {
-			lastHash = txHash
+		if err == errTxWatchTimeout || err == errSeqChanged || err == errSeqTxQueryFailed {
+			if txHash != nil {
+				lastHash = txHash
+			}
 			continue
 		}
 		linoErr, ok := err.(errors.Error)
@@ -134,6 +138,8 @@ func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
 
 // this function ensure the safety of making a broadcast by doing a getSeq after getSeq, using
 // GetTxAndSequenceNumber, if lastHash is provided.
+// The safaty is guaranteed by that, seq number can advance IFF last tx does not exist in
+// GetTxAndSequenceNumber.
 func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, lastHash *string,
 	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
 ) (*model.BroadcastResponse, *string, error) {
@@ -142,14 +148,14 @@ func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, last
 		var seqErr error
 		currentSeq, seqErr = api.Query.GetSeqNumber(ctx, username)
 		if seqErr != nil {
-			return nil, nil, errors.QueryFail("query sequence number failed")
+			return nil, lastHash, errSeqTxQueryFailed
 		}
 	} else {
 		// XXX(yumin): GetTxAndSequenceNumber does GetSeq then GetTx to ensure that if seq changed,
 		// the original tx is not applied, if last hash is not nil.
 		txSeq, seqErr := api.Query.GetTxAndSequenceNumber(ctx, username, *lastHash)
 		if seqErr != nil {
-			return nil, nil, errors.QueryFail("GetTxAndSequenceNumber failed: " + seqErr.Error())
+			return nil, lastHash, errSeqTxQueryFailed
 		}
 
 		// alreay succeeded
@@ -161,26 +167,38 @@ func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, last
 		}
 		currentSeq = txSeq.Sequence
 	}
-	return api.broadcastAndWatch(ctx, currentSeq, f)
+	return api.broadcastAndWatch(ctx, currentSeq, lastHash, f)
 }
 
-func (api *API) broadcastAndWatch(ctx context.Context, seq uint64,
+// unsafe, make sure the @p seq is a conservative value that won't do f twice.
+func (api *API) broadcastAndWatch(ctx context.Context, seq uint64, lastHash *string,
 	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
 ) (*model.BroadcastResponse, *string, error) {
 	resp, err := f(ctx, seq)
+	if resp == nil {
+		return nil, lastHash, errors.GuaranteeBroadcastFail("checkTx failed, empty resp")
+	}
+	commitHash := resp.CommitHash
 	if err != nil {
 		// can retry.
+		// return lastHash because this tx did not passed checkTx.
 		if err.CodeType() == errors.CodeInvalidSequenceNumber {
-			return nil, nil, errSeqChanged
+			return nil, lastHash, errSeqChanged
 		}
-		return nil, nil, err
+
+		// only in case that (tx in cache), we continue polling.
+		if err.CodeType() == errors.CodeFailedToBroadcast &&
+			strings.Contains(err.Error(), "Tx already exists in cache") {
+			// do nothing and start to polling.
+		} else {
+			return nil, &commitHash, err
+		}
 	}
 
 	// check tx commit hash
-	commitHash := resp.CommitHash
-	commitHashBytes, decodeErr := hex.DecodeString(resp.CommitHash)
+	commitHashBytes, decodeErr := hex.DecodeString(commitHash)
 	if decodeErr != nil {
-		return nil, nil, errors.GuaranteeBroadcastFail("commit hash invalid")
+		return nil, lastHash, errors.GuaranteeBroadcastFail("commit hash invalid")
 	}
 
 	ticker := time.NewTicker(api.checkTxConfirmInterval)
