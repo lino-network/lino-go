@@ -23,7 +23,6 @@ var (
 	errTxWatchTimeout   = goerrors.New("errTxWatchTimeout")
 	errSeqChanged       = goerrors.New("errSeqChanged")
 	errSeqTxQueryFailed = goerrors.New("errSeqTxQueryFailed")
-	errTxInCache        = goerrors.New("tx already in cache")
 )
 
 // API is a wrapper of both querying data from blockchain
