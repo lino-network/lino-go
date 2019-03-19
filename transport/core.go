@@ -4,7 +4,6 @@ package transport
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 
 	wire "github.com/cosmos/cosmos-sdk/codec"
@@ -16,7 +15,6 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-	ttypes "github.com/tendermint/tendermint/types"
 )
 
 // Transport is a wrapper of tendermint rpc client and codec.
@@ -265,7 +263,79 @@ func (t Transport) BroadcastTx(tx []byte, checkTxOnly bool) (interface{}, error)
 
 // SignBuildBroadcast signs msg with private key and then broadcasts
 // the transaction to blockchain.
-func (t Transport) SignBuildBroadcast(msg model.Msg, privKeyHex string, seq uint64, memo string, checkTxOnly bool) (*model.BroadcastResponse, errors.Error) {
+// func (t Transport) SignBuildBroadcast(msg model.Msg, privKeyHex string, seq uint64, memo string, checkTxOnly bool) (*model.BroadcastResponse, errors.Error) {
+// 	msgs := []model.Msg{msg}
+
+// 	privKey, err := GetPrivKeyFromHex(privKeyHex)
+// 	if err != nil {
+// 		return nil, errors.FailedToBroadcastf("error to get private key from public key, err: %s", err.Error())
+// 	}
+
+// 	signMsgBytes, err := EncodeSignMsg(t.Cdc, msgs, t.chainId, seq, memo)
+// 	if err != nil {
+// 		return nil, errors.FailedToBroadcastf("error to encode sign msg, err: %s", err.Error())
+// 	}
+// 	// SignatureFromBytes
+// 	sig, err := privKey.Sign(signMsgBytes)
+// 	if err != nil {
+// 		return nil, errors.FailedToBroadcastf("error to sign the msg, err: %s", err.Error())
+// 	}
+
+// 	// build transaction bytes
+// 	txByte, err := EncodeTx(t.Cdc, msgs, privKey.PubKey(), sig, seq, memo)
+// 	if err != nil {
+// 		return nil, errors.FailedToBroadcastf("error to encode transaction, err: %s", err.Error())
+// 	}
+
+// 	broadcastResp := &model.BroadcastResponse{
+// 		CommitHash: hex.EncodeToString(ttypes.Tx(txByte).Hash()),
+// 	}
+
+// 	res, err := t.BroadcastTx(txByte, checkTxOnly)
+// 	if err != nil {
+// 		return broadcastResp, errors.FailedToBroadcastf("broadcast tx failed, err: %s", err.Error())
+// 	}
+
+// 	if checkTxOnly {
+// 		res, ok := res.(*ctypes.ResultBroadcastTx)
+// 		if !ok {
+// 			return broadcastResp, errors.FailedToBroadcast("error to parse the broadcast response")
+// 		}
+// 		code := retrieveCodeFromBlockChainCode(res.Code)
+// 		if err == nil && code == model.InvalidSeqErrCode {
+// 			return broadcastResp, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
+// 		}
+
+// 		if res.Code != uint32(0) {
+// 			return broadcastResp, errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
+// 		}
+// 		if res.Code != uint32(0) {
+// 			return broadcastResp, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
+// 		}
+// 	} else {
+// 		res, ok := res.(*ctypes.ResultBroadcastTxCommit)
+// 		if !ok {
+// 			return broadcastResp, errors.FailedToBroadcast("error to parse the broadcast response")
+// 		}
+// 		code := retrieveCodeFromBlockChainCode(res.CheckTx.Code)
+// 		if err == nil && code == model.InvalidSeqErrCode {
+// 			return nil, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
+// 		}
+
+// 		if res.CheckTx.Code != uint32(0) {
+// 			return nil, errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
+// 		}
+// 		if res.DeliverTx.Code != uint32(0) {
+// 			return nil, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
+// 		}
+// 		broadcastResp.Height = res.Height
+// 	}
+
+// 	return broadcastResp, nil
+// }
+
+// SignAndBuild signs msg with private key and return tx bytes
+func (t Transport) SignAndBuild(msg model.Msg, privKeyHex string, seq uint64, memo string) ([]byte, errors.Error) {
 	msgs := []model.Msg{msg}
 
 	privKey, err := GetPrivKeyFromHex(privKeyHex)
@@ -288,52 +358,7 @@ func (t Transport) SignBuildBroadcast(msg model.Msg, privKeyHex string, seq uint
 	if err != nil {
 		return nil, errors.FailedToBroadcastf("error to encode transaction, err: %s", err.Error())
 	}
-
-	broadcastResp := &model.BroadcastResponse{
-		CommitHash: hex.EncodeToString(ttypes.Tx(txByte).Hash()),
-	}
-
-	res, err := t.BroadcastTx(txByte, checkTxOnly)
-	if err != nil {
-		return broadcastResp, errors.FailedToBroadcastf("broadcast tx failed, err: %s", err.Error())
-	}
-
-	if checkTxOnly {
-		res, ok := res.(*ctypes.ResultBroadcastTx)
-		if !ok {
-			return broadcastResp, errors.FailedToBroadcast("error to parse the broadcast response")
-		}
-		code := retrieveCodeFromBlockChainCode(res.Code)
-		if err == nil && code == model.InvalidSeqErrCode {
-			return broadcastResp, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
-		}
-
-		if res.Code != uint32(0) {
-			return broadcastResp, errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
-		}
-		if res.Code != uint32(0) {
-			return broadcastResp, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
-		}
-	} else {
-		res, ok := res.(*ctypes.ResultBroadcastTxCommit)
-		if !ok {
-			return broadcastResp, errors.FailedToBroadcast("error to parse the broadcast response")
-		}
-		code := retrieveCodeFromBlockChainCode(res.CheckTx.Code)
-		if err == nil && code == model.InvalidSeqErrCode {
-			return nil, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
-		}
-
-		if res.CheckTx.Code != uint32(0) {
-			return nil, errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
-		}
-		if res.DeliverTx.Code != uint32(0) {
-			return nil, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
-		}
-		broadcastResp.Height = res.Height
-	}
-
-	return broadcastResp, nil
+	return txByte, nil
 }
 
 // GetNote returns the Tendermint rpc client node.
