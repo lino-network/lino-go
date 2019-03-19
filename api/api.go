@@ -176,7 +176,13 @@ func (api *API) broadcastAndWatch(ctx context.Context, seq uint64, lastHash *str
 ) (*model.BroadcastResponse, *string, error) {
 	resp, err := f(ctx, seq)
 	if resp == nil {
-		return nil, lastHash, errors.GuaranteeBroadcastFail("checkTx failed, empty resp")
+		msg := "checkTx failed, empty resp: "
+		if err != nil {
+			msg += err.Error()
+		} else {
+			msg += "nil err"
+		}
+		return nil, lastHash, errors.GuaranteeBroadcastFail(msg)
 	}
 	commitHash := resp.CommitHash
 	if err != nil {
