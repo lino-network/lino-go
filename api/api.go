@@ -115,6 +115,9 @@ func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
 			defer cancel()
 			return api.safeBroadcastAndWatch(broadcastCtx, username, lastHash, f)
 		}()
+		if err == nil {
+			return resp, nil
+		}
 		// The only place that does the retry.
 		if err == errTxWatchTimeout || err == errSeqChanged {
 			lastHash = txHash
@@ -125,7 +128,7 @@ func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
 			return resp, linoErr
 		}
 		// This case shall never happen.
-		return resp, errors.GuaranteeBroadcastFail("returned error is not typed: " + err.Error())
+		return resp, errors.GuaranteeBroadcastFail("returned error is not typed: " + linoErr.Error())
 	}
 }
 
