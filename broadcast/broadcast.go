@@ -790,6 +790,10 @@ func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg model.
 		return response, errors.BroadcastTimeoutf("broadcast timeout: %v", msg).AddCause(ctx.Err())
 	}
 
+	if err != nil {
+		return response, errors.FailedToBroadcast("broadcast failed")
+	}
+
 	if checkTxOnly {
 		res, ok := res.(*ctypes.ResultBroadcastTx)
 		if !ok {
