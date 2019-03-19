@@ -23,7 +23,7 @@ var (
 	errTxWatchTimeout   = goerrors.New("errTxWatchTimeout")
 	errSeqChanged       = goerrors.New("errSeqChanged")
 	errSeqTxQueryFailed = goerrors.New("errSeqTxQueryFailed")
-	errTxInCache      = goerrors.New("tx already in cache")
+	errTxInCache        = goerrors.New("tx already in cache")
 )
 
 // API is a wrapper of both querying data from blockchain
@@ -122,7 +122,7 @@ func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
 			return resp, nil
 		}
 		// The only place that does the retry.
-		if err == errTxWatchTimeout || err == errSeqChanged || err == errSeqTxQueryFailed || err == errTxInCache {
+		if err == errTxWatchTimeout || err == errSeqChanged || err == errSeqTxQueryFailed {
 			if txHash != nil {
 				lastHash = txHash
 			}
@@ -139,6 +139,8 @@ func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
 
 // this function ensure the safety of making a broadcast by doing a getSeq after getSeq, using
 // GetTxAndSequenceNumber, if lastHash is provided.
+// The safaty is guaranteed by that, seq number can advance IFF last tx does not exist in
+// GetTxAndSequenceNumber.
 func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, lastHash *string,
 	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
 ) (*model.BroadcastResponse, *string, error) {
@@ -174,22 +176,24 @@ func (api *API) broadcastAndWatch(ctx context.Context, seq uint64, lastHash *str
 	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
 ) (*model.BroadcastResponse, *string, error) {
 	resp, err := f(ctx, seq)
-	var commitHash string
-	if resp != nil {
-		commitHash = resp.CommitHash
+	if resp == nil {
+		return nil, lastHash, errors.GuaranteeBroadcastFail("checkTx failed, empty resp")
 	}
+	commitHash := resp.CommitHash
 	if err != nil {
 		// can retry.
+		// return lastHash because this tx did not passed checkTx.
 		if err.CodeType() == errors.CodeInvalidSequenceNumber {
 			return nil, lastHash, errSeqChanged
 		}
-		if err.CodeType() == errors.CodeFailedToBroadcast {
-			if strings.Contains(err.Error(), "Tx already exists in cache") {
-				return nil, &commitHash, errTxInCache
-			}
-			return nil, nil, err
+
+		// only in case that (tx in cache), we continue polling.
+		if err.CodeType() == errors.CodeFailedToBroadcast &&
+			strings.Contains(err.Error(), "Tx already exists in cache") {
+			// do nothing and start to polling.
+		} else {
+			return nil, &commitHash, err
 		}
-		return nil, nil, err
 	}
 
 	// check tx commit hash

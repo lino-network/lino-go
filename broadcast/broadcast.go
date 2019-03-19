@@ -188,15 +188,15 @@ func (broadcast *Broadcast) CreatePost(ctx context.Context, author, postID, titl
 	}
 
 	msg := model.CreatePostMsg{
-		Author:       author,
-		PostID:       postID,
-		Title:        title,
-		Content:      content,
-		ParentAuthor: parentAuthor,
-		ParentPostID: parentPostID,
-		SourceAuthor: sourceAuthor,
-		SourcePostID: sourcePostID,
-		Links:        mLinks,
+		Author:                  author,
+		PostID:                  postID,
+		Title:                   title,
+		Content:                 content,
+		ParentAuthor:            parentAuthor,
+		ParentPostID:            parentPostID,
+		SourceAuthor:            sourceAuthor,
+		SourcePostID:            sourcePostID,
+		Links:                   mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
 	}
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
@@ -217,15 +217,15 @@ func (broadcast *Broadcast) CreatePostSync(ctx context.Context, author, postID, 
 	}
 
 	msg := model.CreatePostMsg{
-		Author:       author,
-		PostID:       postID,
-		Title:        title,
-		Content:      content,
-		ParentAuthor: parentAuthor,
-		ParentPostID: parentPostID,
-		SourceAuthor: sourceAuthor,
-		SourcePostID: sourcePostID,
-		Links:        mLinks,
+		Author:                  author,
+		PostID:                  postID,
+		Title:                   title,
+		Content:                 content,
+		ParentAuthor:            parentAuthor,
+		ParentPostID:            parentPostID,
+		SourceAuthor:            sourceAuthor,
+		SourcePostID:            sourcePostID,
+		Links:                   mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
 	}
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", true, broadcast.maxAttempts, broadcast.initSleepTime)
