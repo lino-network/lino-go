@@ -711,12 +711,12 @@ func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex
 		if attempts--; attempts > 0 {
 			if strings.Contains(err.Error(), "Tx already exists in cache") || err.CodeType() == errors.CodeTimeout {
 				// if tx already exists in cache
-				return nil, err
+				return res, err
 			}
 			if err.CodeType() == errors.CodeCheckTxFail ||
 				err.CodeType() == errors.CodeDeliverTxFail {
 				if err.BlockChainCode() != 155 {
-					return nil, err
+					return res, err
 				} else {
 					// sign byte error, replace sequence number with correct one
 					lo := err.BlockChainLog()
@@ -726,14 +726,14 @@ func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex
 						seqStr := sub[:i]
 						correctSeq, err := strconv.ParseUint(seqStr, 10, 64)
 						if err != nil {
-							return nil, errors.InvalidArg("invalid sequence number format")
+							return res, errors.InvalidArg("invalid sequence number format")
 						}
 						if correctSeq == seq {
-							return nil, errors.InvalidSignature("invalid signature")
+							return res, errors.InvalidSignature("invalid signature")
 						}
 
 						if broadcast.FixSequenceNumber {
-							return nil, errors.InvalidSequenceNumber(fmt.Sprintf("sequence number error, use %v, expect: %v", seq, correctSeq))
+							return res, errors.InvalidSequenceNumber(fmt.Sprintf("sequence number error, use %v, expect: %v", seq, correctSeq))
 						}
 						seq = correctSeq
 					}
