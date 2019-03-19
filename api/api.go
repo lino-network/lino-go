@@ -21,6 +21,7 @@ import (
 var (
 	errTxWatchTimeout = goerrors.New("errTxWatchTimeout")
 	errSeqChanged     = goerrors.New("errSeqChanged")
+	errTxInCache      = goerrors.New("tx already in cache")
 )
 
 // API is a wrapper of both querying data from blockchain
@@ -119,7 +120,7 @@ func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
 			return resp, nil
 		}
 		// The only place that does the retry.
-		if err == errTxWatchTimeout || err == errSeqChanged {
+		if err == errTxWatchTimeout || err == errSeqChanged || err == errTxInCache {
 			lastHash = txHash
 			continue
 		}
@@ -172,6 +173,9 @@ func (api *API) broadcastAndWatch(ctx context.Context, seq uint64,
 		// can retry.
 		if err.CodeType() == errors.CodeInvalidSequenceNumber {
 			return nil, nil, errSeqChanged
+		}
+		if err.CodeType() == errors.CodeFailedToBroadcast {
+			return nil, nil, errTxInCache
 		}
 		return nil, nil, err
 	}

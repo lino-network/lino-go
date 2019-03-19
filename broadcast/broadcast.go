@@ -4,7 +4,6 @@ package broadcast
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -14,8 +13,6 @@ import (
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
-
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
 // Broadcast is a wrapper of broadcasting transactions to blockchain.
@@ -191,15 +188,15 @@ func (broadcast *Broadcast) CreatePost(ctx context.Context, author, postID, titl
 	}
 
 	msg := model.CreatePostMsg{
-		Author:                  author,
-		PostID:                  postID,
-		Title:                   title,
-		Content:                 content,
-		ParentAuthor:            parentAuthor,
-		ParentPostID:            parentPostID,
-		SourceAuthor:            sourceAuthor,
-		SourcePostID:            sourcePostID,
-		Links:                   mLinks,
+		Author:       author,
+		PostID:       postID,
+		Title:        title,
+		Content:      content,
+		ParentAuthor: parentAuthor,
+		ParentPostID: parentPostID,
+		SourceAuthor: sourceAuthor,
+		SourcePostID: sourcePostID,
+		Links:        mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
 	}
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
@@ -220,15 +217,15 @@ func (broadcast *Broadcast) CreatePostSync(ctx context.Context, author, postID, 
 	}
 
 	msg := model.CreatePostMsg{
-		Author:                  author,
-		PostID:                  postID,
-		Title:                   title,
-		Content:                 content,
-		ParentAuthor:            parentAuthor,
-		ParentPostID:            parentPostID,
-		SourceAuthor:            sourceAuthor,
-		SourcePostID:            sourcePostID,
-		Links:                   mLinks,
+		Author:       author,
+		PostID:       postID,
+		Title:        title,
+		Content:      content,
+		ParentAuthor: parentAuthor,
+		ParentPostID: parentPostID,
+		SourceAuthor: sourceAuthor,
+		SourcePostID: sourcePostID,
+		Links:        mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
 	}
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", true, broadcast.maxAttempts, broadcast.initSleepTime)
@@ -759,10 +756,8 @@ func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex
 //
 func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg model.Msg, privKeyHex string,
 	seq uint64, memo string, checkTxOnly bool) (*model.BroadcastResponse, errors.Error) {
-	broadcastResp := &model.BroadcastResponse{}
-
-	var res interface{}
-	var err error
+	var res *model.BroadcastResponse
+	var err errors.Error
 	finishChan := make(chan bool)
 
 	broadcastCtx, cancel := context.WithTimeout(context.Background(), broadcast.timeout)
@@ -782,50 +777,7 @@ func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg model.
 		return nil, errors.BroadcastTimeoutf("broadcast timeout: %v", msg).AddCause(ctx.Err())
 	}
 
-	if err != nil {
-		return nil, errors.FailedToBroadcast(err.Error())
-	}
-
-	if checkTxOnly {
-		res, ok := res.(*ctypes.ResultBroadcastTx)
-		if !ok {
-			return nil, errors.FailedToBroadcast("error to parse the broadcast response")
-		}
-		code := retrieveCodeFromBlockChainCode(res.Code)
-		if err == nil && code == model.InvalidSeqErrCode {
-			return nil, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
-		}
-
-		if res.Code != uint32(0) {
-			return nil, errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
-		}
-		if res.Code != uint32(0) {
-			return nil, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
-		}
-		commitHash := hex.EncodeToString(res.Hash)
-		broadcastResp.CommitHash = strings.ToUpper(commitHash)
-	} else {
-		res, ok := res.(*ctypes.ResultBroadcastTxCommit)
-		if !ok {
-			return nil, errors.FailedToBroadcast("error to parse the broadcast response")
-		}
-		code := retrieveCodeFromBlockChainCode(res.CheckTx.Code)
-		if err == nil && code == model.InvalidSeqErrCode {
-			return nil, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
-		}
-
-		if res.CheckTx.Code != uint32(0) {
-			return nil, errors.CheckTxFail("CheckTx failed!").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
-		}
-		if res.DeliverTx.Code != uint32(0) {
-			return nil, errors.DeliverTxFail("DeliverTx failed!").AddBlockChainCode(res.DeliverTx.Code).AddBlockChainLog(res.DeliverTx.Log)
-		}
-		commitHash := hex.EncodeToString(res.Hash)
-		broadcastResp.CommitHash = strings.ToUpper(commitHash)
-		broadcastResp.Height = res.Height
-	}
-
-	return broadcastResp, nil
+	return res, err
 }
 
 func retrieveCodeFromBlockChainCode(bcCode uint32) uint32 {
