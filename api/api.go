@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/hex"
 	goerrors "errors"
+	"strings"
 	"time"
 
 	"github.com/lino-network/lino-go/broadcast"
@@ -173,20 +174,26 @@ func (api *API) broadcastAndWatch(ctx context.Context, seq uint64, lastHash *str
 	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
 ) (*model.BroadcastResponse, *string, error) {
 	resp, err := f(ctx, seq)
+	var commitHash string
+	if resp != nil {
+		commitHash = resp.CommitHash
+	}
 	if err != nil {
 		// can retry.
 		if err.CodeType() == errors.CodeInvalidSequenceNumber {
 			return nil, lastHash, errSeqChanged
 		}
 		if err.CodeType() == errors.CodeFailedToBroadcast {
-			return nil, nil, errTxInCache
+			if strings.Contains(err.Error(), "Tx already exists in cache") {
+				return nil, &commitHash, errTxInCache
+			}
+			return nil, nil, err
 		}
 		return nil, nil, err
 	}
 
 	// check tx commit hash
-	commitHash := resp.CommitHash
-	commitHashBytes, decodeErr := hex.DecodeString(resp.CommitHash)
+	commitHashBytes, decodeErr := hex.DecodeString(commitHash)
 	if decodeErr != nil {
 		return nil, lastHash, errors.GuaranteeBroadcastFail("commit hash invalid")
 	}
