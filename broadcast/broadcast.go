@@ -90,6 +90,22 @@ func (broadcast *Broadcast) Transfer(ctx context.Context, sender, receiver, amou
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
 }
 
+// MakeTransferMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeTransferMsg(sender, receiver, amount, memo, privKeyHex string,
+	seq uint64) ([]byte, errors.Error) {
+	msg := model.TransferMsg{
+		Sender:   sender,
+		Receiver: receiver,
+		Amount:   amount,
+		Memo:     memo,
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, memo)
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
 // Transfer sends a certain amount of LINO token from the sender to the receiver.
 // It composes TransferMsg and then broadcasts the transaction to blockchain.
 func (broadcast *Broadcast) TransferSync(ctx context.Context, sender, receiver, amount, memo,
@@ -192,15 +208,15 @@ func (broadcast *Broadcast) CreatePost(ctx context.Context, author, postID, titl
 	}
 
 	msg := model.CreatePostMsg{
-		Author:       author,
-		PostID:       postID,
-		Title:        title,
-		Content:      content,
-		ParentAuthor: parentAuthor,
-		ParentPostID: parentPostID,
-		SourceAuthor: sourceAuthor,
-		SourcePostID: sourcePostID,
-		Links:        mLinks,
+		Author:                  author,
+		PostID:                  postID,
+		Title:                   title,
+		Content:                 content,
+		ParentAuthor:            parentAuthor,
+		ParentPostID:            parentPostID,
+		SourceAuthor:            sourceAuthor,
+		SourcePostID:            sourcePostID,
+		Links:                   mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
 	}
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
@@ -221,15 +237,15 @@ func (broadcast *Broadcast) CreatePostSync(ctx context.Context, author, postID, 
 	}
 
 	msg := model.CreatePostMsg{
-		Author:       author,
-		PostID:       postID,
-		Title:        title,
-		Content:      content,
-		ParentAuthor: parentAuthor,
-		ParentPostID: parentPostID,
-		SourceAuthor: sourceAuthor,
-		SourcePostID: sourcePostID,
-		Links:        mLinks,
+		Author:                  author,
+		PostID:                  postID,
+		Title:                   title,
+		Content:                 content,
+		ParentAuthor:            parentAuthor,
+		ParentPostID:            parentPostID,
+		SourceAuthor:            sourceAuthor,
+		SourcePostID:            sourcePostID,
+		Links:                   mLinks,
 		RedistributionSplitRate: redistributionSplitRate,
 	}
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", true, broadcast.maxAttempts, broadcast.initSleepTime)
@@ -248,6 +264,25 @@ func (broadcast *Broadcast) Donate(ctx context.Context, username, author,
 		Memo:     memo,
 	}
 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
+}
+
+// MakeDonateMsg return signed msg.
+func (broadcast *Broadcast) MakeDonateMsg(username, author, amount, postID, fromApp, memo string,
+	privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := model.DonateMsg{
+		Username: username,
+		Amount:   amount,
+		Author:   author,
+		PostID:   postID,
+		FromApp:  fromApp,
+		Memo:     memo,
+	}
+
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, memo)
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
 }
 
 // Donate adds a money donation to a post by a user.
@@ -753,6 +788,69 @@ func (broadcast *Broadcast) retry(ctx context.Context, msg model.Msg, privKeyHex
 		}
 	}
 	return res, err
+}
+
+// CalcTxMsgHash return hash bytes
+func CalcTxMsgHash(msg []byte) ([]byte, errors.Error) {
+	if msg == nil {
+		return nil, errors.InvalidArg("CalcTxMsgHash: empty msg bytes")
+	}
+	return ttypes.Tx(msg).Hash(), nil
+}
+
+// CalcTxMsgHashHexString return hex encoded hash string
+func CalcTxMsgHashHexString(msg []byte) (string, errors.Error) {
+	hash, err := CalcTxMsgHash(msg)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(hash), nil
+}
+
+// BroadcastRawMsgBytesSync broadcast message to CheckTx.
+func (broadcast *Broadcast) BroadcastRawMsgBytesSync(ctx context.Context, txBytes []byte) errors.Error {
+	var res interface{}
+	var err error
+	finishCh := make(chan struct{})
+
+	broadcastCtx, cancel := context.WithTimeout(ctx, broadcast.timeout)
+	defer cancel()
+
+	go func() {
+		defer func() {
+			finishCh <- struct{}{}
+		}()
+		res, err = broadcast.transport.BroadcastTx(txBytes, true)
+	}()
+
+	select {
+	case <-finishCh:
+		break
+	case <-ctx.Done():
+		return errors.Timeoutf("msg timeout").AddCause(ctx.Err())
+	case <-broadcastCtx.Done():
+		return errors.BroadcastTimeoutf("broadcast timeout").AddCause(ctx.Err())
+	}
+
+	if err != nil {
+		return errors.FailedToBroadcastf("broadcast failed, err: %s", err.Error())
+	}
+
+	bres, ok := res.(*ctypes.ResultBroadcastTx)
+	if !ok {
+		return errors.FailedToBroadcast("error to parse the broadcast response")
+	}
+	code := retrieveCodeFromBlockChainCode(bres.Code)
+	if err == nil && code == model.InvalidSeqErrCode {
+		return errors.InvalidSequenceNumber("invalid seq").
+			AddBlockChainCode(bres.Code).AddBlockChainLog(bres.Log)
+	}
+
+	if bres.Code != uint32(0) {
+		return errors.CheckTxFail("CheckTx failed!").
+			AddBlockChainCode(bres.Code).AddBlockChainLog(bres.Log)
+	}
+	return nil
 }
 
 //
