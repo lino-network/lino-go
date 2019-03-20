@@ -100,7 +100,7 @@ func (broadcast *Broadcast) TransferSync(ctx context.Context, sender, receiver, 
 		Amount:   amount,
 		Memo:     memo,
 	}
-	return broadcast.retry(ctx, msg, privKeyHex, seq, strconv.FormatInt(time.Now().Unix(), 10), true, broadcast.maxAttempts, broadcast.initSleepTime)
+	return broadcast.retry(ctx, msg, privKeyHex, seq, "", true, broadcast.maxAttempts, broadcast.initSleepTime)
 }
 
 // Follow creates a social relationship between follower and followee.
@@ -262,7 +262,7 @@ func (broadcast *Broadcast) DonateSync(ctx context.Context, username, author,
 		FromApp:  fromApp,
 		Memo:     memo,
 	}
-	return broadcast.retry(ctx, msg, privKeyHex, seq, strconv.FormatInt(time.Now().Unix(), 10), true, broadcast.maxAttempts, broadcast.initSleepTime)
+	return broadcast.retry(ctx, msg, privKeyHex, seq, "", true, broadcast.maxAttempts, broadcast.initSleepTime)
 }
 
 // ReportOrUpvote adds a report or upvote action to a post.
