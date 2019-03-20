@@ -791,7 +791,7 @@ func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg model.
 	}
 
 	if err != nil {
-		return response, errors.FailedToBroadcast("broadcast failed")
+		return response, errors.FailedToBroadcastf("broadcast failed, err: %s", err.Error())
 	}
 
 	if checkTxOnly {
