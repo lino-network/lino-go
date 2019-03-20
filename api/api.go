@@ -192,10 +192,13 @@ func (api *API) broadcastAndWatch(ctx context.Context, seq uint64, lastHash *str
 			return nil, lastHash, errSeqChanged
 		}
 
-		// only in case that (tx in cache), we continue polling.
+		// only in case that (tx in cache) or (timeout), we continue polling.
 		if err.CodeType() == errors.CodeFailedToBroadcast &&
 			strings.Contains(err.Error(), "Tx already exists in cache") {
 			// do nothing and start to polling.
+		} else if err.CodeType() == errors.CodeTimeout ||
+			err.CodeType() == errors.CodeBroadcastTimeout {
+			// no-op, fallthrough to polling.
 		} else {
 			return nil, &commitHash, err
 		}
