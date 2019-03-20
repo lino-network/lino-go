@@ -101,15 +101,12 @@ func NewLinoAPIFromArgs(opt *Options) *API {
 	}
 }
 
-// GuaranteeBroadcast - gurantee broadcast succ unless ctx timeout, which status is unknown.
-func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
-	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
-) (*model.BroadcastResponse, errors.Error) {
-	if !api.Broadcast.FixSequenceNumber {
-		return nil, errors.GuaranteeBroadcastFail(
-			"only fix sequence number can guarantee broadcast")
-	}
+// MsgBuilderFunc is usually a closure that return messages bytes for a specific sequence.
+type MsgBuilderFunc func(seq uint64) ([]byte, errors.Error)
 
+// GuaranteeBroadcast - gurantee broadcast succ unless ctx timeout, which status is unknown.
+func (api *API) GuaranteeBroadcast(ctx context.Context,
+	username string, f MsgBuilderFunc) (*model.BroadcastResponse, errors.Error) {
 	var lastHash *string // init: nil
 	for {
 		resp, txHash, err := func() (*model.BroadcastResponse, *string, error) {
@@ -132,7 +129,7 @@ func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
 			return resp, linoErr
 		}
 		// This case shall never happen.
-		return resp, errors.GuaranteeBroadcastFail("returned error is not typed: " + linoErr.Error())
+		return resp, errors.GuaranteeBroadcastFail("returned error is not typed: " + err.Error())
 	}
 }
 
@@ -141,8 +138,7 @@ func (api *API) GuaranteeBroadcast(ctx context.Context, username string,
 // The safaty is guaranteed by that, seq number can advance IFF last tx does not exist in
 // GetTxAndSequenceNumber.
 func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, lastHash *string,
-	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
-) (*model.BroadcastResponse, *string, error) {
+	f MsgBuilderFunc) (*model.BroadcastResponse, *string, error) {
 	var currentSeq uint64 // 0
 	if lastHash == nil {
 		var seqErr error
@@ -167,29 +163,29 @@ func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, last
 		}
 		currentSeq = txSeq.Sequence
 	}
-	return api.broadcastAndWatch(ctx, currentSeq, lastHash, f)
+	msgBytes, err := f(currentSeq)
+	if err != nil {
+		return nil, lastHash, err
+	}
+	newHash, err := broadcast.CalcTxMsgHashHexString(msgBytes)
+	if err != nil {
+		return nil, lastHash, err
+	}
+
+	bres, berr := api.broadcastAndWatch(ctx, msgBytes)
+	if berr != nil {
+		return nil, &newHash, berr
+	}
+	return bres, &newHash, nil
 }
 
 // unsafe, make sure the @p seq is a conservative value that won't do f twice.
-func (api *API) broadcastAndWatch(ctx context.Context, seq uint64, lastHash *string,
-	f func(ctx context.Context, seq uint64) (*model.BroadcastResponse, errors.Error),
-) (*model.BroadcastResponse, *string, error) {
-	resp, err := f(ctx, seq)
-	if resp == nil {
-		msg := "checkTx failed, empty resp: "
-		if err != nil {
-			msg += err.Error()
-		} else {
-			msg += "nil err"
-		}
-		return nil, lastHash, errors.GuaranteeBroadcastFail(msg)
-	}
-	commitHash := resp.CommitHash
+func (api *API) broadcastAndWatch(ctx context.Context, msg []byte) (*model.BroadcastResponse, error) {
+	err := api.Broadcast.BroadcastRawMsgBytesSync(ctx, msg)
 	if err != nil {
 		// can retry.
-		// return lastHash because this tx did not passed checkTx.
 		if err.CodeType() == errors.CodeInvalidSequenceNumber {
-			return nil, lastHash, errSeqChanged
+			return nil, errSeqChanged
 		}
 
 		// only in case that (tx in cache) or (timeout), we continue polling.
@@ -200,36 +196,34 @@ func (api *API) broadcastAndWatch(ctx context.Context, seq uint64, lastHash *str
 			err.CodeType() == errors.CodeBroadcastTimeout {
 			// no-op, fallthrough to polling.
 		} else {
-			return nil, &commitHash, err
+			return nil, err
 		}
 	}
 
-	// check tx commit hash
-	commitHashBytes, decodeErr := hex.DecodeString(commitHash)
-	if decodeErr != nil {
-		return nil, lastHash, errors.GuaranteeBroadcastFail("commit hash invalid")
-	}
-
+	// polling tx commit hash
+	hashBytes, _ := broadcast.CalcTxMsgHash(msg) // msg passed chectx won't meet error here.
 	ticker := time.NewTicker(api.checkTxConfirmInterval)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
-			tx, err := api.GetTx(ctx, commitHashBytes)
+			tx, err := api.GetTx(ctx, hashBytes)
 			// keep retry
 			if err != nil {
 				continue
 			}
 			// if code is not ok (0), report err
 			if tx.Code != 0 {
-				return nil, &commitHash, errors.DeliverTxFail(
-					"deliver tx failed").AddBlockChainCode(tx.Code).AddBlockChainLog(tx.Log)
+				return nil, errors.DeliverTxFail("deliver tx failed").
+					AddBlockChainCode(tx.Code).AddBlockChainLog(tx.Log)
 			}
-			resp.Height = tx.Height
-			return resp, &commitHash, nil
+			return &model.BroadcastResponse{
+				CommitHash: hex.EncodeToString(hashBytes),
+				Height: tx.Height,
+			}, nil
 		case <-ctx.Done():
 			// can retry
-			return nil, &commitHash, errTxWatchTimeout
+			return nil, errTxWatchTimeout
 		}
 	}
 }
