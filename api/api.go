@@ -173,7 +173,6 @@ func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, last
 		}
 		currentSeq = txSeq.Sequence
 	}
-	currentSeq = 1
 	msgBytes, err := f(currentSeq)
 	if err != nil {
 		return nil, lastHash, err
