@@ -108,7 +108,15 @@ type MsgBuilderFunc func(seq uint64) ([]byte, errors.Error)
 func (api *API) GuaranteeBroadcast(ctx context.Context,
 	username string, f MsgBuilderFunc) (*model.BroadcastResponse, errors.Error) {
 	var lastHash *string // init: nil
-	for {
+	stopped := false
+	nRetried := 0
+	for !stopped {
+		select {
+		case  <- ctx.Done():
+			stopped = true
+		default:
+		}
+
 		resp, txHash, err := func() (*model.BroadcastResponse, *string, error) {
 			broadcastCtx, cancel := context.WithTimeout(ctx, api.timeout)
 			defer cancel()
@@ -122,6 +130,7 @@ func (api *API) GuaranteeBroadcast(ctx context.Context,
 			if txHash != nil {
 				lastHash = txHash
 			}
+			nRetried++
 			continue
 		}
 		linoErr, ok := err.(errors.Error)
@@ -131,6 +140,7 @@ func (api *API) GuaranteeBroadcast(ctx context.Context,
 		// This case shall never happen.
 		return resp, errors.GuaranteeBroadcastFail("returned error is not typed: " + err.Error())
 	}
+	return nil, errors.BroadcastTimeoutf("GuaranteeBroadcast timeout, retried: %d", nRetried)
 }
 
 // this function ensure the safety of making a broadcast by doing a getSeq after getSeq, using
@@ -163,6 +173,7 @@ func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, last
 		}
 		currentSeq = txSeq.Sequence
 	}
+	currentSeq = 1
 	msgBytes, err := f(currentSeq)
 	if err != nil {
 		return nil, lastHash, err
