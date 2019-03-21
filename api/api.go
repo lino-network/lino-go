@@ -172,7 +172,7 @@ func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, last
 		return nil, lastHash, err
 	}
 
-	bres, berr := api.broadcastAndWatch(ctx, msgBytes)
+	bres, berr := api.broadcastAndWatch(ctx, msgBytes, currentSeq)
 	if berr != nil {
 		return nil, &newHash, berr
 	}
@@ -180,8 +180,8 @@ func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, last
 }
 
 // unsafe, make sure the @p seq is a conservative value that won't do f twice.
-func (api *API) broadcastAndWatch(ctx context.Context, msg []byte) (*model.BroadcastResponse, error) {
-	err := api.Broadcast.BroadcastRawMsgBytesSync(ctx, msg)
+func (api *API) broadcastAndWatch(ctx context.Context, msg []byte, seq uint64) (*model.BroadcastResponse, error) {
+	err := api.Broadcast.BroadcastRawMsgBytesSync(ctx, msg, seq)
 	if err != nil {
 		// can retry.
 		if err.CodeType() == errors.CodeInvalidSequenceNumber {

@@ -807,8 +807,23 @@ func CalcTxMsgHashHexString(msg []byte) (string, errors.Error) {
 	return hex.EncodeToString(hash), nil
 }
 
+// ExtractSeqNumberFromErrLog extracts correct sequence number from
+func ExtractSeqNumberFromErrLog(log string) *uint64 {
+	sub := SubstringAfterStr(log, "seq:")
+	i := strings.Index(sub, "\"")
+	if i != -1 {
+		seqStr := sub[:i]
+		correctSeq, err := strconv.ParseUint(seqStr, 10, 64)
+		if err != nil {
+			return nil
+		}
+		return &correctSeq
+	}
+	return nil
+}
+
 // BroadcastRawMsgBytesSync broadcast message to CheckTx.
-func (broadcast *Broadcast) BroadcastRawMsgBytesSync(ctx context.Context, txBytes []byte) errors.Error {
+func (broadcast *Broadcast) BroadcastRawMsgBytesSync(ctx context.Context, txBytes []byte, seq uint64) errors.Error {
 	var res interface{}
 	var err error
 	finishCh := make(chan struct{})
@@ -841,9 +856,14 @@ func (broadcast *Broadcast) BroadcastRawMsgBytesSync(ctx context.Context, txByte
 		return errors.FailedToBroadcast("error to parse the broadcast response")
 	}
 	code := retrieveCodeFromBlockChainCode(bres.Code)
-	if err == nil && code == model.InvalidSeqErrCode {
-		return errors.InvalidSequenceNumber("invalid seq").
-			AddBlockChainCode(bres.Code).AddBlockChainLog(bres.Log)
+
+	// special handling of invalid sequence number
+	if code == uint32(errors.CodeUnverifiedBytes) {
+		correctSeq := ExtractSeqNumberFromErrLog(bres.Log)
+		if correctSeq != nil && seq != *correctSeq {
+			return errors.InvalidSequenceNumber("invalid seq").
+				AddBlockChainCode(bres.Code).AddBlockChainLog(bres.Log)
+		}
 	}
 
 	if bres.Code != uint32(0) {
