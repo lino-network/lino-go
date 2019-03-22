@@ -105,9 +105,11 @@ func NewLinoAPIFromArgs(opt *Options) *API {
 type MsgBuilderFunc func(seq uint64) ([]byte, errors.Error)
 
 // GuaranteeBroadcast - gurantee broadcast succ unless ctx timeout, which status is unknown.
+// return response and an array of tx hash executed.
 // XXX(yumin): BROKEN now, not recommended to use.
 func (api *API) GuaranteeBroadcast(ctx context.Context,
-	username string, f MsgBuilderFunc) (*model.BroadcastResponse, errors.Error) {
+	username string, f MsgBuilderFunc) (*model.BroadcastResponse, []string, errors.Error) {
+	hashHistory := make([]string, 0)
 	var lastHash *string // init: nil
 
 	ticker := time.NewTicker(1 * time.Second)
@@ -127,8 +129,13 @@ func (api *API) GuaranteeBroadcast(ctx context.Context,
 			defer cancel()
 			return api.safeBroadcastAndWatch(broadcastCtx, username, lastHash, f)
 		}()
+		if txHash != nil {
+			if lastHash == nil || (lastHash != nil && *txHash != *lastHash) {
+				hashHistory = append(hashHistory, *txHash)
+			}
+		}
 		if err == nil {
-			return resp, nil
+			return resp, hashHistory, nil
 		}
 		// The only place that does the retry.
 		if err == errTxWatchTimeout || err == errSeqChanged || err == errSeqTxQueryFailed {
@@ -140,12 +147,14 @@ func (api *API) GuaranteeBroadcast(ctx context.Context,
 		}
 		linoErr, ok := err.(errors.Error)
 		if ok {
-			return resp, linoErr
+			return resp, hashHistory, linoErr
 		}
 		// This case shall never happen.
-		return resp, errors.GuaranteeBroadcastFail("returned error is not typed: " + err.Error())
+		return resp, hashHistory, errors.GuaranteeBroadcastFail(
+			"returned error is not typed: " + err.Error())
 	}
-	return nil, errors.BroadcastTimeoutf("GuaranteeBroadcast timeout, retried: %d", nRetried)
+	return nil, hashHistory, errors.BroadcastTimeoutf(
+		"GuaranteeBroadcast timeout, retried: %d", nRetried)
 }
 
 // this function ensure the safety of making a broadcast by doing a getSeq after getSeq, using
