@@ -190,8 +190,9 @@ type GrantPermissionMsg struct {
 }
 
 type RevokePermissionMsg struct {
-	Username string        `json:"username"`
-	PubKey   crypto.PubKey `json:"public_key"`
+	Username   string     `json:"username"`
+	RevokeFrom string     `json:"revoke_from"`
+	Permission Permission `json:"permission"`
 }
 
 type PreAuthorizationMsg struct {
