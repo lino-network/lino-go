@@ -33,7 +33,7 @@ type Broadcast struct {
 // NewBroadcast returns an instance of Broadcast.
 func NewBroadcast(
 	transport *transport.Transport, maxAttempts int64, initSleepTime time.Duration,
-	timeout time.Duration, exponentialBackoff bool, backoffRandomness bool, fixSequenceNumber bool) *Broadcast {
+	timeout time.Duration, exponentialBackoff bool, backoffRandomness bool) *Broadcast {
 	return &Broadcast{
 		transport:          transport,
 		maxAttempts:        maxAttempts,
@@ -41,7 +41,7 @@ func NewBroadcast(
 		initSleepTime:      initSleepTime,
 		exponentialBackoff: exponentialBackoff,
 		backoffRandomness:  backoffRandomness,
-		FixSequenceNumber:  fixSequenceNumber,
+		FixSequenceNumber:  true,
 	}
 }
 

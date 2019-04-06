@@ -43,7 +43,6 @@ type Options struct {
 	Timeout                time.Duration `json:"timeout"`
 	ExponentialBackoff     bool          `json:"exponential_back_off"`
 	BackoffRandomness      bool          `json:"backoff_randomness"`
-	FixSequenceNumber      bool          `json:"fix_sequence_number"`
 	CheckTxConfirmInterval time.Duration `json:"check_tx_confirm_interval"`
 }
 
@@ -95,7 +94,7 @@ func NewLinoAPIFromArgs(opt *Options) *API {
 	transport := transport.NewTransportFromArgs(opt.ChainID, opt.NodeURL)
 	return &API{
 		Query:                  query.NewQuery(transport),
-		Broadcast:              broadcast.NewBroadcast(transport, opt.MaxAttempts, opt.InitSleepTime, opt.Timeout, opt.ExponentialBackoff, opt.BackoffRandomness, opt.FixSequenceNumber),
+		Broadcast:              broadcast.NewBroadcast(transport, opt.MaxAttempts, opt.InitSleepTime, opt.Timeout, opt.ExponentialBackoff, opt.BackoffRandomness),
 		checkTxConfirmInterval: opt.CheckTxConfirmInterval,
 		timeout:                opt.Timeout,
 	}
