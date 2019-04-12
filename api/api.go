@@ -495,7 +495,10 @@ func (api *API) UpgradeProtocol(ctx context.Context, creator, link, reason strin
 
 // GuaranteeBroadcast - gurantee broadcast succ unless ctx timeout, which status is unknown.
 // return response and an array of tx hash executed.
-// XXX(yumin): BROKEN now, not recommended to use.
+// WARNING-1: Use on lino fullnode version >= 0.2.10 ONLY!
+// on lower version, txs may be executed twice
+// WARNING-2: @p f, the MsgBuilderFunc, must be a pure function(no state, deterministic),
+// otherwise, tx may be executed twice
 func (api *API) GuaranteeBroadcast(ctx context.Context,
 	username string, f MsgBuilderFunc) (*model.BroadcastResponse, []string, errors.Error) {
 	hashHistory := make([]string, 0)
@@ -585,35 +588,6 @@ func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, last
 		return nil, lastHash, err
 	}
 
-	// XXX(yumin): so bad that GetTxAndSequenceNumber is broken for now because txinder
-	// is async. In this case, we will redo the query N times, and allow it only
-	// when stay the same for that many times of queries.
-	// Note that, it Guarantee NOTHING, only likely to be just ok. DO NOT use in
-	// important txs.
-	if lastHash != nil && *lastHash != newHash {
-		N := 5
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
-		for i := 0; i < N; i++ {
-			txSeqCheck, seqErr := api.Query.GetTxAndSequenceNumber(ctx, username, *lastHash)
-			if seqErr != nil {
-				return nil, lastHash, errSeqTxQueryFailed
-			}
-			// not stabled.
-			if txSeqCheck.Sequence != currentSeq {
-				return nil, lastHash, errSeqTxQueryFailed
-			}
-			// well it actually succeeded.
-			if txSeqCheck.Tx != nil {
-				return &model.BroadcastResponse{
-					Height:     txSeqCheck.Tx.Height,
-					CommitHash: txSeqCheck.Tx.Hash,
-				}, lastHash, nil
-			}
-			<-ticker.C
-		}
-	}
-
 	bres, berr := api.broadcastAndWatch(ctx, msgBytes, currentSeq)
 	if berr != nil {
 		return nil, &newHash, berr
@@ -643,7 +617,7 @@ func (api *API) broadcastAndWatch(ctx context.Context, msg []byte, seq uint64) (
 	}
 
 	// polling tx commit hash
-	hashBytes, _ := broadcast.CalcTxMsgHash(msg) // msg passed chectx won't meet error here.
+	hashBytes, _ := broadcast.CalcTxMsgHash(msg) // msg passed checktx won't trigger error here.
 	ticker := time.NewTicker(api.checkTxConfirmInterval)
 	defer ticker.Stop()
 	for {
