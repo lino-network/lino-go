@@ -168,3 +168,8 @@ func InvalidSignature(msg string) Error {
 func GuaranteeBroadcastFail(msg string) Error {
 	return newError(CodeGuaranteeBroadcastFail, msg)
 }
+
+//UnmarshaFailed creates an error with  and formatted message
+func UnmarshaFailed(msg string) Error {
+	return newError(CodeUnmarshalFailed, msg)
+}

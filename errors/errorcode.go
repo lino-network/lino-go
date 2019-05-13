@@ -18,4 +18,5 @@ const (
 	CodeInvalidSignature       // invalid sign bytes
 	CodeTxNotFound             // tx not found
 	CodeGuaranteeBroadcastFail // guarantee broadcast fail
+	CodeUnmarshalFailed
 )

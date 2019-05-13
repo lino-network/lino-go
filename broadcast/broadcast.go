@@ -132,7 +132,16 @@ func (broadcast *Broadcast) MakeTransferMsg(sender, receiver, amount, memo, priv
 	if buildErr != nil {
 		return nil, buildErr
 	}
+	fmt.Println(string(txByte))
 	return txByte, nil
+}
+
+func (broadcast *Broadcast) DecodeTxBytes(txbytes []byte) (*model.Transaction, errors.Error) {
+	tx := &model.Transaction{}
+	if err := broadcast.transport.Cdc.UnmarshalJSON(txbytes, tx); err != nil {
+		return nil, errors.UnmarshaFailed("Unmarshal failed")
+	}
+	return tx, nil
 }
 
 // Transfer sends a certain amount of LINO token from the sender to the receiver.

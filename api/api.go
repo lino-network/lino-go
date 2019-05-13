@@ -356,7 +356,7 @@ func (api *API) PreAuthorizationPermission(ctx context.Context, username, author
 // RevokePermission revokes the permission given previously to a app.
 // It composes RevokePermissionMsg and then broadcasts the transaction to blockchain.
 func (api *API) RevokePermission(ctx context.Context, username, revokeFrom string, permission model.Permission,
-	privKeyHex string, seq uint64) (*model.BroadcastResponse, errors.Error) {
+	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeRevokePermissionPermissionMsg(username, revokeFrom, permission, privKeyHex, seq)
 	})
