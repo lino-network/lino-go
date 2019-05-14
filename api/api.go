@@ -588,6 +588,35 @@ func (api *API) safeBroadcastAndWatch(ctx context.Context, username string, last
 		return nil, lastHash, err
 	}
 
+	// XXX(yumin): so bad that GetTxAndSequenceNumber is broken for now because txinder
+	// is async. In this case, we will redo the query N times, and allow it only
+	// when stay the same for that many times of queries.
+	// Note that, it Guarantee NOTHING, only likely to be just ok. DO NOT use in
+	// important txs.
+	if lastHash != nil && *lastHash != newHash {
+		N := 5
+		ticker := time.NewTicker(1 * time.Second)
+		defer ticker.Stop()
+		for i := 0; i < N; i++ {
+			txSeqCheck, seqErr := api.Query.GetTxAndSequenceNumber(ctx, username, *lastHash)
+			if seqErr != nil {
+				return nil, lastHash, errSeqTxQueryFailed
+			}
+			// not stabled.
+			if txSeqCheck.Sequence != currentSeq {
+				return nil, lastHash, errSeqTxQueryFailed
+			}
+			// well it actually succeeded.
+			if txSeqCheck.Tx != nil {
+				return &model.BroadcastResponse{
+					Height:     txSeqCheck.Tx.Height,
+					CommitHash: txSeqCheck.Tx.Hash,
+				}, lastHash, nil
+			}
+			<-ticker.C
+		}
+	}
+
 	bres, berr := api.broadcastAndWatch(ctx, msgBytes, currentSeq)
 	if berr != nil {
 		return nil, &newHash, berr
