@@ -132,7 +132,6 @@ func (broadcast *Broadcast) MakeTransferMsg(sender, receiver, amount, memo, priv
 	if buildErr != nil {
 		return nil, buildErr
 	}
-	fmt.Println(string(txByte))
 	return txByte, nil
 }
 
