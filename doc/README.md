@@ -30,11 +30,11 @@ dep ensure
 ```
 api := api.NewLinoAPIFromArgs(chainID, nodeURL)
 ```
-chanID and nodeURL can be found remotely from https://linotracker.io/ 
+chanID and nodeURL can be found remotely from https://github.com/lino-network/testnets/blob/master/lino-testnet/genesis.json 
 or locally from ~/.lino/config/genesis.json
 
 For example,  
-Remotely: chainID = "test-chain-BgWrtq" and nodeURL = "http://fullnode.linovalidator.io:80"  
+Remotely: chainID = "lino-testnet" and nodeURL = "https://fullnode.lino.network:443"  
 Locally: chainID = "test-chain-q8lMWR" and nodeURL = "http://localhost:26657"  
 
 ## API
