@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/lino-network/lino-go/errors"
-	"github.com/lino-network/lino-go/model"
+	"github.com/lino-network/lino/x/developer/model"
 )
 
 // GetDeveloper returns a specific developer info from blockchain.

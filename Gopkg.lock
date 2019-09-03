@@ -3,11 +3,27 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:09a7f74eb6bb3c0f14d8926610c87f569c5cff68e978d30e9a3540aeb626fdf0"
+  name = "github.com/bartekn/go-bip39"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a05967ea095d81c8fe4833776774cfaff8e5036c"
+
+[[projects]]
+  branch = "master"
   digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
   pruneopts = "UT"
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
+
+[[projects]]
+  digest = "1:1343a2963481a305ca4d051e84bc2abd16b601ee22ed324f8d605de1adb291b0"
+  name = "github.com/bgentry/speakeasy"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "4aabc24848ce5fd31929f7d1e4ea74d3709c14cd"
+  version = "v0.1.0"
 
 [[projects]]
   digest = "1:093bf93a65962e8191e3e8cd8fc6c363f83d43caca9739c906531ba7210a9904"
@@ -24,17 +40,83 @@
   revision = "d4cc87b860166d00d6b5b9e0d3b3d71d6088d4d4"
 
 [[projects]]
-  digest = "1:499c4617f42bb21578d04bd6a5d5cb1dd9f3bdb6a9b64f6af7b1232b5f90df7a"
+  digest = "1:4120d9bbf7e2c3506ab65772444cf88a5f42a1eb1351b7acfe271507a39d3e1a"
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
+    "baseapp",
+    "client",
+    "client/keys",
+    "cmd/gaia/app",
     "codec",
+    "crypto",
+    "crypto/keys",
+    "crypto/keys/hd",
+    "crypto/keys/keyerror",
+    "crypto/keys/mintkey",
+    "store",
+    "store/cachekv",
+    "store/cachemulti",
+    "store/dbadapter",
+    "store/errors",
     "store/gaskv",
+    "store/iavl",
+    "store/prefix",
+    "store/rootmulti",
+    "store/tracekv",
+    "store/transient",
     "store/types",
+    "tests",
     "types",
+    "version",
+    "x/auth",
+    "x/auth/client/txbuilder",
+    "x/bank",
+    "x/crisis",
+    "x/distribution",
+    "x/distribution/keeper",
+    "x/distribution/tags",
+    "x/distribution/types",
+    "x/gov",
+    "x/gov/tags",
+    "x/mint",
+    "x/mock",
+    "x/params",
+    "x/params/subspace",
+    "x/slashing",
+    "x/slashing/tags",
+    "x/staking",
+    "x/staking/keeper",
+    "x/staking/querier",
+    "x/staking/tags",
+    "x/staking/types",
   ]
   pruneopts = "UT"
-  revision = "906e9509cfcae3330584416c8b8e9cfe6c8d2766"
-  version = "v0.32.0"
+  revision = "62fa99e715308dcf53de3bec8bee79e2a6a394bc"
+  version = "v0.34.4"
+
+[[projects]]
+  branch = "master"
+  digest = "1:0427cfa11785c899dfe0ea6987bc0c9dea61647f6bb3987163d62c867f1cad6a"
+  name = "github.com/cosmos/go-bip39"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "555e2067c45d9fcd7292bf3b8e732bc10ac8c58e"
+
+[[projects]]
+  digest = "1:b4af4b28b7adce7bb6263f5f249acad6c1e4b346e043fc5b1d0feb3799aded17"
+  name = "github.com/cosmos/ledger-cosmos-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "836324878776cb6f1a6b4ddcd81a67ead217358c"
+  version = "v0.10.3"
+
+[[projects]]
+  digest = "1:34efba6719d5a29ddc868bf772b864980654dc1a1c18e06659e4246ea1665fb8"
+  name = "github.com/cosmos/ledger-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "1c99b41f1877b58e3517ef93012cc76fe5cd335b"
+  version = "v0.9.2"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -43,14 +125,6 @@
   pruneopts = "UT"
   revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
   version = "v1.1.1"
-
-[[projects]]
-  digest = "1:fed20bf7f0da387c96d4cfc140a95572e5aba4bb984beb7de910e090ae39849b"
-  name = "github.com/ethereum/go-ethereum"
-  packages = ["crypto/secp256k1"]
-  pruneopts = "UT"
-  revision = "c942700427557e3ff6de3aaf6b916e2f056c1ec2"
-  version = "v1.8.23"
 
 [[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
@@ -93,7 +167,7 @@
   version = "v1.8.0"
 
 [[projects]]
-  digest = "1:35621fe20f140f05a0c4ef662c26c0ab4ee50bca78aa30fe87d33120bd28165e"
+  digest = "1:95e1006e41c641abd2f365dfa0f1213c04da294e7cd5f0bf983af234b775db64"
   name = "github.com/gogo/protobuf"
   packages = [
     "gogoproto",
@@ -104,8 +178,8 @@
     "types",
   ]
   pruneopts = "UT"
-  revision = "636bf0302bc95575d69441b25a2603156ffdddf1"
-  version = "v1.1.1"
+  revision = "ba06b47c162d49f2af050fb4c75bcbc86a159d5c"
+  version = "v1.2.1"
 
 [[projects]]
   digest = "1:17fe264ee908afc795734e8c4e63db2accabaf57326dbf21763a7d6b86096260"
@@ -165,12 +239,12 @@
   version = "v1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:39b27d1381a30421f9813967a5866fba35dc1d4df43a6eefe3b7a5444cb07214"
+  digest = "1:a74b5a8e34ee5843cd6e65f698f3e75614f812ff170c2243425d75bc091e9af2"
   name = "github.com/jmhodges/levigo"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c42d9e0ca023e2198120196f842701bb4c55d7b9"
+  revision = "853d788c5c416eaaee5b044570784a96c7a26975"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -182,11 +256,40 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9915764bcd23f37552f97d555ff07fd14b4d2111ffc47c36e606ec3722ca49fb"
+  digest = "1:58dc20843a969154bd273b8bae2e3f04a7a3f51fe719ffe0ebb51974262f9063"
   name = "github.com/lino-network/lino"
-  packages = ["types"]
+  packages = [
+    "param",
+    "types",
+    "utils",
+    "x/account",
+    "x/account/manager",
+    "x/account/model",
+    "x/account/types",
+    "x/developer",
+    "x/developer/model",
+    "x/global",
+    "x/global/model",
+    "x/infra",
+    "x/infra/model",
+    "x/post",
+    "x/post/manager",
+    "x/post/model",
+    "x/post/types",
+    "x/price",
+    "x/proposal",
+    "x/proposal/model",
+    "x/reputation",
+    "x/reputation/internal",
+    "x/reputation/repv2",
+    "x/validator",
+    "x/validator/model",
+    "x/vote",
+    "x/vote/model",
+    "x/vote/types",
+  ]
   pruneopts = "UT"
-  revision = "7fa881d584b8f1c76a7fdb3485206eaa57a96e46"
+  revision = "e0e837210d6e69a5866db2dd02c5b1cd5cd2862b"
 
 [[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
@@ -195,6 +298,14 @@
   pruneopts = "UT"
   revision = "c2353362d570a7bfa228149c62842019201cfb71"
   version = "v1.8.0"
+
+[[projects]]
+  digest = "1:36325ebb862e0382f2f14feef409ba9351271b89ada286ae56836c603d43b59c"
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e1f7b56ace729e4a73a29a6b4fac6cd5fcda7ab3"
+  version = "v0.0.9"
 
 [[projects]]
   digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
@@ -227,6 +338,14 @@
   pruneopts = "UT"
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
+
+[[projects]]
+  digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  pruneopts = "UT"
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:93a746f1060a8acbcf69344862b2ceced80f854170e1caae089b2834c5fbf7f4"
@@ -341,6 +460,17 @@
   version = "v1.3.1"
 
 [[projects]]
+  digest = "1:99d32780e5238c2621fff621123997c3e3cca96db8be13179013aea77dfab551"
+  name = "github.com/stretchr/testify"
+  packages = [
+    "assert",
+    "require",
+  ]
+  pruneopts = "UT"
+  revision = "221dbe5ed46703ee255b1da0dec05086f5035f62"
+  version = "v1.4.0"
+
+[[projects]]
   digest = "1:5b180f17d5bc50b765f4dcf0d126c72979531cbbd7f7929bf3edd87fb801ea2d"
   name = "github.com/syndtr/goleveldb"
   packages = [
@@ -362,6 +492,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:83f5e189eea2baad419a6a410984514266ff690075759c87e9ede596809bd0b8"
+  name = "github.com/tendermint/btcd"
+  packages = ["btcec"]
+  pruneopts = "UT"
+  revision = "80daadac05d1cd29571fccf27002d79667a88b58"
+  version = "v0.1.1"
+
+[[projects]]
   digest = "1:ad9c4c1a4e7875330b1f62906f2830f043a23edb5db997e3a5ac5d3e6eadf80a"
   name = "github.com/tendermint/go-amino"
   packages = ["."]
@@ -370,7 +508,15 @@
   version = "v0.14.1"
 
 [[projects]]
-  digest = "1:b1fb7b9e734c001d78aa7070188f566bb760cf47645dc5116c5033e506ea46ae"
+  digest = "1:9f8cd74d11cdb703946d85b4d131f014daf989e9f1b22c794ca5210a7773ca3e"
+  name = "github.com/tendermint/iavl"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2f35d309e69ffec33c044a910acd9e8d739eb095"
+  version = "v0.12.2"
+
+[[projects]]
+  digest = "1:76819c6c3dfc7a38ad87c81d488838894b68202ba336955378e5fc97e828b576"
   name = "github.com/tendermint/tendermint"
   packages = [
     "abci/client",
@@ -383,16 +529,20 @@
     "consensus",
     "consensus/types",
     "crypto",
+    "crypto/armor",
     "crypto/ed25519",
     "crypto/encoding/amino",
     "crypto/merkle",
     "crypto/multisig",
     "crypto/multisig/bitarray",
     "crypto/secp256k1",
+    "crypto/secp256k1/internal/secp256k1",
     "crypto/tmhash",
+    "crypto/xsalsa20symmetric",
     "evidence",
     "libs/autofile",
     "libs/bech32",
+    "libs/cli",
     "libs/clist",
     "libs/common",
     "libs/db",
@@ -425,12 +575,22 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "v0.30.0"
+  revision = "v0.31.5"
 
 [[projects]]
-  digest = "1:b6621a5e9003d7d809993d49217a841d27ef85b4bc0459115d3fd1f8c1518999"
+  digest = "1:5a736f4722932d9a45d28852e85b83f68292d9af2ef0be29d4e5fe6fd89d5d96"
+  name = "github.com/zondax/hid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "302fd402163c34626286195dfa9adac758334acc"
+  version = "v0.9.0"
+
+[[projects]]
+  digest = "1:6f6dc6060c4e9ba73cf28aa88f12a69a030d3d19d518ef8e931879eaa099628d"
   name = "golang.org/x/crypto"
   packages = [
+    "bcrypt",
+    "blowfish",
     "chacha20poly1305",
     "curve25519",
     "ed25519",
@@ -440,12 +600,16 @@
     "internal/subtle",
     "nacl/box",
     "nacl/secretbox",
+    "openpgp/armor",
+    "openpgp/errors",
+    "pbkdf2",
     "poly1305",
     "ripemd160",
     "salsa20/salsa",
   ]
   pruneopts = "UT"
-  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+  revision = "3764759f34a542a3aef74d6b02e35be7ab893bba"
+  source = "https://github.com/tendermint/crypto"
 
 [[projects]]
   digest = "1:d36f55a999540d29b6ea3c2ea29d71c76b1d9853fdcd3e5c5cb4836f2ba118f1"
@@ -559,7 +723,23 @@
   input-imports = [
     "github.com/cosmos/cosmos-sdk/codec",
     "github.com/cosmos/cosmos-sdk/types",
+    "github.com/cosmos/cosmos-sdk/x/auth",
+    "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder",
     "github.com/lino-network/lino/types",
+    "github.com/lino-network/lino/x/account/model",
+    "github.com/lino-network/lino/x/account/types",
+    "github.com/lino-network/lino/x/developer",
+    "github.com/lino-network/lino/x/developer/model",
+    "github.com/lino-network/lino/x/infra",
+    "github.com/lino-network/lino/x/infra/model",
+    "github.com/lino-network/lino/x/post/model",
+    "github.com/lino-network/lino/x/post/types",
+    "github.com/lino-network/lino/x/proposal",
+    "github.com/lino-network/lino/x/proposal/model",
+    "github.com/lino-network/lino/x/validator",
+    "github.com/lino-network/lino/x/validator/model",
+    "github.com/lino-network/lino/x/vote",
+    "github.com/lino-network/lino/x/vote/model",
     "github.com/spf13/viper",
     "github.com/tendermint/tendermint/crypto",
     "github.com/tendermint/tendermint/crypto/encoding/amino",

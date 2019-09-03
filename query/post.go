@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/lino-network/lino-go/errors"
-	"github.com/lino-network/lino-go/model"
+	"github.com/lino-network/lino/x/post/model"
 )
 
 // GetPostInfo returns post info given a permlink(author#postID).
-func (query *Query) GetPostInfo(ctx context.Context, author, postID string) (*model.PostInfo, error) {
+func (query *Query) GetPostInfo(ctx context.Context, author, postID string) (*model.Post, error) {
 	permlink := getPermlink(author, postID)
 	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostInfoSubStore, []string{permlink})
 	if err != nil {
@@ -18,76 +18,11 @@ func (query *Query) GetPostInfo(ctx context.Context, author, postID string) (*mo
 		}
 		return nil, err
 	}
-	postInfo := new(model.PostInfo)
+	postInfo := new(model.Post)
 	if err := query.transport.Cdc.UnmarshalJSON(resp, postInfo); err != nil {
 		return nil, err
 	}
 	return postInfo, nil
-}
-
-// GetPostMeta returns post meta given a permlink.
-func (query *Query) GetPostMeta(ctx context.Context, author, postID string) (*model.PostMeta, error) {
-	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostMetaSubStore, []string{permlink})
-	if err != nil {
-		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodePostMetaNotFound) {
-			return nil, errors.EmptyResponse("post meta is not found")
-		}
-		return nil, err
-	}
-	postMeta := new(model.PostMeta)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, postMeta); err != nil {
-		return nil, err
-	}
-	return postMeta, nil
-}
-
-// GetPostComment returns a specific comment of a post given the post permlink
-// and comment permlink.
-func (query *Query) GetPostComment(ctx context.Context, author, postID, commentPermlink string) (*model.Comment, error) {
-	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostCommentSubStore, []string{permlink})
-	if err != nil {
-		return nil, err
-	}
-	comment := new(model.Comment)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, comment); err != nil {
-		return nil, err
-	}
-	return comment, nil
-}
-
-// GetPostView returns a view of a post performed by a user.
-func (query *Query) GetPostView(ctx context.Context, author, postID, viewUser string) (*model.View, error) {
-	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostViewSubStore, []string{permlink})
-	if err != nil {
-		return nil, err
-	}
-	view := new(model.View)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, view); err != nil {
-		return nil, err
-	}
-	return view, nil
-}
-
-// GetPostReportOrUpvote returns report or upvote that a user has given to a post.
-func (query *Query) GetPostReportOrUpvote(ctx context.Context, author, postID, user string) (*model.ReportOrUpvote, error) {
-	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostReportOrUpvoteSubStore, []string{permlink, user})
-	if err != nil {
-		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodePostReportOrUpvoteNotFound) {
-			return nil, errors.EmptyResponse("post is not found")
-		}
-		return nil, err
-	}
-	reportOrUpvote := new(model.ReportOrUpvote)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, reportOrUpvote); err != nil {
-		return nil, err
-	}
-	return reportOrUpvote, nil
 }
 
 //

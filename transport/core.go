@@ -8,7 +8,6 @@ import (
 
 	wire "github.com/cosmos/cosmos-sdk/codec"
 	"github.com/lino-network/lino-go/errors"
-	"github.com/lino-network/lino-go/model"
 	"github.com/spf13/viper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,10 +18,11 @@ import (
 
 // Transport is a wrapper of tendermint rpc client and codec.
 type Transport struct {
-	chainId string
-	nodeUrl string
-	client  rpcclient.Client
-	Cdc     *wire.Codec
+	chainId      string
+	nodeUrl      string
+	maxFeeInCoin int64
+	client       rpcclient.Client
+	Cdc          *wire.Codec
 }
 
 // NewTransportFromConfig initiates an instance of Transport from config files.
@@ -335,8 +335,8 @@ func (t Transport) BroadcastTx(tx []byte, checkTxOnly bool) (interface{}, error)
 // }
 
 // SignAndBuild signs msg with private key and return tx bytes
-func (t Transport) SignAndBuild(msg model.Msg, privKeyHex string, seq uint64, memo string) ([]byte, errors.Error) {
-	msgs := []model.Msg{msg}
+func (t Transport) SignAndBuild(msg sdk.Msg, privKeyHex string, seq uint64, memo string) ([]byte, errors.Error) {
+	msgs := []sdk.Msg{msg}
 
 	privKey, err := GetPrivKeyFromHex(privKeyHex)
 	if err != nil {
@@ -354,7 +354,7 @@ func (t Transport) SignAndBuild(msg model.Msg, privKeyHex string, seq uint64, me
 	}
 
 	// build transaction bytes
-	txByte, err := EncodeTx(t.Cdc, msgs, privKey.PubKey(), sig, seq, memo)
+	txByte, err := EncodeTx(t.Cdc, msgs, privKey.PubKey(), sig, seq, memo, t.maxFeeInCoin)
 	if err != nil {
 		return nil, errors.FailedToBroadcastf("error to encode transaction, err: %s", err.Error())
 	}

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/lino-network/lino-go/errors"
-	"github.com/lino-network/lino-go/model"
+	"github.com/lino-network/lino/x/validator/model"
 )
 
 // GetValidator returns validator info given a validator name from blockchain.

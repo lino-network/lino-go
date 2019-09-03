@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 
-	"github.com/lino-network/lino-go/model"
+	"github.com/lino-network/lino/x/proposal/model"
 )
 
 // GetOngoingProposal returns one ongoing proposal.

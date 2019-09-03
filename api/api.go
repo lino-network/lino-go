@@ -15,6 +15,8 @@ import (
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/query"
 	"github.com/lino-network/lino-go/transport"
+	"github.com/lino-network/lino/param"
+	linotypes "github.com/lino-network/lino/types"
 	"github.com/spf13/viper"
 )
 
@@ -124,12 +126,12 @@ func (api *API) Transfer(ctx context.Context, sender, receiver, amount, memo, pr
 
 // Claim claims rewards of a certain user.
 // It composes ClaimMsg and then broadcasts the transaction to blockchain.
-func (api *API) Claim(ctx context.Context, username, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
-		return api.MakeClaimMsg(username, privKeyHex, seq)
-	})
-	return resp, err
-}
+// func (api *API) Claim(ctx context.Context, username, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
+// 		return api.MakeClaimMsg(username, privKeyHex, seq)
+// 	})
+// 	return resp, err
+// }
 
 // UpdateAccount updates account related info in jsonMeta which are not
 // included in AccountInfo or AccountBank.
@@ -155,12 +157,11 @@ func (api *API) Recover(ctx context.Context, username, newResetPubKeyHex,
 
 // CreatePost creates a new post on blockchain.
 // It composes CreatePostMsg and then broadcasts the transaction to blockchain.
-func (api *API) CreatePost(ctx context.Context, author, postID, title, content,
-	parentAuthor, parentPostID, sourceAuthor, sourcePostID, redistributionSplitRate string,
-	links map[string]string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) CreatePost(
+	ctx context.Context, author, postID, title, content, createdBy string, preauth bool,
+	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, author, func(seq uint64) ([]byte, errors.Error) {
-		return api.MakeCreatePostMsg(author, postID, title, content,
-			parentAuthor, parentPostID, sourceAuthor, sourcePostID, redistributionSplitRate, links, privKeyHex, seq)
+		return api.MakeCreatePostMsg(author, postID, title, content, createdBy, preauth, privKeyHex, seq)
 	})
 	return resp, err
 }
@@ -175,16 +176,6 @@ func (api *API) Donate(ctx context.Context, username, author,
 	return resp, err
 }
 
-// ReportOrUpvote adds a report or upvote action to a post.
-// It composes ReportOrUpvoteMsg and then broadcasts the transaction to blockchain.
-func (api *API) ReportOrUpvote(ctx context.Context, username, author,
-	postID string, isReport bool, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
-		return api.MakeReportOrUpvoteMsg(username, author, postID, isReport, privKeyHex, seq)
-	})
-	return resp, err
-}
-
 // DeletePost deletes a post from the blockchain. It doesn't actually
 // remove the post from the blockchain, instead it sets IsDeleted to true
 // and clears all the other data.
@@ -193,15 +184,6 @@ func (api *API) DeletePost(ctx context.Context, author,
 	postID string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, author, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeDeleteMsg(author, postID, privKeyHex, seq)
-	})
-	return resp, err
-}
-
-// View increases the view count of a post by one.
-// It composes ViewMsg and then broadcasts the transaction to blockchain.
-func (api *API) View(ctx context.Context, username, author, postID string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
-		return api.MakeViewMsg(username, author, postID, privKeyHex, seq)
 	})
 	return resp, err
 }
@@ -323,8 +305,10 @@ func (api *API) DeveloperRevoke(ctx context.Context, username, privKeyHex string
 // GrantPermission grants a certain (e.g. App) permission to
 // an authorized app with a certain period of time.
 // It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
-func (api *API) GrantPermission(ctx context.Context, username, authorizedApp string,
-	validityPeriodSec int64, grantLevel model.Permission, amount string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) GrantPermission(
+	ctx context.Context, username, authorizedApp string,
+	validityPeriodSec int64, grantLevel linotypes.Permission,
+	amount string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeGrantPermissionMsg(username, authorizedApp, validityPeriodSec, grantLevel, amount, privKeyHex, seq)
 	})
@@ -337,25 +321,16 @@ func (api *API) GrantPermission(ctx context.Context, username, authorizedApp str
 func (api *API) GrantAppAndPreAuthPermission(ctx context.Context, username, authorizedApp string,
 	validityPeriodSec int64, amount string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
-		return api.MakeGrantAppAndPreAuthPermissionMsg(username, authorizedApp, validityPeriodSec, amount, privKeyHex, seq)
-	})
-	return resp, err
-}
-
-// GrantAppAndPreAuthPermission grants both app and preauth permission to
-// an authorized app with a certain period of time.
-// It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
-func (api *API) PreAuthorizationPermission(ctx context.Context, username, authorizedApp string,
-	validityPeriodSec int64, amount string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
-		return api.MakePreAuthorizationPermissionMsg(username, authorizedApp, validityPeriodSec, amount, privKeyHex, seq)
+		return api.MakeGrantPermissionMsg(
+			username, authorizedApp, validityPeriodSec, linotypes.AppAndPreAuthorizationPermission, amount, privKeyHex, seq)
 	})
 	return resp, err
 }
 
 // RevokePermission revokes the permission given previously to a app.
 // It composes RevokePermissionMsg and then broadcasts the transaction to blockchain.
-func (api *API) RevokePermission(ctx context.Context, username, revokeFrom string, permission model.Permission,
+func (api *API) RevokePermission(
+	ctx context.Context, username, revokeFrom string, permission linotypes.Permission,
 	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeRevokePermissionPermissionMsg(username, revokeFrom, permission, privKeyHex, seq)
@@ -376,7 +351,7 @@ func (api *API) ProviderReport(ctx context.Context, username string, usage int64
 // ChangeGlobalAllocationParam changes GlobalAllocationParam with new value.
 // It composes ChangeGlobalAllocationParamMsg and then broadcasts the transaction to blockchain.
 func (api *API) ChangeGlobalAllocationParam(ctx context.Context, creator string,
-	parameter model.GlobalAllocationParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	parameter param.GlobalAllocationParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, creator, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeChangeGlobalAllocationParamMsg(creator, parameter, reason, privKeyHex, seq)
 	})
@@ -385,8 +360,9 @@ func (api *API) ChangeGlobalAllocationParam(ctx context.Context, creator string,
 
 // ChangeInfraInternalAllocationParam changes InfraInternalAllocationParam with new value.
 // It composes ChangeInfraInternalAllocationParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeInfraInternalAllocationParam(ctx context.Context, creator string,
-	parameter model.InfraInternalAllocationParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) ChangeInfraInternalAllocationParam(
+	ctx context.Context, creator string, parameter param.InfraInternalAllocationParam,
+	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, creator, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeChangeInfraInternalAllocationParamMsg(creator, parameter, reason, privKeyHex, seq)
 	})
@@ -395,8 +371,9 @@ func (api *API) ChangeInfraInternalAllocationParam(ctx context.Context, creator 
 
 // ChangeVoteParam changes VoteParam with new value.
 // It composes ChangeVoteParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeVoteParam(ctx context.Context, creator string,
-	parameter model.VoteParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) ChangeVoteParam(
+	ctx context.Context, creator string, parameter param.VoteParam,
+	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, creator, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeChangeVoteParamMsg(creator, parameter, reason, privKeyHex, seq)
 	})
@@ -405,8 +382,9 @@ func (api *API) ChangeVoteParam(ctx context.Context, creator string,
 
 // ChangeProposalParam changes ProposalParam with new value.
 // It composes ChangeProposalParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeProposalParam(ctx context.Context, creator string,
-	parameter model.ProposalParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) ChangeProposalParam(
+	ctx context.Context, creator string, parameter param.ProposalParam,
+	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, creator, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeChangeProposalParamMsg(creator, parameter, reason, privKeyHex, seq)
 	})
@@ -415,8 +393,9 @@ func (api *API) ChangeProposalParam(ctx context.Context, creator string,
 
 // ChangeDeveloperParam changes DeveloperParam with new value.
 // It composes ChangeDeveloperParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeDeveloperParam(ctx context.Context, creator string,
-	parameter model.DeveloperParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) ChangeDeveloperParam(
+	ctx context.Context, creator string, parameter param.DeveloperParam,
+	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, creator, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeChangeDeveloperParamMsg(creator, parameter, reason, privKeyHex, seq)
 	})
@@ -425,8 +404,9 @@ func (api *API) ChangeDeveloperParam(ctx context.Context, creator string,
 
 // ChangeValidatorParam changes ValidatorParam with new value.
 // It composes ChangeValidatorParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeValidatorParam(ctx context.Context, creator string,
-	parameter model.ValidatorParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) ChangeValidatorParam(
+	ctx context.Context, creator string, parameter param.ValidatorParam,
+	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, creator, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeChangeValidatorParamMsg(creator, parameter, reason, privKeyHex, seq)
 	})
@@ -435,8 +415,9 @@ func (api *API) ChangeValidatorParam(ctx context.Context, creator string,
 
 // ChangeBandwidthParam changes BandwidthParam with new value.
 // It composes ChangeBandwidthParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeBandwidthParam(ctx context.Context, creator string,
-	parameter model.BandwidthParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) ChangeBandwidthParam(
+	ctx context.Context, creator string, parameter param.BandwidthParam,
+	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, creator, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeChangeBandwidthParamMsg(creator, parameter, reason, privKeyHex, seq)
 	})
@@ -445,8 +426,9 @@ func (api *API) ChangeBandwidthParam(ctx context.Context, creator string,
 
 // ChangeAccountParam changes AccountParam with new value.
 // It composes ChangeAccountParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeAccountParam(ctx context.Context, creator string,
-	parameter model.AccountParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) ChangeAccountParam(
+	ctx context.Context, creator string, parameter param.AccountParam,
+	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, creator, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeChangeAccountParamMsg(creator, parameter, reason, privKeyHex, seq)
 	})
@@ -455,8 +437,9 @@ func (api *API) ChangeAccountParam(ctx context.Context, creator string,
 
 // ChangePostParam changes PostParam with new value.
 // It composes ChangePostParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangePostParam(ctx context.Context, creator string,
-	parameter model.PostParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) ChangePostParam(
+	ctx context.Context, creator string, parameter param.PostParam,
+	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, creator, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeChangePostParamMsg(creator, parameter, reason, privKeyHex, seq)
 	})
@@ -466,8 +449,9 @@ func (api *API) ChangePostParam(ctx context.Context, creator string,
 // DeletePostContent deletes the content of a post on blockchain, which is used
 // for content censorship.
 // It composes DeletePostContentMsg and then broadcasts the transaction to blockchain.
-func (api *API) DeletePostContent(ctx context.Context, creator, postAuthor,
-	postID, reason, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) DeletePostContent(
+	ctx context.Context, creator, postAuthor, postID, reason,
+	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, creator, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeDeletePostContentMsg(creator, postAuthor, postID, reason, privKeyHex, seq)
 	})
@@ -476,8 +460,9 @@ func (api *API) DeletePostContent(ctx context.Context, creator, postAuthor,
 
 // VoteProposal adds a vote to a certain proposal with agree/disagree.
 // It composes VoteProposalMsg and then broadcasts the transaction to blockchain.
-func (api *API) VoteProposal(ctx context.Context, voter, proposalID string,
-	result bool, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+func (api *API) VoteProposal(
+	ctx context.Context, voter, proposalID string, result bool,
+	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, voter, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeVoteProposalMsg(voter, proposalID, result, privKeyHex, seq)
 	})

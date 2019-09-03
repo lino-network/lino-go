@@ -5,101 +5,35 @@ import (
 	"encoding/json"
 
 	wire "github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	auth "github.com/cosmos/cosmos-sdk/x/auth"
+	txbuilder "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 	"github.com/lino-network/lino-go/errors"
-	"github.com/lino-network/lino-go/model"
+	linotypes "github.com/lino-network/lino/types"
+	acctypes "github.com/lino-network/lino/x/account/types"
+	devtypes "github.com/lino-network/lino/x/developer"
+	posttypes "github.com/lino-network/lino/x/post/types"
+	proposal "github.com/lino-network/lino/x/proposal"
+	valtypes "github.com/lino-network/lino/x/validator"
+	votetypes "github.com/lino-network/lino/x/vote"
 
 	crypto "github.com/tendermint/tendermint/crypto"
 	cryptoAmino "github.com/tendermint/tendermint/crypto/encoding/amino"
 )
 
-// ZeroFee is used in building a standard transaction.
-var ZeroFee = model.Fee{
-	Amount: model.SDKCoins{},
-	Gas:    0,
-}
-
 // MakeCodec returns all interface and messages to Tendermint.
 func MakeCodec() *wire.Codec {
 	cdc := wire.New()
 
-	cdc.RegisterInterface((*model.Msg)(nil), nil)
-	cdc.RegisterInterface((*model.Tx)(nil), nil)
-	cdc.RegisterConcrete(model.Transaction{}, "auth/StdTx", nil)
-
-	// account
-	cdc.RegisterConcrete(model.RegisterMsg{}, "lino/register", nil)
-	cdc.RegisterConcrete(model.FollowMsg{}, "lino/follow", nil)
-	cdc.RegisterConcrete(model.UnfollowMsg{}, "lino/unfollow", nil)
-	cdc.RegisterConcrete(model.TransferMsg{}, "lino/transfer", nil)
-	cdc.RegisterConcrete(model.ClaimMsg{}, "lino/claim", nil)
-	cdc.RegisterConcrete(model.RecoverMsg{}, "lino/recover", nil)
-	cdc.RegisterConcrete(model.UpdateAccountMsg{}, "lino/updateAcc", nil)
-
-	// post
-	cdc.RegisterConcrete(model.CreatePostMsg{}, "lino/createPost", nil)
-	cdc.RegisterConcrete(model.UpdatePostMsg{}, "lino/updatePost", nil)
-	cdc.RegisterConcrete(model.DeletePostMsg{}, "lino/deletePost", nil)
-	cdc.RegisterConcrete(model.DonateMsg{}, "lino/donate", nil)
-	cdc.RegisterConcrete(model.ViewMsg{}, "lino/view", nil)
-	cdc.RegisterConcrete(model.ReportOrUpvoteMsg{}, "lino/reportOrUpvote", nil)
-
-	// validator
-	cdc.RegisterConcrete(model.ValidatorDepositMsg{}, "lino/valDeposit", nil)
-	cdc.RegisterConcrete(model.ValidatorWithdrawMsg{}, "lino/valWithdraw", nil)
-	cdc.RegisterConcrete(model.ValidatorRevokeMsg{}, "lino/valRevoke", nil)
-
-	// vote
-	cdc.RegisterConcrete(model.StakeInMsg{}, "lino/stakeIn", nil)
-	cdc.RegisterConcrete(model.StakeOutMsg{}, "lino/stakeOut", nil)
-	cdc.RegisterConcrete(model.DelegateMsg{}, "lino/delegate", nil)
-	cdc.RegisterConcrete(model.DelegatorWithdrawMsg{}, "lino/delegateWithdraw", nil)
-	cdc.RegisterConcrete(model.ClaimInterestMsg{}, "lino/claimInterest", nil)
-
-	// developer
-	cdc.RegisterConcrete(model.DeveloperRegisterMsg{}, "lino/devRegister", nil)
-	cdc.RegisterConcrete(model.DeveloperUpdateMsg{}, "lino/devUpdate", nil)
-	cdc.RegisterConcrete(model.DeveloperRevokeMsg{}, "lino/devRevoke", nil)
-	cdc.RegisterConcrete(model.GrantPermissionMsg{}, "lino/grantPermission", nil)
-	cdc.RegisterConcrete(model.RevokePermissionMsg{}, "lino/revokePermission", nil)
-	cdc.RegisterConcrete(model.PreAuthorizationMsg{}, "lino/preAuthorizationPermission", nil)
-
-	// infra provider
-	cdc.RegisterConcrete(model.ProviderReportMsg{}, "lino/providerReport", nil)
-
-	// proposal
-	cdc.RegisterConcrete(model.VoteProposalMsg{}, "lino/voteProposal", nil)
-	cdc.RegisterConcrete(model.DeletePostContentMsg{}, "lino/deletePostContent", nil)
-	cdc.RegisterConcrete(model.UpgradeProtocolMsg{}, "lino/upgradeProtocol", nil)
-	cdc.RegisterConcrete(model.ChangeGlobalAllocationParamMsg{}, "lino/changeGlobalAllocation", nil)
-	cdc.RegisterConcrete(model.ChangeInfraInternalAllocationParamMsg{}, "lino/changeInfraAllocation", nil)
-	cdc.RegisterConcrete(model.ChangeVoteParamMsg{}, "lino/changeVoteParam", nil)
-	cdc.RegisterConcrete(model.ChangeProposalParamMsg{}, "lino/changeProposalParam", nil)
-	cdc.RegisterConcrete(model.ChangeDeveloperParamMsg{}, "lino/changeDeveloperParam", nil)
-	cdc.RegisterConcrete(model.ChangeValidatorParamMsg{}, "lino/changeValidatorParam", nil)
-	cdc.RegisterConcrete(model.ChangeBandwidthParamMsg{}, "lino/changeBandwidthParam", nil)
-	cdc.RegisterConcrete(model.ChangeAccountParamMsg{}, "lino/changeAccountParam", nil)
-	cdc.RegisterConcrete(model.ChangePostParamMsg{}, "lino/changePostParam", nil)
-
-	// // TODO:
-	// cdc.RegisterInterface((*model.Proposal)(nil), nil)
-	// cdc.RegisterConcrete(&model.ChangeParamProposal{}, "changeParam", nil)
-	// cdc.RegisterConcrete(&model.ProtocolUpgradeProposal{}, "upgrade", nil)
-	// cdc.RegisterConcrete(&model.ContentCensorshipProposal{}, "censorship", nil)
-
-	// cdc.RegisterInterface((*param.Parameter)(nil), nil)
-	// cdc.RegisterConcrete(param.EvaluateOfContentValueParam{}, "param/contentValue", nil)
-	// cdc.RegisterConcrete(param.GlobalAllocationParam{}, "param/allocation", nil)
-	// cdc.RegisterConcrete(param.InfraInternalAllocationParam{}, "param/infaAllocation", nil)
-	// cdc.RegisterConcrete(param.VoteParam{}, "param/vote", nil)
-	// cdc.RegisterConcrete(param.ProposalParam{}, "param/proposal", nil)
-	// cdc.RegisterConcrete(param.DeveloperParam{}, "param/developer", nil)
-	// cdc.RegisterConcrete(param.ValidatorParam{}, "param/validator", nil)
-	// cdc.RegisterConcrete(param.CoinDayParam{}, "param/coinDay", nil)
-	// cdc.RegisterConcrete(param.BandwidthParam{}, "param/bandwidth", nil)
-	// cdc.RegisterConcrete(param.AccountParam{}, "param/account", nil)
-	// cdc.RegisterConcrete(param.PostParam{}, "param/post", nil)
+	acctypes.RegisterWire(cdc)
+	posttypes.RegisterCodec(cdc)
+	votetypes.RegisterWire(cdc)
+	valtypes.RegisterWire(cdc)
+	proposal.RegisterWire(cdc)
+	devtypes.RegisterWire(cdc)
 
 	wire.RegisterCrypto(cdc)
+	sdk.RegisterCodec(cdc)
 	return cdc
 }
 
@@ -117,34 +51,17 @@ func sortJSON(toSortJSON []byte) ([]byte, error) {
 }
 
 // EncodeSignMsg encodes the message to the standard signed message.
-func EncodeSignMsg(cdc *wire.Codec, msgs []model.Msg, chainId string, seq uint64, memo string) ([]byte, error) {
-	feeBytes, err := cdc.MarshalJSON(ZeroFee)
-	if err != nil {
-		return nil, err
-	}
-
-	var msgsBytes []json.RawMessage
-	for _, msg := range msgs {
-		bz, err := cdc.MarshalJSON(msg)
-		if err != nil {
-			return nil, err
-		}
-
-		signBytes, err := sortJSON(bz)
-		if err != nil {
-			return nil, err
-		}
-
-		msgsBytes = append(msgsBytes, json.RawMessage(signBytes))
-	}
-
-	stdSignMsg := model.SignMsg{
+func EncodeSignMsg(cdc *wire.Codec, msgs []sdk.Msg, chainID string, seq uint64, memo string) ([]byte, error) {
+	stdSignMsg := txbuilder.StdSignMsg{
 		AccountNumber: 0,
-		ChainID:       chainId,
-		Fee:           json.RawMessage(feeBytes),
-		Memo:          memo,
-		Msgs:          msgsBytes,
-		Sequence:      seq,
+		ChainID:       chainID,
+		Fee: auth.StdFee{
+			Amount: sdk.Coins{},
+			Gas:    0,
+		},
+		Memo:     memo,
+		Msgs:     msgs,
+		Sequence: seq,
 	}
 
 	signMsgBytes, err := cdc.MarshalJSON(stdSignMsg)
@@ -152,22 +69,26 @@ func EncodeSignMsg(cdc *wire.Codec, msgs []model.Msg, chainId string, seq uint64
 		return nil, err
 	}
 
-	return sortJSON(signMsgBytes)
+	return sdk.MustSortJSON(signMsgBytes), nil
 }
 
 // EncodeTx encodes a message to the standard transaction.
-func EncodeTx(cdc *wire.Codec, msgs []model.Msg, pubKey crypto.PubKey,
-	sig []byte, seq uint64, memo string) ([]byte, error) {
-	stdSig := model.Signature{
-		PubKey:   pubKey,
-		Sig:      sig,
-		Sequence: seq,
+func EncodeTx(
+	cdc *wire.Codec, msgs []sdk.Msg, pubKey crypto.PubKey, sig []byte,
+	seq uint64, memo string, maxFeeInCoin int64) ([]byte, error) {
+	stdSig := auth.StdSignature{
+		PubKey:    pubKey,
+		Signature: sig,
 	}
 
-	stdTx := model.Transaction{
-		Msgs:       msgs,
-		Fee:        ZeroFee,
-		Signatures: []model.Signature{stdSig},
+	stdTx := auth.StdTx{
+		Msgs: msgs,
+		Fee: auth.StdFee{
+			Amount: sdk.NewCoins(
+				sdk.NewCoin(linotypes.LinoCoinDenom, sdk.NewInt(maxFeeInCoin))),
+			Gas: 0,
+		},
+		Signatures: []auth.StdSignature{stdSig},
 		Memo:       memo,
 	}
 	return cdc.MarshalJSON(stdTx)

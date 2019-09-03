@@ -7,8 +7,9 @@ import (
 	"strings"
 
 	"github.com/lino-network/lino-go/errors"
-	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
+	"github.com/lino-network/lino/types"
+	"github.com/lino-network/lino/x/account/model"
 	"github.com/tendermint/tendermint/crypto"
 )
 
@@ -38,33 +39,35 @@ func (query *Query) GetTransactionPubKey(ctx context.Context, username string) (
 	return strings.ToUpper(hex.EncodeToString(info.TransactionKey.Bytes())), nil
 }
 
-// GetAppPubKey returns string format app public key.
-func (query *Query) GetAppPubKey(ctx context.Context, username string) (string, error) {
+// GetSigningPubKey returns string format signing public key.
+func (query *Query) GetSigningPubKey(ctx context.Context, username string) (string, error) {
 	info, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
 		return "", err
 	}
 
-	return strings.ToUpper(hex.EncodeToString(info.AppKey.Bytes())), nil
+	return strings.ToUpper(hex.EncodeToString(info.SignningKey.Bytes())), nil
 }
 
-// DoesUsernameMatchResetPrivKey returns true if a user has the reset private key.
-func (query *Query) DoesUsernameMatchResetPrivKey(ctx context.Context, username, resetPrivKeyHex string) (bool, error) {
+// DoesUsernameMatchSigningPrivKey returns true if a user has the correct signing private key.
+func (query *Query) DoesUsernameMatchSigningPrivKey(
+	ctx context.Context, username, signingPrivKeyHex string) (bool, error) {
 	accInfo, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
 		return false, err
 	}
 
-	resetPrivKey, e := transport.GetPrivKeyFromHex(resetPrivKeyHex)
+	signingPrivKey, e := transport.GetPrivKeyFromHex(signingPrivKeyHex)
 	if e != nil {
 		return false, e
 	}
 
-	return accInfo.ResetKey.Equals(resetPrivKey.PubKey()), nil
+	return accInfo.SignningKey.Equals(signingPrivKey.PubKey()), nil
 }
 
-// DoesUsernameMatchTxPrivKey returns true if a user has the transaction private key.
-func (query *Query) DoesUsernameMatchTxPrivKey(ctx context.Context, username, txPrivKeyHex string) (bool, error) {
+// DoesUsernameMatchTransactionPrivKey returns true if a user has the correct transaction private key.
+func (query *Query) DoesUsernameMatchTransactionPrivKey(
+	ctx context.Context, username, txPrivKeyHex string) (bool, error) {
 	accInfo, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
 		return false, err
@@ -76,21 +79,6 @@ func (query *Query) DoesUsernameMatchTxPrivKey(ctx context.Context, username, tx
 	}
 
 	return accInfo.TransactionKey.Equals(txPrivKey.PubKey()), nil
-}
-
-// DoesUsernameMatchAppPrivKey returns true if a user has the app private key.
-func (query *Query) DoesUsernameMatchAppPrivKey(ctx context.Context, username, appPrivKeyHex string) (bool, error) {
-	accInfo, err := query.GetAccountInfo(ctx, username)
-	if err != nil {
-		return false, err
-	}
-
-	appPrivKey, e := transport.GetPrivKeyFromHex(appPrivKeyHex)
-	if e != nil {
-		return false, e
-	}
-
-	return accInfo.AppKey.Equals(appPrivKey.PubKey()), nil
 }
 
 // GetAccountBank returns account bank info for a specific user.
@@ -108,23 +96,6 @@ func (query *Query) GetAccountBank(ctx context.Context, username string) (*model
 		return nil, err
 	}
 	return bank, nil
-}
-
-// GetAccountBank returns account bank info for a specific user.
-func (query *Query) GetPendingCoinDay(ctx context.Context, username string) (*model.PendingCoinDayQueue, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountPendingCoinDaySubStore, []string{username})
-	if err != nil {
-		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodePendingCoinDayQueueNotFound) {
-			return nil, errors.EmptyResponse("account pending coin day is not found")
-		}
-		return nil, err
-	}
-	pendingCoinDay := new(model.PendingCoinDayQueue)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, pendingCoinDay); err != nil {
-		return nil, err
-	}
-	return pendingCoinDay, nil
 }
 
 // GetAccountMeta returns account meta info for a specific user.
@@ -147,22 +118,23 @@ func (query *Query) GetAccountMeta(ctx context.Context, username string) (*model
 // GetSeqNumber returns the next sequence number of a user which should
 // be used for broadcast.
 func (query *Query) GetSeqNumber(ctx context.Context, username string) (uint64, error) {
-	meta, err := query.GetAccountMeta(ctx, username)
+	bank, err := query.GetAccountBank(ctx, username)
 	if err != nil {
 		return 0, err
 	}
-	return meta.Sequence, nil
+	return bank.Sequence, nil
 }
 
 // GetGrantPubKey returns the specific granted pubkey info of a user
 // that has given to the pubKey.
-func (query *Query) GetGrantPubKey(ctx context.Context, username string, grantTo string, permission model.Permission) (*model.GrantPubKey, error) {
+func (query *Query) GetGrantPubKey(
+	ctx context.Context, username string, grantTo string, permission types.Permission) (*model.GrantPermission, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountGrantPubKeySubStore, []string{username, grantTo})
 	if err != nil {
 		return nil, errors.EmptyResponse("grant pubkey is not found or err")
 	}
 
-	grantPubKeyList := make([]*model.GrantPubKey, 0)
+	grantPubKeyList := make([]*model.GrantPermission, 0)
 	if err := query.transport.Cdc.UnmarshalJSON(resp, &grantPubKeyList); err != nil {
 		return nil, err
 	}
@@ -193,13 +165,13 @@ func (query *Query) GetReward(ctx context.Context, username string) (*model.Rewa
 }
 
 // GetReward returns rewards of a user.
-func (query *Query) GetReputation(ctx context.Context, username string) (*model.Coin, error) {
+func (query *Query) GetReputation(ctx context.Context, username string) (*types.Coin, error) {
 	resp, err := query.transport.Query(ctx, ReputationKVStore, UserReputation, []string{username})
 	if err != nil {
 		return nil, err
 	}
 
-	reward := new(model.Coin)
+	reward := new(types.Coin)
 	if err := query.transport.Cdc.UnmarshalJSON(resp, reward); err != nil {
 		return reward, err
 	}
@@ -232,12 +204,12 @@ func (query *Query) GetRewardAtHeight(ctx context.Context, username string, heig
 //
 
 // GetAllGrantPubKeys returns a list of all granted public keys of a user.
-func (query *Query) GetAllGrantPubKeys(ctx context.Context, username string) ([]*model.GrantPubKey, error) {
+func (query *Query) GetAllGrantPubKeys(ctx context.Context, username string) ([]*model.GrantPermission, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountAllGrantPubKeys, []string{username})
 	if err != nil {
 		return nil, errors.EmptyResponse("grant pub key is not found")
 	}
-	grantPubKeyList := make([]*model.GrantPubKey, 0)
+	grantPubKeyList := make([]*model.GrantPermission, 0)
 	if err := query.transport.Cdc.UnmarshalJSON(resp, &grantPubKeyList); err != nil {
 		return nil, err
 	}
@@ -253,8 +225,9 @@ func (query *Query) SignWithSha256(ctx context.Context, payload string, privKey 
 	return privKey.Sign(signByte)
 }
 
-// VerifyUserSignatureUsingAppKey verify signature is signed from payload by user's app private key.
-func (query *Query) VerifyUserSignatureUsingAppKey(ctx context.Context, username string, payload string, signature string) (bool, error) {
+// VerifyUserSignature verify signature is signed from payload by user's signing or tx private key.
+func (query *Query) VerifyUserSignature(
+	ctx context.Context, username string, payload string, signature string) (bool, error) {
 	info, err := query.GetAccountInfo(ctx, username)
 	if err != nil {
 		return false, err
@@ -263,7 +236,24 @@ func (query *Query) VerifyUserSignatureUsingAppKey(ctx context.Context, username
 	if err != nil {
 		return false, err
 	}
-	return info.AppKey.VerifyBytes([]byte(payload), sig), nil
+	if info.SignningKey.VerifyBytes([]byte(payload), sig) || info.TransactionKey.VerifyBytes([]byte(payload), sig) {
+		return true, nil
+	}
+	return false, nil
+}
+
+// VerifyUserSignatureUsingSigningKey verify signature is signed from payload by user's app private key.
+func (query *Query) VerifyUserSignatureUsingSigningKey(
+	ctx context.Context, username string, payload string, signature string) (bool, error) {
+	info, err := query.GetAccountInfo(ctx, username)
+	if err != nil {
+		return false, err
+	}
+	sig, err := hex.DecodeString(signature)
+	if err != nil {
+		return false, err
+	}
+	return info.SignningKey.VerifyBytes([]byte(payload), sig), nil
 }
 
 // VerifyUserSignatureUsingTxKey verify signature is signed from payload by user's transaction private key.

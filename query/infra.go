@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/lino-network/lino-go/errors"
-	"github.com/lino-network/lino-go/model"
+	"github.com/lino-network/lino/x/infra/model"
 )
 
 // GetInfraProvider returns the infra provider info such as usage.

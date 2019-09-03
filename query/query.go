@@ -6,9 +6,11 @@ import (
 	"context"
 	"strings"
 
+	auth "github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
+	ttypes "github.com/tendermint/tendermint/types"
 )
 
 // Query is a wrapper of querying data from blockchain.
@@ -24,26 +26,13 @@ func NewQuery(transport *transport.Transport) *Query {
 }
 
 // GetBlock returns a block at a certain height from blockchain.
-func (query *Query) GetBlock(ctx context.Context, height int64) (*model.Block, error) {
+func (query *Query) GetBlock(ctx context.Context, height int64) (*ttypes.Block, error) {
 	resp, err := query.transport.QueryBlock(ctx, height)
 	if err != nil {
 		return nil, errors.QueryFailf("GetBlock err").AddCause(err)
 	}
 
-	block := new(model.Block)
-	block.Header = resp.Block.Header
-	block.Evidence = resp.Block.Evidence
-	block.LastCommit = resp.Block.LastCommit
-	block.Data = new(model.Data)
-	block.Data.Txs = []model.Transaction{}
-	for _, txBytes := range resp.Block.Data.Txs {
-		var tx model.Transaction
-		if err := query.transport.Cdc.UnmarshalJSON(txBytes, &tx); err != nil {
-			return nil, err
-		}
-		block.Data.Txs = append(block.Data.Txs, tx)
-	}
-	return block, nil
+	return resp.Block, nil
 }
 
 // GetBlockStatus returns the current block status from blockchain.
@@ -71,7 +60,7 @@ func (query *Query) GetTx(ctx context.Context, hash []byte) (*model.BlockTx, err
 		return nil, errors.QueryFailf("GetTx err").AddCause(err)
 	}
 
-	var tx model.Transaction
+	var tx auth.StdTx
 	if err := query.transport.Cdc.UnmarshalJSON(resp.Tx, &tx); err != nil {
 		return nil, errors.QueryFailf("Unmarshal tx err").AddCause(err)
 	}
