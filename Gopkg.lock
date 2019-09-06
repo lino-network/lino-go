@@ -256,10 +256,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:58dc20843a969154bd273b8bae2e3f04a7a3f51fe719ffe0ebb51974262f9063"
+  digest = "1:cfea5ccc92373e526a14e35bf24d420928138d5f8c783bc9d09be39d539ffad5"
   name = "github.com/lino-network/lino"
   packages = [
     "param",
+    "testutils",
     "types",
     "utils",
     "x/account",
@@ -268,6 +269,7 @@
     "x/account/types",
     "x/developer",
     "x/developer/model",
+    "x/developer/types",
     "x/global",
     "x/global/model",
     "x/infra",
@@ -289,7 +291,7 @@
     "x/vote/types",
   ]
   pruneopts = "UT"
-  revision = "e0e837210d6e69a5866db2dd02c5b1cd5cd2862b"
+  revision = "6f62e26a8099e0d9023d43d78c15a864d39e6b9f"
 
 [[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
@@ -725,6 +727,7 @@
     "github.com/cosmos/cosmos-sdk/types",
     "github.com/cosmos/cosmos-sdk/x/auth",
     "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder",
+    "github.com/lino-network/lino/param",
     "github.com/lino-network/lino/types",
     "github.com/lino-network/lino/x/account/model",
     "github.com/lino-network/lino/x/account/types",

@@ -46,7 +46,7 @@ func (query *Query) GetSigningPubKey(ctx context.Context, username string) (stri
 		return "", err
 	}
 
-	return strings.ToUpper(hex.EncodeToString(info.SignningKey.Bytes())), nil
+	return strings.ToUpper(hex.EncodeToString(info.SigningKey.Bytes())), nil
 }
 
 // DoesUsernameMatchSigningPrivKey returns true if a user has the correct signing private key.
@@ -62,7 +62,7 @@ func (query *Query) DoesUsernameMatchSigningPrivKey(
 		return false, e
 	}
 
-	return accInfo.SignningKey.Equals(signingPrivKey.PubKey()), nil
+	return accInfo.SigningKey.Equals(signingPrivKey.PubKey()), nil
 }
 
 // DoesUsernameMatchTransactionPrivKey returns true if a user has the correct transaction private key.
@@ -236,7 +236,7 @@ func (query *Query) VerifyUserSignature(
 	if err != nil {
 		return false, err
 	}
-	if info.SignningKey.VerifyBytes([]byte(payload), sig) || info.TransactionKey.VerifyBytes([]byte(payload), sig) {
+	if info.SigningKey.VerifyBytes([]byte(payload), sig) || info.TransactionKey.VerifyBytes([]byte(payload), sig) {
 		return true, nil
 	}
 	return false, nil
@@ -253,7 +253,7 @@ func (query *Query) VerifyUserSignatureUsingSigningKey(
 	if err != nil {
 		return false, err
 	}
-	return info.SignningKey.VerifyBytes([]byte(payload), sig), nil
+	return info.SigningKey.VerifyBytes([]byte(payload), sig), nil
 }
 
 // VerifyUserSignatureUsingTxKey verify signature is signed from payload by user's transaction private key.

@@ -19,7 +19,7 @@ import (
 	"github.com/lino-network/lino/param"
 	linotypes "github.com/lino-network/lino/types"
 	acctypes "github.com/lino-network/lino/x/account/types"
-	devtypes "github.com/lino-network/lino/x/developer"
+	devtypes "github.com/lino-network/lino/x/developer/types"
 	infratypes "github.com/lino-network/lino/x/infra"
 	posttypes "github.com/lino-network/lino/x/post/types"
 	proposal "github.com/lino-network/lino/x/proposal"
@@ -751,7 +751,6 @@ func (broadcast *Broadcast) MakeDeveloperRegisterMsg(username, deposit, website,
 	description, appMetaData, privKeyHex string, seq uint64) ([]byte, errors.Error) {
 	msg := devtypes.DeveloperRegisterMsg{
 		Username:    linotypes.AccountKey(username),
-		Deposit:     deposit,
 		Website:     website,
 		Description: description,
 		AppMetaData: appMetaData,

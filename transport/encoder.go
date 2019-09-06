@@ -11,7 +11,7 @@ import (
 	"github.com/lino-network/lino-go/errors"
 	linotypes "github.com/lino-network/lino/types"
 	acctypes "github.com/lino-network/lino/x/account/types"
-	devtypes "github.com/lino-network/lino/x/developer"
+	devtypes "github.com/lino-network/lino/x/developer/types"
 	posttypes "github.com/lino-network/lino/x/post/types"
 	proposal "github.com/lino-network/lino/x/proposal"
 	valtypes "github.com/lino-network/lino/x/validator"

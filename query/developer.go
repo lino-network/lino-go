@@ -24,16 +24,16 @@ func (query *Query) GetDeveloper(ctx context.Context, developerName string) (*mo
 	return developer, nil
 }
 
-// GetDevelopers returns a list of all developers.
-func (query *Query) GetDevelopers(ctx context.Context) (*model.DeveloperList, error) {
-	resp, err := query.transport.Query(ctx, DeveloperKVStoreKey, DeveloperListSubStore, []string{})
-	if err != nil {
-		return nil, err
-	}
+// // GetDevelopers returns a list of all developers.
+// func (query *Query) GetDevelopers(ctx context.Context) (*model.DeveloperList, error) {
+// 	resp, err := query.transport.Query(ctx, DeveloperKVStoreKey, DeveloperListSubStore, []string{})
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	developerList := new(model.DeveloperList)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, developerList); err != nil {
-		return nil, err
-	}
-	return developerList, nil
-}
+// 	developerList := new(model.DeveloperList)
+// 	if err := query.transport.Cdc.UnmarshalJSON(resp, developerList); err != nil {
+// 		return nil, err
+// 	}
+// 	return developerList, nil
+// }
