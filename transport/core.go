@@ -6,10 +6,11 @@ import (
 	"context"
 	"fmt"
 
-	wire "github.com/cosmos/cosmos-sdk/codec"
 	"github.com/lino-network/lino-go/errors"
+	linoapp "github.com/lino-network/lino/app"
 	"github.com/spf13/viper"
 
+	wire "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
@@ -43,21 +44,22 @@ func NewTransportFromConfig() *Transport {
 		chainId: v.GetString("chain_id"),
 		nodeUrl: nodeUrl,
 		client:  rpc,
-		Cdc:     MakeCodec(),
+		Cdc:     linoapp.MakeCodec(),
 	}
 }
 
 // NewTransportFromArgs initiates an instance of Transport from parameters passed in.
-func NewTransportFromArgs(chainID, nodeUrl string) *Transport {
+func NewTransportFromArgs(chainID, nodeUrl string, maxFeeInCoin int64) *Transport {
 	if nodeUrl == "" {
 		nodeUrl = "localhost:26657"
 	}
 	rpc := rpcclient.NewHTTP(nodeUrl, "/websocket")
 	return &Transport{
-		chainId: chainID,
-		nodeUrl: nodeUrl,
-		client:  rpc,
-		Cdc:     MakeCodec(),
+		chainId:      chainID,
+		nodeUrl:      nodeUrl,
+		client:       rpc,
+		Cdc:          linoapp.MakeCodec(),
+		maxFeeInCoin: maxFeeInCoin,
 	}
 }
 
@@ -343,10 +345,7 @@ func (t Transport) SignAndBuild(msg sdk.Msg, privKeyHex string, seq uint64, memo
 		return nil, errors.FailedToBroadcastf("error to get private key from public key, err: %s", err.Error())
 	}
 
-	signMsgBytes, err := EncodeSignMsg(t.Cdc, msgs, t.chainId, seq, memo)
-	if err != nil {
-		return nil, errors.FailedToBroadcastf("error to encode sign msg, err: %s", err.Error())
-	}
+	signMsgBytes := EncodeSignMsg(t.Cdc, msgs, t.chainId, seq, memo, t.maxFeeInCoin)
 	// SignatureFromBytes
 	sig, err := privKey.Sign(signMsgBytes)
 	if err != nil {

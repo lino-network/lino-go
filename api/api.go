@@ -41,6 +41,7 @@ type Options struct {
 	ChainID                string        `json:"chain_id"`
 	NodeURL                string        `json:"node_url"`
 	MaxAttempts            int64         `json:"max_attempts"`
+	MaxFeeInCoin           int64         `json:"max_fee_in_coin"`
 	InitSleepTime          time.Duration `json:"init_sleep_time"`
 	Timeout                time.Duration `json:"timeout"`
 	ExponentialBackoff     bool          `json:"exponential_back_off"`
@@ -57,6 +58,9 @@ func (opt *Options) init() {
 	}
 	if opt.Timeout == 0 {
 		opt.Timeout = time.Second * 10
+	}
+	if opt.MaxFeeInCoin == 0 {
+		opt.MaxFeeInCoin = linotypes.Decimals
 	}
 	if opt.CheckTxConfirmInterval == 0 {
 		opt.CheckTxConfirmInterval = time.Second
@@ -93,7 +97,7 @@ func NewLinoAPIFromConfig() *API {
 // chainID and nodeUrl that are passed in.
 func NewLinoAPIFromArgs(opt *Options) *API {
 	opt.init()
-	transport := transport.NewTransportFromArgs(opt.ChainID, opt.NodeURL)
+	transport := transport.NewTransportFromArgs(opt.ChainID, opt.NodeURL, opt.MaxFeeInCoin)
 	return &API{
 		Query:                  query.NewQuery(transport),
 		Broadcast:              broadcast.NewBroadcast(transport, opt.MaxAttempts, opt.InitSleepTime, opt.Timeout, opt.ExponentialBackoff, opt.BackoffRandomness),

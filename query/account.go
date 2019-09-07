@@ -146,25 +146,7 @@ func (query *Query) GetGrantPubKey(
 	return nil, errors.EmptyResponse("grant pubkey is not found")
 }
 
-// GetReward returns rewards of a user.
-func (query *Query) GetReward(ctx context.Context, username string) (*model.Reward, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountRewardSubStore, []string{username})
-	if err != nil {
-		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodeRewardNotFound) {
-			return nil, errors.EmptyResponse("account reward is not found")
-		}
-		return nil, err
-	}
-
-	reward := new(model.Reward)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, reward); err != nil {
-		return reward, err
-	}
-	return reward, nil
-}
-
-// GetReward returns rewards of a user.
+// GetReputation returns rewards of a user.
 func (query *Query) GetReputation(ctx context.Context, username string) (*types.Coin, error) {
 	resp, err := query.transport.Query(ctx, ReputationKVStore, UserReputation, []string{username})
 	if err != nil {
@@ -179,25 +161,25 @@ func (query *Query) GetReputation(ctx context.Context, username string) (*types.
 }
 
 // GetRewardAtHeight returns rewards of a user at certain height.
-func (query *Query) GetRewardAtHeight(ctx context.Context, username string, height int64) (*model.Reward, error) {
-	resp, err := query.transport.QueryAtHeight(ctx, getRewardKey(username), AccountKVStoreKey, height)
-	if err != nil {
-		switch err.(type) {
-		case errors.Error:
-			vErr := err.(errors.Error)
-			if vErr.CodeType() == errors.CodeEmptyResponse {
-				return nil, nil
-			}
-		}
-		return nil, err
-	}
+// func (query *Query) GetRewardAtHeight(ctx context.Context, username string, height int64) (*model.Reward, error) {
+// 	resp, err := query.transport.QueryAtHeight(ctx, getRewardKey(username), AccountKVStoreKey, height)
+// 	if err != nil {
+// 		switch err.(type) {
+// 		case errors.Error:
+// 			vErr := err.(errors.Error)
+// 			if vErr.CodeType() == errors.CodeEmptyResponse {
+// 				return nil, nil
+// 			}
+// 		}
+// 		return nil, err
+// 	}
 
-	reward := new(model.Reward)
-	if err := query.transport.Cdc.UnmarshalBinaryLengthPrefixed(resp, reward); err != nil {
-		return reward, err
-	}
-	return reward, nil
-}
+// 	reward := new(model.Reward)
+// 	if err := query.transport.Cdc.UnmarshalBinaryLengthPrefixed(resp, reward); err != nil {
+// 		return reward, err
+// 	}
+// 	return reward, nil
+// }
 
 //
 // Range Query
