@@ -312,6 +312,7 @@ func (broadcast *Broadcast) MakeCreatePostMsg(
 		Title:     title,
 		Content:   content,
 		CreatedBy: linotypes.AccountKey(createdBy),
+		Preauth:   preauth,
 	}
 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
 	if buildErr != nil {
