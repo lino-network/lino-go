@@ -1,18 +1,9 @@
-package model
+package util
 
 import (
-	"math"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	linotypes "github.com/lino-network/lino/types"
-)
-
-var (
-	// LowerBoundRat - the lower bound of Rat
-	LowerBoundRat = NewDecFromRat(1, Decimals)
-	// UpperBoundRat - the upper bound of Rat
-	UpperBoundRat = sdk.NewDec(math.MaxInt64 / Decimals)
 )
 
 const (

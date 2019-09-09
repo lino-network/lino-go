@@ -1469,7 +1469,7 @@ func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg sdk.Ms
 			return response, errors.FailedToBroadcast("error to parse the broadcast response")
 		}
 		code := retrieveCodeFromBlockChainCode(res.Code)
-		if err == nil && code == model.InvalidSeqErrCode {
+		if err == nil && code == uint32(linotypes.CodeInvalidSequence) {
 			return response, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.Code).AddBlockChainLog(res.Log)
 		}
 
@@ -1485,7 +1485,7 @@ func (broadcast *Broadcast) broadcastTransaction(ctx context.Context, msg sdk.Ms
 			return response, errors.FailedToBroadcast("error to parse the broadcast response")
 		}
 		code := retrieveCodeFromBlockChainCode(res.CheckTx.Code)
-		if err == nil && code == model.InvalidSeqErrCode {
+		if err == nil && code == uint32(linotypes.CodeInvalidSequence) {
 			return response, errors.InvalidSequenceNumber("invalid seq").AddBlockChainCode(res.CheckTx.Code).AddBlockChainLog(res.CheckTx.Log)
 		}
 
