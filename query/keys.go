@@ -21,6 +21,7 @@ const (
 	ParamKVStoreKey     = "param"
 	ProposalKVStoreKey  = "proposal"
 	ReputationKVStore   = "reputation"
+	BandwidthKVStoreKey = "bandwidth"
 
 	AccountInfoSubStore           = "info"
 	AccountBankSubStore           = "bank"
@@ -30,6 +31,10 @@ const (
 	AccountGrantPubKeySubStore    = "grantPubKey"
 	AccountAllGrantPubKeys        = "allGrantPubKey"
 	AccountTxAndSequence          = "txAndSeq"
+
+	BandwidthInfoSubStore    = "bandwidthinfo"
+	BlockInfoSubStore        = "blockinfo"
+	AppBandwidthInfoSubStore = "appinfo"
 
 	DeveloperSubStore     = "dev"
 	DeveloperListSubStore = "devList"
