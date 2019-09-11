@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/lino-network/lino-go/errors"
+	"github.com/lino-network/lino/types"
 	"github.com/lino-network/lino/x/developer/model"
 )
 
@@ -12,7 +13,7 @@ func (query *Query) GetDeveloper(ctx context.Context, developerName string) (*mo
 	resp, err := query.transport.Query(ctx, DeveloperKVStoreKey, DeveloperSubStore, []string{developerName})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodeDeveloperNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(types.CodeDeveloperNotFound) {
 			return nil, errors.EmptyResponse("developer is not found")
 		}
 		return nil, err

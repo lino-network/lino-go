@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/lino-network/lino-go/errors"
+	"github.com/lino-network/lino/types"
 	"github.com/lino-network/lino/x/post/model"
 )
 
@@ -13,7 +14,7 @@ func (query *Query) GetPostInfo(ctx context.Context, author, postID string) (*mo
 	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostInfoSubStore, []string{permlink})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodePostNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(types.CodePostNotFound) {
 			return nil, errors.EmptyResponse("post is not found")
 		}
 		return nil, err

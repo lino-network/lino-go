@@ -18,7 +18,7 @@ func (query *Query) GetAccountInfo(ctx context.Context, username string) (*model
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountInfoSubStore, []string{username})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodeAccountInfoNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(types.CodeAccountInfoNotFound) {
 			return nil, errors.EmptyResponse("account info is not found")
 		}
 		return nil, err
@@ -86,7 +86,7 @@ func (query *Query) GetAccountBank(ctx context.Context, username string) (*model
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountBankSubStore, []string{username})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodeAccountBankNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(types.CodeAccountBankNotFound) {
 			return nil, errors.EmptyResponse("account bank is not found")
 		}
 		return nil, err
@@ -103,7 +103,7 @@ func (query *Query) GetAccountMeta(ctx context.Context, username string) (*model
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountMetaSubStore, []string{username})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodeAccountMetaNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(types.CodeAccountMetaNotFound) {
 			return nil, errors.EmptyResponse("account meta is not found")
 		}
 		return nil, err

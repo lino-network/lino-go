@@ -13,6 +13,7 @@ import (
 	"encoding/hex"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	auth "github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
@@ -146,13 +147,13 @@ func (broadcast *Broadcast) MakeTransferMsg(sender, receiver, amount, memo, priv
 	return txByte, nil
 }
 
-// func (broadcast *Broadcast) DecodeTxBytes(txbytes []byte) (*sdk.Transaction, errors.Error) {
-// 	tx := &model.Transaction{}
-// 	if err := broadcast.transport.Cdc.UnmarshalJSON(txbytes, tx); err != nil {
-// 		return nil, errors.UnmarshaFailed("Unmarshal failed")
-// 	}
-// 	return tx, nil
-// }
+func (broadcast *Broadcast) DecodeTxBytes(txbytes []byte) (*auth.StdTx, errors.Error) {
+	tx := &auth.StdTx{}
+	if err := broadcast.transport.Cdc.UnmarshalJSON(txbytes, tx); err != nil {
+		return nil, errors.UnmarshaFailed("Unmarshal failed")
+	}
+	return tx, nil
+}
 
 // Transfer sends a certain amount of LINO token from the sender to the receiver.
 // It composes TransferMsg and then broadcasts the transaction to blockchain.
@@ -1409,7 +1410,7 @@ func (broadcast *Broadcast) BroadcastRawMsgBytesSync(ctx context.Context, txByte
 	code := retrieveCodeFromBlockChainCode(bres.Code)
 
 	// special handling of invalid sequence number
-	if code == uint32(errors.CodeUnverifiedBytes) {
+	if code == uint32(linotypes.CodeUnverifiedBytes) {
 		correctSeq := ExtractSeqNumberFromErrLog(bres.Log)
 		if correctSeq != nil && seq != *correctSeq {
 			return errors.InvalidSequenceNumber("invalid seq").

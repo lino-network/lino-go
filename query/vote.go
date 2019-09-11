@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/lino-network/lino-go/errors"
+	"github.com/lino-network/lino/types"
 	"github.com/lino-network/lino/x/vote/model"
 )
 
@@ -64,7 +65,7 @@ func (query *Query) GetVoter(ctx context.Context, voterName string) (*model.Vote
 	resp, err := query.transport.Query(ctx, VoteKVStoreKey, VoterSubStore, []string{voterName})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodeVoterNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(types.CodeVoterNotFound) {
 			return nil, errors.EmptyResponse("voter is not found")
 		}
 		return nil, err
@@ -81,7 +82,7 @@ func (query *Query) GetVote(ctx context.Context, proposalID, voter string) (*mod
 	resp, err := query.transport.Query(ctx, VoteKVStoreKey, VoteSubStore, []string{proposalID, voter})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(errors.CodeVoteNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(types.CodeVoteNotFound) {
 			return nil, errors.EmptyResponse("voter is not found")
 		}
 		return nil, err
