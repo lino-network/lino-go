@@ -816,6 +816,76 @@ func (broadcast *Broadcast) MakeDeveloperRevokeMsg(username, privKeyHex string, 
 	return txByte, nil
 }
 
+// MakeIDAIssueMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeIDAIssueMsg(username string, IDAPrice int64, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := devtypes.IDAIssueMsg{
+		Username: linotypes.AccountKey(username),
+		IDAPrice: IDAPrice,
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
+// MakeIDAMintMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeIDAMintMsg(username, amount string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := devtypes.IDAMintMsg{
+		Username: linotypes.AccountKey(username),
+		Amount:   amount,
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
+// MakeIDATransferMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeIDATransferMsg(app, amount, from, to, signer string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := devtypes.IDATransferMsg{
+		App:    linotypes.AccountKey(app),
+		Amount: linotypes.IDAStr(amount),
+		From:   linotypes.AccountKey(from),
+		To:     linotypes.AccountKey(to),
+		Signer: linotypes.AccountKey(signer),
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
+// MakeIDAAuthorizeMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeIDAAuthorizeMsg(username, app string, activate bool, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := devtypes.IDAAuthorizeMsg{
+		Username: linotypes.AccountKey(username),
+		App:      linotypes.AccountKey(app),
+		Activate: activate,
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
+// MakeUpdateAffiliatedMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeUpdateAffiliatedMsg(username, app string, activate bool, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := devtypes.UpdateAffiliatedMsg{
+		Username: linotypes.AccountKey(username),
+		App:      linotypes.AccountKey(app),
+		Activate: activate,
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
 // GrantPermission grants a certain (e.g. App) permission to
 // an authorized app with a certain period of time.
 // It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.

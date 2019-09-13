@@ -150,14 +150,14 @@ func (api *API) UpdateAccount(ctx context.Context, username, jsonMeta, privKeyHe
 // UpdateAccount updates account related info in jsonMeta which are not
 // included in AccountInfo or AccountBank.
 // It composes UpdateAccountMsg and then broadcasts the transaction to blockchain.
-func (api *API) Recover(ctx context.Context, username, newResetPubKeyHex,
-	newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex string, seq uint64) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
-		return api.MakeRecoverAccountMsg(username, newResetPubKeyHex,
-			newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex, seq)
-	})
-	return resp, err
-}
+// func (api *API) Recover(ctx context.Context, username, newResetPubKeyHex,
+// 	newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex string, seq uint64) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
+// 		return api.MakeRecoverAccountMsg(username, newResetPubKeyHex,
+// 			newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex, seq)
+// 	})
+// 	return resp, err
+// }
 
 // CreatePost creates a new post on blockchain.
 // It composes CreatePostMsg and then broadcasts the transaction to blockchain.
@@ -342,10 +342,54 @@ func (api *API) RevokePermission(
 	return resp, err
 }
 
+// IDAIssue issues IDA on the blockchain.
+func (api *API) IDAIssue(
+	ctx context.Context, username string, IDAPrice int64, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
+		return api.MakeIDAIssueMsg(username, IDAPrice, privKeyHex, seq)
+	})
+	return resp, err
+}
+
+// IDAMint generates new IDA on the blockchain.
+func (api *API) IDAMint(
+	ctx context.Context, username, amount string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
+		return api.MakeIDAMintMsg(username, amount, privKeyHex, seq)
+	})
+	return resp, err
+}
+
+// IDATransfer moves IDA between accounts.
+func (api *API) IDATransfer(
+	ctx context.Context, app, amount, from, to, signer string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	resp, _, err := api.GuaranteeBroadcast(ctx, signer, func(seq uint64) ([]byte, errors.Error) {
+		return api.MakeIDATransferMsg(app, amount, from, to, signer, privKeyHex, seq)
+	})
+	return resp, err
+}
+
+// IDAAuthorize can set status of user's IDA account.
+func (api *API) IDAAuthorize(
+	ctx context.Context, username, app string, activate bool, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
+		return api.MakeIDAAuthorizeMsg(username, app, activate, privKeyHex, seq)
+	})
+	return resp, err
+}
+
+// UpdateAffiliated can set affiliate account for app.
+func (api *API) UpdateAffiliated(
+	ctx context.Context, username, app string, activate bool, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	resp, _, err := api.GuaranteeBroadcast(ctx, app, func(seq uint64) ([]byte, errors.Error) {
+		return api.MakeUpdateAffiliatedMsg(username, app, activate, privKeyHex, seq)
+	})
+	return resp, err
+}
+
 // ProviderReport reports infra usage of a infra provider in order to get infra inflation.
 // It composes ProviderReportMsg and then broadcasts the transaction to blockchain.
-func (api *API) ProviderReport(ctx context.Context, username string, usage int64,
-	privKeyHex string, seq uint64) (*model.BroadcastResponse, errors.Error) {
+func (api *API) ProviderReport(ctx context.Context, username string, usage int64, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, username, func(seq uint64) ([]byte, errors.Error) {
 		return api.MakeProviderReportMsg(username, usage, privKeyHex, seq)
 	})
