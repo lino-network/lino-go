@@ -97,6 +97,7 @@ func NewLinoAPIFromConfig() *API {
 // chainID and nodeUrl that are passed in.
 func NewLinoAPIFromArgs(opt *Options) *API {
 	opt.init()
+	linotypes.ConfigAndSealCosmosSDKAddress()
 	transport := transport.NewTransportFromArgs(opt.ChainID, opt.NodeURL, opt.MaxFeeInCoin)
 	return &API{
 		Query:                  query.NewQuery(transport),
