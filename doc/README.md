@@ -34,34 +34,34 @@
 To connect with latest Lino Blockchain, chain id and node url should be set specifically as following:
 
 ```
-    api := api.NewLinoAPIFromArgs(&api.Options{
-		ChainID: "lino-testnet-upgrade2",
-		NodeURL: "https://fullnode.lino.network:443",
-	})
+api := api.NewLinoAPIFromArgs(&api.Options{
+	ChainID: "lino-testnet-upgrade2",
+	NodeURL: "https://fullnode.lino.network:443",
+})
 ```
 
 ## API
 ### Node
 #### Get Lastest Block Height
 ```
-    resp, _ := api.GetBlockStatus(context.Background())
+    	resp, _ := api.GetBlockStatus(context.Background())
 	fmt.Println(resp.SyncInfo.LatestBlockHeight)
 ```
 
 #### Get Lastest Block Time
 ```
-    resp, _ := api.GetBlockStatus(context.Background())
+    	resp, _ := api.GetBlockStatus(context.Background())
 	fmt.Println(resp.SyncInfo.LatestBlockTime)
 ```
 #### Check If Node is Synced with Latest Blocks
 ```
-    resp, _ := api.GetBlockStatus(context.Background())
+    	resp, _ := api.GetBlockStatus(context.Background())
 	fmt.Println(resp.SyncInfo.CatchingUp)
 ```
 
 #### Get Block Information
 ```
-    resp, _ := api.GetBlock(context.Background(), 1)
+    	resp, _ := api.GetBlock(context.Background(), 1)
 ```
 
 Block Information include BlockID, all precommits, height, header, all transactions, etc.
