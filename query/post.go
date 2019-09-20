@@ -4,17 +4,18 @@ import (
 	"context"
 
 	"github.com/lino-network/lino-go/errors"
-	"github.com/lino-network/lino/types"
+	linotypes "github.com/lino-network/lino/types"
 	"github.com/lino-network/lino/x/post/model"
+	"github.com/lino-network/lino/x/post/types"
 )
 
 // GetPostInfo returns post info given a permlink(author#postID).
 func (query *Query) GetPostInfo(ctx context.Context, author, postID string) (*model.Post, error) {
 	permlink := getPermlink(author, postID)
-	resp, err := query.transport.Query(ctx, PostKVStoreKey, PostInfoSubStore, []string{permlink})
+	resp, err := query.transport.Query(ctx, PostKVStoreKey, types.QueryPostInfo, []string{permlink})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(types.CodePostNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(linotypes.CodePostNotFound) {
 			return nil, errors.EmptyResponse("post is not found")
 		}
 		return nil, err

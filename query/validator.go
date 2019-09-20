@@ -4,16 +4,17 @@ import (
 	"context"
 
 	"github.com/lino-network/lino-go/errors"
-	"github.com/lino-network/lino/types"
+	linotypes "github.com/lino-network/lino/types"
+	"github.com/lino-network/lino/x/validator"
 	"github.com/lino-network/lino/x/validator/model"
 )
 
 // GetValidator returns validator info given a validator name from blockchain.
 func (query *Query) GetValidator(ctx context.Context, username string) (*model.Validator, error) {
-	resp, err := query.transport.Query(ctx, ValidatorKVStoreKey, ValidatorSubStore, []string{username})
+	resp, err := query.transport.Query(ctx, ValidatorKVStoreKey, validator.QueryValidator, []string{username})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(types.CodeValidatorNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeValidatorNotFound) {
 			return nil, errors.EmptyResponse("validator is not found")
 		}
 		return nil, err
@@ -27,7 +28,7 @@ func (query *Query) GetValidator(ctx context.Context, username string) (*model.V
 
 // GetAllValidators returns all oncall validators from blockchain.
 func (query *Query) GetAllValidators(ctx context.Context) (*model.ValidatorList, error) {
-	resp, err := query.transport.Query(ctx, ValidatorKVStoreKey, ValidatorListSubStore, []string{})
+	resp, err := query.transport.Query(ctx, ValidatorKVStoreKey, validator.QueryValidatorList, []string{})
 	if err != nil {
 		return nil, err
 	}

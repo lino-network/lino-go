@@ -18,64 +18,6 @@ const (
 	ProposalKVStoreKey  = "proposal"
 	ReputationKVStore   = "reputation"
 	BandwidthKVStoreKey = "bandwidth"
-
-	AccountInfoSubStore           = "info"
-	AccountBankSubStore           = "bank"
-	AccountMetaSubStore           = "meta"
-	AccountRewardSubStore         = "reward"
-	AccountPendingCoinDaySubStore = "pendingCoinDay"
-	AccountGrantPubKeySubStore    = "grantPubKey"
-	AccountAllGrantPubKeys        = "allGrantPubKey"
-	AccountTxAndSequence          = "txAndSeq"
-
-	BandwidthInfoSubStore    = "bandwidthinfo"
-	BlockInfoSubStore        = "blockinfo"
-	AppBandwidthInfoSubStore = "appinfo"
-
-	DeveloperSubStore     = "dev"
-	DeveloperListSubStore = "devList"
-
-	TimeEventListSubStore   = "timeEventList"
-	globalMetaSubStore      = "globalMeta"
-	inflationPoolSubStore   = "inflationPool"
-	consumptionMetaSubStore = "consumptionMeta"
-	tpsSubStore             = "tps"
-	linoStakeStatSubStore   = "linoStakeStat"
-
-	InfraProviderSubStore = "infra"
-	InfraListSubStore     = "infraList"
-
-	PostInfoSubStore           = "info"
-	PostMetaSubStore           = "meta"
-	PostReportOrUpvoteSubStore = "reportOrUpvote"
-	PostCommentSubStore        = "comment"
-	PostViewSubStore           = "view"
-
-	NextProposalIDSubStore  = "next"
-	OngoingProposalSubStore = "ongoing"
-	ExpiredProposalSubStore = "expired"
-
-	ValidatorSubStore     = "validator"
-	ValidatorListSubStore = "valList"
-
-	DelegationSubStore    = "delegation"
-	VoterSubStore         = "voter"
-	VoteSubStore          = "vote"
-	ReferenceListSubStore = "refList"
-	DelegateeSubStore     = "delegatee"
-
-	AllocationParamSubStore              = "allocation"
-	InfraInternalAllocationParamSubStore = "infraInternal"
-	DeveloperParamSubStore               = "developer"
-	VoteParamSubStore                    = "vote"
-	ProposalParamSubStore                = "proposal"
-	ValidatorParamSubStore               = "validator"
-	CoinDayParamSubStore                 = "coinday"
-	BandwidthParamSubStore               = "bandwidth"
-	AccountParamSubStore                 = "account"
-	PostParamSubStore                    = "post"
-	ReputationParamSubStore              = "reputation"
-	UserReputation                       = "rep"
 )
 
 var (

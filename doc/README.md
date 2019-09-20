@@ -1,9 +1,16 @@
 # Documentation
-* [Get Tools & dependencies](#get-tools-dependencies)  
 * [Init](#init)  
-* [API](#api)  
-    * [Query](#query)  
-        * [Account](#account)  
+* [API](#api) 
+    * [Node](#node)
+        * [Get Lastest Block Height](#get-lastest-block-height)
+        * [Get Lastest Block Time](#get-lastest-block-time)
+        * [Check If Node is Synced with Latest Blocks](#check-if-node-is-synced-with-latest-blocks)
+        * [Get Block Information](#get-block-information)
+        * [Get All Transactions in a Block](#get-all-transactions-in-a-block)
+        * [Get Transactions by Hash](#get-transactions-by-hash)
+    * [Account](#account)
+        * [Generate Private Key Pair](#generate-private-key-pair)
+    * [Query](#query)
         * [Developer](#developer)  
         * [Infra](#infra)  
         * [Blockchain Parameters](#blockchain-parameters)  
@@ -12,7 +19,8 @@
         * [Block](#block)  
         * [Validator](#validator)  
         * [Vote](#vote)  
-    * [Broadcast](#broadcast)  
+    * [Broadcast](#broadcast) 
+        * [Synchronizing and Analyzing the Successful Transfers](#synchronizing-and-analyzing-the-successful-transfers)
         * [Account](#broadcast-account)  
         * [Post](#broadcast-post)  
         * [Validator](#broadcast-validator)  
@@ -21,531 +29,446 @@
         * [Infra](#broadcast-infra)  
         * [Proposal](#broadcast-proposal)  
 
-## Get Tools & Dependencies
-```
-dep ensure
-```
-
 ## Init
-```
-api := api.NewLinoAPIFromArgs(chainID, nodeURL)
-```
-chanID and nodeURL can be found remotely from https://github.com/lino-network/testnets/blob/master/lino-testnet/genesis.json 
-or locally from ~/.lino/config/genesis.json
 
-For example,  
-Remotely: chainID = "lino-testnet" and nodeURL = "https://fullnode.lino.network:443"  
-Locally: chainID = "test-chain-q8lMWR" and nodeURL = "http://localhost:26657"  
+To connect with latest Lino Blockchain, chain id and node url should be set specifically as following:
+
+```
+    api := api.NewLinoAPIFromArgs(&api.Options{
+		ChainID: "lino-testnet-upgrade2",
+		NodeURL: "https://fullnode.lino.network:443",
+	})
+```
 
 ## API
+### Node
+#### Get Lastest Block Height
+```
+    resp, _ := api.GetBlockStatus(context.Background())
+	fmt.Println(resp.SyncInfo.LatestBlockHeight)
+```
 
-### Query
-#### Account 
-##### Get AccountInfo
+#### Get Lastest Block Time
+```
+    resp, _ := api.GetBlockStatus(context.Background())
+	fmt.Println(resp.SyncInfo.LatestBlockTime)
+```
+#### Check If Node is Synced with Latest Blocks
+```
+    resp, _ := api.GetBlockStatus(context.Background())
+	fmt.Println(resp.SyncInfo.CatchingUp)
+```
+
+#### Get Block Information
+```
+    resp, _ := api.GetBlock(context.Background(), 1)
+```
+
+Block Information include BlockID, all precommits, height, header, all transactions, etc.
+
+#### Get All Transactions in a Block
+
+```
+package main
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/lino-network/lino-go/api"
+	auth "github.com/cosmos/cosmos-sdk/x/auth"
+	linoapp "github.com/lino-network/lino/app"
+)
+
+func main() {
+	api := api.NewLinoAPIFromArgs(&api.Options{
+		ChainID: "lino-testnet-upgrade2",
+		NodeURL: "https://fullnode.lino.network:443",
+	})
+
+	resp, _ := api.GetBlock(context.Background(), 24208)
+    for i := 0, i < len(resp.Data.Txs); i ++ {
+        var tx auth.StdTx
+        cdc := linoapp.MakeCodec()
+        if err := cdc.UnmarshalJSON(resp.Data.Txs[0], &tx); err != nil {
+            panic(err)
+        }
+        fmt.Println(tx)
+    }
+}
+```
+
+#### Get Transactions by Hash
+
+```
+	commitHash, _ := hex.DecodeString("df6bf5c9cfc8b2a999dcd6544218f972a557faab43439ff81047041cb980ec59")
+	tx, _ := api.GetTx(context.Background(), commitHash)
+	fmt.Println(tx.Code)   // error code of tx execution result. 0 means success.
+	fmt.Println(tx.Height) // height when tx is commited.
+	fmt.Println(tx.Log)    // log of tx execution result.
+	fmt.Println(tx.Tx)     // raw transaction
+```
+
+### Account
+
+#### Generate Private Key Pair
+```
+package main
+
+import (
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+)
+
+func main() {
+	priv := secp256k1.GenPrivKey()
+	pub := priv.PubKey()
+	addr := pub.Address()
+}
+```
+
+#### Get AccountInfo By Username
 ```
 accountInfo, err := api.GetAccountInfo(ctx, username)
 ```
-##### Get Transaction Public Key
+
+#### Get Transaction Public Key
 ```
 txPubKey, err := api.GetTransactionPubKey(ctx, username)
 ```
-##### Get App Public Key
+
+#### Get Signing Public Key
 ```
-appPubKey, err := api.GetAppPubKey(ctx, username)
+signingPubKey, err := api.GetSigningPubKey(ctx, username)
 ```
-##### Check Does Username Match Reset Private Key
-```
-isMatch, err := api.DoesUsernameMatchResetPrivKey(ctx, username, resetPrivKeyHex)
-```
-##### Check Does Username Match Transaction Private Key
+
+#### Check Does Username Match Transaction Private Key
 ```
 isMatch, err := api.DoesUsernameMatchTxPrivKey(ctx, username, txPrivKeyHex)
 ```
-##### Check Does Username Match App Private Key
+
+#### Check Does Username Match Signing Private Key
 ```
 isMatch, err := api.DoesUsernameMatchAppPrivKey(ctx, username, appPrivKeyHex)
 ```
-##### Get AccountBank
+
+#### Get AccountBank By Username
 ```
 accountBank, err := api.GetAccountBank(ctx, username)
 ```
-##### Get AccountMeta
+
+#### Get AccountBank By Address
+```
+accountBank, err := api.GetAccountBankByAddress(ctx, address)
+```
+
+#### Get AccountMeta
 ```
 accountMeta, err := api.GetAccountMeta(ctx, username)
 ```
-##### Get Next Sequence Number
+
+#### Get Next Sequence Number
 ```
 seq, err := api.GetSeqNumber(ctx, username)
 ```
-##### Get All Balance History From All Buckets
+
+#### Get Granted Public Key
 ```
-allBalanceHistory, err := api.GetAllBalanceHistory(ctx, username)
+grantPubKey, err := api.GetGrantPubKey(ctx, username, grantTo, permission)
 ```
-##### Get A Certain Number Of Recent Balance History
-```
-recentBalanceHistory, err := api.GetRecentBalanceHistory(ctx, uesrname, numOfHistory)
-```
-##### Get Balance History In The Range Of Index [from, to] Inclusively
-```
-rangedBalanceHistory, err := api.GetBalanceHistoryFromTo(ctx, username, from, to)
-```
-##### Get Balance History From A Certain Bucket
-```
-bucketBalanceHistory, err := api.GetBalanceHistory(ctx, username, bucketIndex)
-```
-##### Get Granted Public Key
-```
-grantPubKey, err := api.GetGrantPubKey(ctx, username, pubKeyHex)
-```
-##### Get Reward
-```
-reward, err := api.GetReward(ctx, username)
-```
-##### Get Reward At A Certain Block Height
-```
-reward, err := api.GetRewardAtHeight(ctx, username, height)
-```
-##### Get All Reward History From All Buckets
-```
-allRewardHistory, err := api.GetAllRewardHistory(ctx, username)
-```
-##### Get A Certain Number Of Recent Reward History
-```
-recentRewardHistory, err := api.GetRecentRewardHistory(ctx, username, numOfHistory) 
-```
-##### Get Reward History In The Range Of Index [from, to] Inclusively
-```
-rangedRewardHistory, err := api.GetRewardHistoryFromTo(ctx, username, from, to)
-```
-##### Get Reward History From A Certain Bucket
-```
-bucketRewardHistory, err := api.GetRewardHistory(ctx, username, bucketIndex)
-```
-##### Get Donation Relationship
-```
-relationship, err := api.GetRelationship(ctx, me, other)
-```
-##### Get Follower Meta
-```
-followerMeta, err := api.GetFollowerMeta(ctx, me, myFollower)
-```
-##### Get Following Meta
-```
-followingMeta, err := api.GetFollowingMeta(ctx, me, myFollowing)
-```
-##### Get All Granted Public Keys
+
+#### Get All Granted Public Keys
 ```
 pubKeyToGrantPubKeyMap, err := api.GetAllGrantPubKeys(ctx, username)
 ```
-##### Get All Donation Relationships 
-```
-userToRelationshipMap, err := api.GetAllRelationships(ctx, username)
-```
-##### Get All Follower Meta
-```
-followerToMetaMap, err := api.GetAllFollowerMeta(ctx, username)
-```
-##### Get All Following Meta
-```
-followingToMetaMap, err := api.GetAllFollowingMeta(ctx, username)
-```
 
-#### Developer
-##### Get Developer 
+### Developer
+#### Get Developer 
 ```
 developer, err := api.GetDeveloper(ctx, developerName)
 ```
-##### Get All Developers
-```
-devevlopers, err := api.GetDevelopers(ctx)
-```
 
-#### Infra
-##### Get Infra Provider
+### Infra
+#### Get Infra Provider
 ```
 infraProvider, err := api.GetInfraProvider(ctx, providerName)
 ```
-##### Get All Infra Providers
-```
-infraProviders, err := api.GetInfraProviders(ctx)
-```
 
-#### Blockchain Parameters
-##### Get Evaluate Of Content Value Param
+### Blockchain Parameters
+#### Get Evaluate Of Content Value Param
 ```
 p, err := api.GetEvaluateOfContentValueParam(ctx)
 ```
-##### Get Global Allocation Param
+#### Get Global Allocation Param
 ```
 p, err := api.GetGlobalAllocationParam(ctx)
 ```
-##### Get Infra Internal Allocation Param
+#### Get Infra Internal Allocation Param
 ```
 p, err := api.GetInfraInternalAllocation(ctx)
 ```
-##### Get Developer Param
+#### Get Developer Param
 ```
 p, err := api.GetDeveloperParam(ctx)
 ```
-##### Get Vote Param
+#### Get Vote Param
 ```
 p, err := api.GetVoteParam(ctx)
 ```
-##### Get Proposal Param
+#### Get Proposal Param
 ```
 p, err := api.GetProposalParam(ctx)
 ```
-##### Get Validator Param
+#### Get Validator Param
 ```
 p, err := api.GetValidatorParam(ctx)
 ```
-##### Get Coin Day Param
-```
-p, err := api.GetCoinDayParam(ctx)
-```
-##### Get Bandwidth Param
+#### Get Bandwidth Param
 ```
 p, err := api.GetBandwidthParam(ctx)
 ```
-##### Get Account Param
+#### Get Account Param
 ```
 p, err := api.GetAccountParam(ctx)
 ```
-##### Get Post Param
+#### Get Post Param
 ```
 p, err := api.GetPostParam(ctx)
 ```
 
-#### Post
-##### Get PostInfo
+### Post
+#### Get PostInfo
 ```
 postInfo, err := api.GetPostInfo(ctx, author, postID)
 ```
-##### Get PostMeta
-```
-postMeta, err := api.GetPostMeta(ctx, author, postID)
-```
-##### Get Post Comment
-```
-comment, err := api.GetPostComment(ctx, author, postID, commentPermlink)
-```
-##### Get Post View
-```
-view, err := api.GetPostView(ctx, author, postID, viewUser)
-```
-##### Get Post Donations
-```
-donations, err := api.GetPostDonations(ctx, author, postID, donateUser)
-```
-##### Get Post ReportOrUpvote
-```
-reportOrUpvote, err := api.GetPostReportOrUpvote(ctx, author, postID, user)
-```
-##### Get User All Posts
-```
-permlinkToPostMap, err := api.GetUserAllPosts(ctx, username)
-```
-##### Get Post All Comments
-```
-permlinkToCommentMap, err := api.GetPostAllComments(ctx, author, postID)
-```
-##### Get Post All Views
-```
-userToViewMap, err := api.GetPostAllViews(ctx, author, postID)
-```
-##### Get Post All Donations
-```
-userToDonationsMap, err := api.GetPostAllDonations(ctx, author, postID)
-```
-##### Get Post All ReportOrUpvotes
-```
-userToReportOrUpvoteMap, err := api.GetPostAllReportOrUpvotes(ctx, author, postID)
-```
-
-#### Proposal
-##### Get Proposal List
+### Proposal
+#### Get Proposal List
 ```
 proposalList, err := api.GetProposalList(ctx)
 ```
-##### Get Proposal 
+#### Get Proposal 
 ```
 proposal, err := api.GetProposal(ctx, proposalID)
 ```
-##### Get Ongoing Proposals
+#### Get Ongoing Proposals
 ```
 ongoingProposals, err := api.GetOngoingProposal(ctx)
 ```
-##### Get Expired Proposals
+#### Get Expired Proposals
 ```
 expiredProposals, err := api.GetExpiredProposal(ctx)
 ```
-##### Get Next Proposal ID
-```
-nextProposalID, err := api.GetNextProposalID(ctx)
-```
 
-#### Block
-##### Get Block
+### Block
+#### Get Block
 ```
 block, err := api.GetBlock(ctx, height)
 ```
-##### Get Block Status
+#### Get Block Status
 ```
 blockStatus, err := api.GetBlockStatus(ctx)
 ```
 
-#### Validator
-##### Get Validator
+### Validator
+#### Get Validator
 ```
 validator, err := api.GetValidator(ctx, username)
 ```
-##### Get All Validators
+#### Get All Validators
 ```
 validators, err := api.GetAllValidators(ctx)
 ```
 
-#### Vote
-##### Get Delegation
-```
-delegation, err := api.GetDelegation(ctx, voter, delegator)
-```
-##### Get Voter All Delegations
-```
-delegations, err := api.GetVoterAllDelegation(ctx, voter)
-```
-##### Get Delegator All Delegations
-```
-delegations, err := api.GetDelegatorAllDelegation(ctx, delegatorName)
-```
-##### Get Voter
+### Vote
+#### Get Voter
 ```
 voter, err := api.GetVoter(ctx, voterName)
 ```
-##### Get Vote
-```
-vote, err := api.GetVote(ctx, proposalID, voter)
-```
-##### Get Proposal All Votes
-```
-votes, err := api.GetProposalAllVotes(ctx, proposalID)
-```
 
 ### Broadcast
-#### Broadcast Account
-##### Register A New User
+### Synchronizing and Analyzing the Successful Transfers
 ```
-seq, err := api.GetSeqNumber(ctx, referrer)
-resp, err := api.Register(ctx, referrer, registerFee, newUsername, newUserResetPubHex, newUserTxPubHex, newUserAppPubHex, referrerTxPrivKey, seq)
-```
-##### Transfer LINO Between two users
-```
-seq, err := api.GetSeqNumber(ctx, sender)
-resp, err := api.Transfer(ctx, sender, receiver, amount, memo, privKeyHex, seq)
-```
-##### Follow 
-```
-seq, err := api.GetSeqNumber(ctx, follower)
-resp, err := api.Follow(ctx, follower, followee, privKeyHex, seq)
-```
-##### Unfollow 
-```
-seq, err := api.GetSeqNumber(ctx, follower)
-resp, err := api.Unfollow(ctx, follower, followee, privKeyHex, seq)
-```
-##### Claim Reward
-```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.Claim(ctx, username, privKeyHex, seq)
-```
-##### Claim Interest
-```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.ClaimInterest(ctx, username, privKeyHex, seq)
-```
-##### Update Account
-```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.UpdateAccount(ctx, username, jsonMeta, privKeyHex, seq)
-```
-##### Recover 
-```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.Recover(ctx, username, newResetPubKeyHex, newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex, seq)
+resp, err := api.Transfer(ctx, sender, receiver, amount, memo, privKeyHex)
+if err != nil {
+    panic(err) // transfer failed
+}
+fmt.Println(resp.CommitHash) // commit hash of the transaction, can be queried by tx query api.
+fmt.Println(resp.Height) // height when the transaction was executed
 ```
 
-#### Broadcast Post
-##### Create Post
+### Broadcast Account
+#### Register A New User
 ```
-seq, err := api.GetSeqNumber(ctx, author)
-resp, err := api.CreatePost(ctx, author, postID, title, content, parentAuthor, parentPostID, sourceAuthor, sourcePostID, redistributionSplitRate, links, privKeyHex, seq)
+resp, err := api.Register(ctx, referrer, registerFee, newUsername, newUserResetPubHex, newUserTxPubHex, newUserAppPubHex, referrerTxPrivKey)
 ```
-##### Donate To A Post
+#### Transfer LINO Between two users
 ```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.Donate(ctx, username, author, amount, postID, fromApp, memo, privKeyHex, seq)
+resp, err := api.Transfer(ctx, sender, receiver, amount, memo, privKeyHex)
 ```
-##### ReportOrUpvote To A Post
+#### Follow 
 ```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.ReportOrUpvote(ctx, username, author, postID, isReport, privKeyHex, seq)
+resp, err := api.Follow(ctx, follower, followee, privKeyHex)
 ```
-##### Delete Post
+#### Unfollow 
 ```
-seq, err := api.GetSeqNumber(ctx, author)
-resp, err := api.DeletePost(ctx, author, postID, privKeyHex, seq)
+resp, err := api.Unfollow(ctx, follower, followee, privKeyHex)
 ```
-##### View A Post
+#### Claim Reward
 ```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.View(ctx, username, author, postID, privKeyHex, seq)
+resp, err := api.Claim(ctx, username, privKeyHex)
 ```
-##### Update Post
+#### Claim Interest
 ```
-seq, err := api.GetSeqNumber(ctx, author)
-resp, err := api.UpdatePost(ctx, author, title, postID, content, links, privKeyHex, seq)
+resp, err := api.ClaimInterest(ctx, username, privKeyHex)
 ```
-
-#### Broadcast Validator
-##### Validator Deposit
+#### Update Account
 ```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.ValidatorDeposit(ctx, username, deposit, validatorPubKey, link, privKeyHex, seq)
+resp, err := api.UpdateAccount(ctx, username, jsonMeta, privKeyHex)
 ```
-##### Validator Withdraw
+#### Recover 
 ```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.ValidatorWithdraw(ctx, username, amount, privKeyHex, seq)
-```
-##### Validator Revoke
-```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.ValidatorRevoke(ctx, username, privKeyHex, seq)
+resp, err := api.Recover(ctx, username, newResetPubKeyHex, newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex)
 ```
 
-#### Broadcast Vote
-##### Voter StakeIn
+### Broadcast Post
+#### Create Post
 ```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.StakeIn(ctx, username, deposit, privKeyHex, seq)
+resp, err := api.CreatePost(ctx, author, postID, title, content, parentAuthor, parentPostID, sourceAuthor, sourcePostID, redistributionSplitRate, links, privKeyHex)
 ```
-##### Voter StakeOut
+#### Donate To A Post
 ```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.StakeOut(ctx, username, amount, privKeyHex, seq)
+resp, err := api.Donate(ctx, username, author, amount, postID, fromApp, memo, privKeyHex)
 ```
-##### Delegate To Voter
+#### ReportOrUpvote To A Post
 ```
-seq, err := api.GetSeqNumber(ctx, delegator)
-resp, err := api.Delegate(ctx, delegator, voter, amount, privKeyHex, seq)
+resp, err := api.ReportOrUpvote(ctx, username, author, postID, isReport, privKeyHex)
 ```
-##### Delegator Withdraw
+#### Delete Post
 ```
-seq, err := api.GetSeqNumber(ctx, delegator)
-resp, err := api.DelegatorWithdraw(ctx, delegator, voter, amount, privKeyHex, seq)
+resp, err := api.DeletePost(ctx, author, postID, privKeyHex)
 ```
-##### RevokeDelegation
+#### View A Post
 ```
-seq, err := api.GetSeqNumber(ctx, delegator)
-resp, err := api.RevokeDelegation(ctx, delegator, voter, privKeyHex, seq)
+resp, err := api.View(ctx, username, author, postID, privKeyHex)
 ```
-
-#### Broadcast Developer
-##### Developer Register
+#### Update Post
 ```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.DeveloperRegister(ctx, username, deposit, website, description, appMetaData, privKeyHex, seq)
-```
-##### DeveloperUpdate
-```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.DeveloperUpdate(ctx, username, website, description, appMetaData, privKeyHex, seq)
-```
-##### DeveloperRevoke
-```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.DeveloperRevoke(ctx, username, privKeyHex, seq)
-```
-##### Grant Permission
-```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.GrantPermission(ctx, username, authorizedApp, validityPeriodSec, grantLevel, privKeyHex, seq)
-```
-##### Pre Authorization Permission
-```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.PreAuthorizationPermission(ctx, username, authorizedApp, validityPeriodSec, amount, privKeyHex, seq)
-```
-##### Revoke Permission
-```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.RevokePermission(ctx, username, pubKeyHex, privKeyHex, seq)
+resp, err := api.UpdatePost(ctx, author, title, postID, content, links, privKeyHex)
 ```
 
-#### Broadcast Infra
-##### Infra Provider Report
+### Broadcast Validator
+#### Validator Deposit
 ```
-seq, err := api.GetSeqNumber(ctx, username)
-resp, err := api.ProviderReport(ctx, username, usage, privKeyHex, seq)
+resp, err := api.ValidatorDeposit(ctx, username, deposit, validatorPubKey, link, privKeyHex)
+```
+#### Validator Withdraw
+```
+resp, err := api.ValidatorWithdraw(ctx, username, amount, privKeyHex)
+```
+#### Validator Revoke
+```
+resp, err := api.ValidatorRevoke(ctx, username, privKeyHex)
 ```
 
-#### Broadcast Proposal
-##### Change Evaluate Of Content Value Param
+### Broadcast Vote
+#### Voter StakeIn
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.ChangeEvaluateOfContentValueParam(ctx, creator, parameter, reason, privKeyHex, seq)
+resp, err := api.StakeIn(ctx, username, deposit, privKeyHex)
 ```
-##### Change Global Allocation Param
+#### Voter StakeOut
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.ChangeGlovalAllocationParam(ctx, creator, parameter, reason, privKeyHex, seq)
+resp, err := api.StakeOut(ctx, username, amount, privKeyHex)
 ```
-##### Change Infra Internal Allocation Param
+#### Delegate To Voter
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.ChangeInfraInternalAllocationParam(ctx, creator, parameter, reason, privKeyHex, seq)
+resp, err := api.Delegate(ctx, delegator, voter, amount, privKeyHex)
 ```
-##### Change Vote Param
+#### Delegator Withdraw
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.ChangeVoteParam(ctx, creator, parameter, reason, privKeyHex, seq)
+resp, err := api.DelegatorWithdraw(ctx, delegator, voter, amount, privKeyHex)
 ```
-##### Change Proposal Param
+#### RevokeDelegation
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.ChangeProposalParam(ctx, creator, parameter, reason, privKeyHex, seq)
+resp, err := api.RevokeDelegation(ctx, delegator, voter, privKeyHex)
 ```
-##### Change Developer Param
+
+### Broadcast Developer
+#### Developer Register
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.ChangeDeveloperParam(ctx, creator, parameter, reason, privKeyHex, seq)
+resp, err := api.DeveloperRegister(ctx, username, deposit, website, description, appMetaData, privKeyHex)
 ```
-##### Change Validator Param
+#### DeveloperUpdate
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.ChangeValidatorParam(ctx, creator, parameter, reason, privKeyHex, seq)
+resp, err := api.DeveloperUpdate(ctx, username, website, description, appMetaData, privKeyHex)
 ```
-##### Change Bandwidth Param
+#### DeveloperRevoke
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.ChangeBandwidthParam(ctx, creator, parameter, reason, privKeyHex, seq)
+resp, err := api.DeveloperRevoke(ctx, username, privKeyHex)
 ```
-##### Change Account Param
+#### Grant Permission
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.ChangeAccountParam(ctx, creator, parameter, reason, privKeyHex, seq)
+resp, err := api.GrantPermission(ctx, username, authorizedApp, validityPeriodSec, grantLevel, privKeyHex)
 ```
-##### Change Post Param
+#### Pre Authorization Permission
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.ChangePostParam(ctx, creator, parameter, reason, privKeyHex, seq)
+resp, err := api.PreAuthorizationPermission(ctx, username, authorizedApp, validityPeriodSec, amount, privKeyHex)
 ```
-##### Delete Post Content
+#### Revoke Permission
 ```
-seq, err := api.GetSeqNumber(ctx, creator)
-resp, err := api.DeletePostContent(ctx, creator, postAuthor, postID, reason, privKeyHex, seq)
+resp, err := api.RevokePermission(ctx, username, pubKeyHex, privKeyHex)
 ```
-##### Vote Proposal
+
+### Broadcast Infra
+#### Infra Provider Report
 ```
-seq, err := api.GetSeqNumber(ctx, voter)
-resp, err := api.VoteProposal(ctx, voter, proposalID, result, privKeyHex, seq)
+resp, err := api.ProviderReport(ctx, username, usage, privKeyHex)
+```
+
+### Broadcast Proposal
+#### Change Evaluate Of Content Value Param
+```
+resp, err := api.ChangeEvaluateOfContentValueParam(ctx, creator, parameter, reason, privKeyHex)
+```
+#### Change Global Allocation Param
+```
+resp, err := api.ChangeGlovalAllocationParam(ctx, creator, parameter, reason, privKeyHex)
+```
+#### Change Infra Internal Allocation Param
+```
+resp, err := api.ChangeInfraInternalAllocationParam(ctx, creator, parameter, reason, privKeyHex)
+```
+#### Change Vote Param
+```
+resp, err := api.ChangeVoteParam(ctx, creator, parameter, reason, privKeyHex)
+```
+#### Change Proposal Param
+```
+resp, err := api.ChangeProposalParam(ctx, creator, parameter, reason, privKeyHex)
+```
+#### Change Developer Param
+```
+resp, err := api.ChangeDeveloperParam(ctx, creator, parameter, reason, privKeyHex)
+```
+#### Change Validator Param
+```
+resp, err := api.ChangeValidatorParam(ctx, creator, parameter, reason, privKeyHex)
+```
+#### Change Bandwidth Param
+```
+resp, err := api.ChangeBandwidthParam(ctx, creator, parameter, reason, privKeyHex)
+```
+#### Change Account Param
+```
+resp, err := api.ChangeAccountParam(ctx, creator, parameter, reason, privKeyHex)
+```
+#### Change Post Param
+```
+resp, err := api.ChangePostParam(ctx, creator, parameter, reason, privKeyHex)
+```
+#### Delete Post Content
+```
+resp, err := api.DeletePostContent(ctx, creator, postAuthor, postID, reason, privKeyHex)
+```
+#### Vote Proposal
+```
+resp, err := api.VoteProposal(ctx, voter, proposalID, result, privKeyHex)
 ```

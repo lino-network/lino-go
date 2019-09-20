@@ -8,17 +8,18 @@ import (
 
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/transport"
-	"github.com/lino-network/lino/types"
+	linotypes "github.com/lino-network/lino/types"
 	"github.com/lino-network/lino/x/account/model"
+	"github.com/lino-network/lino/x/account/types"
 	"github.com/tendermint/tendermint/crypto"
 )
 
 // GetAccountInfo returns account info for a specific user.
 func (query *Query) GetAccountInfo(ctx context.Context, username string) (*model.AccountInfo, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountInfoSubStore, []string{username})
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountInfo, []string{username})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(types.CodeAccountInfoNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeAccountInfoNotFound) {
 			return nil, errors.EmptyResponse("account info is not found")
 		}
 		return nil, err
@@ -83,10 +84,27 @@ func (query *Query) DoesUsernameMatchTransactionPrivKey(
 
 // GetAccountBank returns account bank info for a specific user.
 func (query *Query) GetAccountBank(ctx context.Context, username string) (*model.AccountBank, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountBankSubStore, []string{username})
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountBank, []string{username})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(types.CodeAccountBankNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeAccountBankNotFound) {
+			return nil, errors.EmptyResponse("account bank is not found")
+		}
+		return nil, err
+	}
+	bank := new(model.AccountBank)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, bank); err != nil {
+		return nil, err
+	}
+	return bank, nil
+}
+
+// GetAccountBankByAddress returns account bank info for a specific address.
+func (query *Query) GetAccountBankByAddress(ctx context.Context, address string) (*model.AccountBank, error) {
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountBank, []string{address})
+	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeAccountBankNotFound) {
 			return nil, errors.EmptyResponse("account bank is not found")
 		}
 		return nil, err
@@ -100,10 +118,10 @@ func (query *Query) GetAccountBank(ctx context.Context, username string) (*model
 
 // GetAccountMeta returns account meta info for a specific user.
 func (query *Query) GetAccountMeta(ctx context.Context, username string) (*model.AccountMeta, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountMetaSubStore, []string{username})
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountMeta, []string{username})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(types.CodeAccountMetaNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeAccountMetaNotFound) {
 			return nil, errors.EmptyResponse("account meta is not found")
 		}
 		return nil, err
@@ -128,8 +146,8 @@ func (query *Query) GetSeqNumber(ctx context.Context, username string) (uint64, 
 // GetGrantPubKey returns the specific granted pubkey info of a user
 // that has given to the pubKey.
 func (query *Query) GetGrantPubKey(
-	ctx context.Context, username string, grantTo string, permission types.Permission) (*model.GrantPermission, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountGrantPubKeySubStore, []string{username, grantTo})
+	ctx context.Context, username string, grantTo string, permission linotypes.Permission) (*model.GrantPermission, error) {
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountGrantPubKeys, []string{username, grantTo})
 	if err != nil {
 		return nil, errors.EmptyResponse("grant pubkey is not found or err")
 	}
@@ -147,18 +165,18 @@ func (query *Query) GetGrantPubKey(
 }
 
 // GetReputation returns rewards of a user.
-func (query *Query) GetReputation(ctx context.Context, username string) (*types.Coin, error) {
-	resp, err := query.transport.Query(ctx, ReputationKVStore, UserReputation, []string{username})
-	if err != nil {
-		return nil, err
-	}
+// func (query *Query) GetReputation(ctx context.Context, username string) (*linotypes.Coin, error) {
+// 	resp, err := query.transport.Query(ctx, ReputationKVStore, types, []string{username})
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	reward := new(types.Coin)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, reward); err != nil {
-		return reward, err
-	}
-	return reward, nil
-}
+// 	reward := new(linotypes.Coin)
+// 	if err := query.transport.Cdc.UnmarshalJSON(resp, reward); err != nil {
+// 		return reward, err
+// 	}
+// 	return reward, nil
+// }
 
 // GetRewardAtHeight returns rewards of a user at certain height.
 // func (query *Query) GetRewardAtHeight(ctx context.Context, username string, height int64) (*model.Reward, error) {
@@ -187,7 +205,7 @@ func (query *Query) GetReputation(ctx context.Context, username string) (*types.
 
 // GetAllGrantPubKeys returns a list of all granted public keys of a user.
 func (query *Query) GetAllGrantPubKeys(ctx context.Context, username string) ([]*model.GrantPermission, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountAllGrantPubKeys, []string{username})
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountAllGrantPubKeys, []string{username})
 	if err != nil {
 		return nil, errors.EmptyResponse("grant pub key is not found")
 	}
@@ -253,7 +271,7 @@ func (query *Query) VerifyUserSignatureUsingTxKey(ctx context.Context, username 
 
 // GetTxAndSequenceNumber verify signature is signed from payload by user's transaction private key.
 func (query *Query) GetTxAndSequenceNumber(ctx context.Context, username, hash string) (*model.TxAndSequenceNumber, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, AccountTxAndSequence, []string{username, hash})
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryTxAndAccountSequence, []string{username, hash})
 	if err != nil {
 		return nil, err
 	}
