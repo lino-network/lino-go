@@ -44,24 +44,24 @@ api := api.NewLinoAPIFromArgs(&api.Options{
 ### Node
 #### Get Lastest Block Height
 ```
-    	resp, _ := api.GetBlockStatus(context.Background())
-	fmt.Println(resp.SyncInfo.LatestBlockHeight)
+resp, _ := api.GetBlockStatus(context.Background())
+fmt.Println(resp.SyncInfo.LatestBlockHeight)
 ```
 
 #### Get Lastest Block Time
 ```
-    	resp, _ := api.GetBlockStatus(context.Background())
-	fmt.Println(resp.SyncInfo.LatestBlockTime)
+resp, _ := api.GetBlockStatus(context.Background())
+fmt.Println(resp.SyncInfo.LatestBlockTime)
 ```
 #### Check If Node is Synced with Latest Blocks
 ```
-    	resp, _ := api.GetBlockStatus(context.Background())
-	fmt.Println(resp.SyncInfo.CatchingUp)
+resp, _ := api.GetBlockStatus(context.Background())
+fmt.Println(resp.SyncInfo.CatchingUp)
 ```
 
 #### Get Block Information
 ```
-    	resp, _ := api.GetBlock(context.Background(), 1)
+resp, _ := api.GetBlock(context.Background(), 1)
 ```
 
 Block Information include BlockID, all precommits, height, header, all transactions, etc.
@@ -101,12 +101,12 @@ func main() {
 #### Get Transactions by Hash
 
 ```
-	commitHash, _ := hex.DecodeString("df6bf5c9cfc8b2a999dcd6544218f972a557faab43439ff81047041cb980ec59")
-	tx, _ := api.GetTx(context.Background(), commitHash)
-	fmt.Println(tx.Code)   // error code of tx execution result. 0 means success.
-	fmt.Println(tx.Height) // height when tx is commited.
-	fmt.Println(tx.Log)    // log of tx execution result.
-	fmt.Println(tx.Tx)     // raw transaction
+commitHash, _ := hex.DecodeString("df6bf5c9cfc8b2a999dcd6544218f972a557faab43439ff81047041cb980ec59")
+tx, _ := api.GetTx(context.Background(), commitHash)
+fmt.Println(tx.Code)   // error code of tx execution result. 0 means success.
+fmt.Println(tx.Height) // height when tx is commited.
+fmt.Println(tx.Log)    // log of tx execution result.
+fmt.Println(tx.Tx)     // raw transaction
 ```
 
 ### Account
