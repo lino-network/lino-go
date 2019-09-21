@@ -1495,6 +1495,14 @@ func (broadcast *Broadcast) BroadcastRawMsgBytesSync(ctx context.Context, txByte
 	return nil
 }
 
+func (broadcast *Broadcast) BroadcastToMempool(tx []byte) (*ctypes.ResultBroadcastTx, error) {
+	node, err := broadcast.transport.GetNode()
+	if err != nil {
+		return nil, err
+	}
+	return node.BroadcastTxSync(tx)
+}
+
 //
 // internal helper functions
 //

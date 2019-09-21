@@ -287,10 +287,34 @@ voter, err := api.GetVoter(ctx, voterName)
 ### Broadcast
 ### Synchronizing and Analyzing the Successful Transfers
 ```
-resp, err := api.Transfer(ctx, sender, receiver, amount, memo, privKeyHex)
+tx, err := api.MakeTransferMsg(sender, receiver, amount, memo, privKeyHex, seq)
 if err != nil {
-    panic(err) // transfer failed
+    panic(err)
 }
+err = api.BroadcastToMempool(tx)
+if err != nil {
+    panic(err)
+}
+ticker := time.NewTicker(api.checkTxConfirmInterval)
+defer ticker.Stop()
+for {
+	select {
+	case <-ticker.C:
+		tx, err := api.GetTx(ctx, hashBytes)
+		if err != nil {
+			continue
+		}
+		// if code is not ok (0), report err
+		if tx.Code != 0 {
+            // failed
+		} else {
+            // success
+        }
+	}
+}
+
+
+resp, err := api.Transfer(ctx, sender, receiver, amount, memo, privKeyHex)
 fmt.Println(resp.CommitHash) // commit hash of the transaction, can be queried by tx query api.
 fmt.Println(resp.Height) // height when the transaction was executed
 ```
