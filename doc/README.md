@@ -312,11 +312,6 @@ for {
         }
 	}
 }
-
-
-resp, err := api.Transfer(ctx, sender, receiver, amount, memo, privKeyHex)
-fmt.Println(resp.CommitHash) // commit hash of the transaction, can be queried by tx query api.
-fmt.Println(resp.Height) // height when the transaction was executed
 ```
 
 ### Broadcast Account
