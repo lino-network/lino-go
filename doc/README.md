@@ -306,9 +306,9 @@ for {
 		}
 		// if code is not ok (0), report err
 		if tx.Code != 0 {
-            // failed
+        // failed
 		} else {
-            // success
+        // success
         }
 	}
 }
