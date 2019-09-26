@@ -87,14 +87,14 @@ func main() {
 	})
 
 	resp, _ := api.GetBlock(context.Background(), 24208)
-    for i := 0, i < len(resp.Data.Txs); i ++ {
-        var tx auth.StdTx
-        cdc := linoapp.MakeCodec()
-        if err := cdc.UnmarshalJSON(resp.Data.Txs[0], &tx); err != nil {
-            panic(err)
-        }
-        fmt.Println(tx)
-    }
+	for i := 0, i < len(resp.Data.Txs); i ++ {
+		var tx auth.StdTx
+		cdc := linoapp.MakeCodec()
+		if err := cdc.UnmarshalJSON(resp.Data.Txs[0], &tx); err != nil {
+		    panic(err)
+		}
+		fmt.Println(tx)
+	}
 }
 ```
 
@@ -306,10 +306,10 @@ for {
 		}
 		// if code is not ok (0), report err
 		if tx.Code != 0 {
-        // failed
+        		// failed
 		} else {
-        // success
-        }
+        		// success
+        	}
 	}
 }
 ```
