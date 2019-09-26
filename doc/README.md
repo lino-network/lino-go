@@ -90,7 +90,7 @@ func main() {
 	for i := 0, i < len(resp.Data.Txs); i ++ {
 		var tx auth.StdTx
 		cdc := linoapp.MakeCodec()
-		if err := cdc.UnmarshalJSON(resp.Data.Txs[0], &tx); err != nil {
+		if err := cdc.UnmarshalJSON(resp.Data.Txs[i], &tx); err != nil {
 		    panic(err)
 		}
 		fmt.Println(tx)
