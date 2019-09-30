@@ -164,10 +164,16 @@ func (api *API) UpdateAccount(ctx context.Context, username, jsonMeta, privKeyHe
 // It composes CreatePostMsg and then broadcasts the transaction to blockchain.
 func (api *API) CreatePost(
 	ctx context.Context, author, postID, title, content, createdBy string, preauth bool,
-	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, author, func(seq uint64) ([]byte, errors.Error) {
-		return api.MakeCreatePostMsg(author, postID, title, content, createdBy, preauth, privKeyHex, seq)
-	})
+	privKeyHex string) (resp *model.BroadcastResponse, err errors.Error) {
+	if preauth {
+		resp, _, err = api.GuaranteeBroadcast(ctx, author, func(seq uint64) ([]byte, errors.Error) {
+			return api.MakeCreatePostMsg(author, postID, title, content, createdBy, preauth, privKeyHex, seq)
+		})
+	} else {
+		resp, _, err = api.GuaranteeBroadcast(ctx, createdBy, func(seq uint64) ([]byte, errors.Error) {
+			return api.MakeCreatePostMsg(author, postID, title, content, createdBy, preauth, privKeyHex, seq)
+		})
+	}
 	return resp, err
 }
 
