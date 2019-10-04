@@ -12,6 +12,7 @@ import (
 
 	wire "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	crypto "github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -353,7 +354,37 @@ func (t Transport) SignAndBuild(msg sdk.Msg, privKeyHex string, seq uint64, memo
 	}
 
 	// build transaction bytes
-	txByte, err := EncodeTx(t.Cdc, msgs, privKey.PubKey(), sig, seq, memo, t.maxFeeInCoin)
+	txByte, err := EncodeTx(t.Cdc, msgs, []crypto.PubKey{privKey.PubKey()}, [][]byte{sig}, memo, t.maxFeeInCoin)
+	if err != nil {
+		return nil, errors.FailedToBroadcastf("error to encode transaction, err: %s", err.Error())
+	}
+	return txByte, nil
+}
+
+// SignAndBuildMultiSig signs msg with multiple private key and return tx bytes
+func (t Transport) SignAndBuildMultiSig(msg sdk.Msg, privKeyHexs []string, seqs []uint64, memo string) ([]byte, errors.Error) {
+	msgs := []sdk.Msg{msg}
+
+	pubKeys := []crypto.PubKey{}
+	sigs := [][]byte{}
+	for i, privKeyHex := range privKeyHexs {
+		privKey, err := GetPrivKeyFromHex(privKeyHex)
+		if err != nil {
+			return nil, errors.FailedToBroadcastf("error to get private key from public key, err: %s", err.Error())
+		}
+
+		signMsgBytes := EncodeSignMsg(t.Cdc, msgs, t.chainId, seqs[i], memo, t.maxFeeInCoin)
+		// SignatureFromBytes
+		sig, err := privKey.Sign(signMsgBytes)
+		if err != nil {
+			return nil, errors.FailedToBroadcastf("error to sign the msg, err: %s", err.Error())
+		}
+		pubKeys = append(pubKeys, privKey.PubKey())
+		sigs = append(sigs, sig)
+	}
+
+	// build transaction bytes
+	txByte, err := EncodeTx(t.Cdc, msgs, pubKeys, sigs, memo, t.maxFeeInCoin)
 	if err != nil {
 		return nil, errors.FailedToBroadcastf("error to encode transaction, err: %s", err.Error())
 	}

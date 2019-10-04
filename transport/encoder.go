@@ -25,15 +25,18 @@ func EncodeSignMsg(
 
 // EncodeTx encodes a message to the standard transaction.
 func EncodeTx(
-	cdc *wire.Codec, msgs []sdk.Msg, pubKey crypto.PubKey, sig []byte,
-	seq uint64, memo string, maxFeeInCoin int64) ([]byte, error) {
-	stdSig := auth.StdSignature{
-		PubKey:    pubKey,
-		Signature: sig,
+	cdc *wire.Codec, msgs []sdk.Msg, pubKeys []crypto.PubKey, sigs [][]byte,
+	memo string, maxFeeInCoin int64) ([]byte, error) {
+	signature := []auth.StdSignature{}
+	for i := range pubKeys {
+		signature = append(signature, auth.StdSignature{
+			PubKey:    pubKeys[i],
+			Signature: sigs[i],
+		})
 	}
 
 	stdTx := auth.NewStdTx(msgs, auth.NewStdFee(0, sdk.NewCoins(
-		sdk.NewCoin(linotypes.LinoCoinDenom, sdk.NewInt(maxFeeInCoin)))), []auth.StdSignature{stdSig}, memo)
+		sdk.NewCoin(linotypes.LinoCoinDenom, sdk.NewInt(maxFeeInCoin)))), signature, memo)
 	return cdc.MarshalJSON(stdTx)
 }
 

@@ -5,8 +5,8 @@ import (
 
 	"github.com/lino-network/lino-go/errors"
 	linotypes "github.com/lino-network/lino/types"
-	"github.com/lino-network/lino/x/vote"
 	"github.com/lino-network/lino/x/vote/model"
+	vote "github.com/lino-network/lino/x/vote/types"
 )
 
 // GetDelegation returns the delegation relationship between
@@ -38,21 +38,4 @@ func (query *Query) GetVoter(ctx context.Context, voterName string) (*model.Vote
 		return nil, err
 	}
 	return voter, nil
-}
-
-// GetVote returns a vote performed by a voter for a given proposal.
-func (query *Query) GetVote(ctx context.Context, proposalID, voter string) (*model.Vote, error) {
-	resp, err := query.transport.Query(ctx, VoteKVStoreKey, vote.QueryVote, []string{proposalID, voter})
-	if err != nil {
-		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeVoteNotFound) {
-			return nil, errors.EmptyResponse("voter is not found")
-		}
-		return nil, err
-	}
-	vote := new(model.Vote)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, vote); err != nil {
-		return nil, err
-	}
-	return vote, nil
 }

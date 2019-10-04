@@ -143,6 +143,16 @@ func (query *Query) GetSeqNumber(ctx context.Context, username string) (uint64, 
 	return bank.Sequence, nil
 }
 
+// GetSeqNumberByAddress returns the next sequence number of an address which should
+// be used for broadcast.
+func (query *Query) GetSeqNumberByAddress(ctx context.Context, address string) (uint64, error) {
+	bank, err := query.GetAccountBankByAddress(ctx, address)
+	if err != nil {
+		return 0, err
+	}
+	return bank.Sequence, nil
+}
+
 // GetGrantPubKey returns the specific granted pubkey info of a user
 // that has given to the pubKey.
 func (query *Query) GetGrantPubKey(
@@ -269,9 +279,23 @@ func (query *Query) VerifyUserSignatureUsingTxKey(ctx context.Context, username 
 	return info.TransactionKey.VerifyBytes([]byte(payload), sig), nil
 }
 
-// GetTxAndSequenceNumber verify signature is signed from payload by user's transaction private key.
-func (query *Query) GetTxAndSequenceNumber(ctx context.Context, username, hash string) (*model.TxAndSequenceNumber, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryTxAndAccountSequence, []string{username, hash})
+// GetTxAndSequenceNumberByUsername get sequence from remote then check transaction is valid or not by username.
+func (query *Query) GetTxAndSequenceNumberByUsername(ctx context.Context, username, hash string) (*model.TxAndSequenceNumber, error) {
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryTxAndAccountSequence, []string{username, hash, "false"})
+	if err != nil {
+		return nil, err
+	}
+
+	txAndSeq := new(model.TxAndSequenceNumber)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, txAndSeq); err != nil {
+		return txAndSeq, err
+	}
+	return txAndSeq, nil
+}
+
+// GetTxAndSequenceNumberByAddress get sequence from remote then check transaction is valid or not by address.
+func (query *Query) GetTxAndSequenceNumberByAddress(ctx context.Context, address, hash string) (*model.TxAndSequenceNumber, error) {
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryTxAndAccountSequence, []string{address, hash, "true"})
 	if err != nil {
 		return nil, err
 	}

@@ -24,8 +24,8 @@ import (
 	infratypes "github.com/lino-network/lino/x/infra"
 	posttypes "github.com/lino-network/lino/x/post/types"
 	proposal "github.com/lino-network/lino/x/proposal"
-	valtypes "github.com/lino-network/lino/x/validator"
-	votetypes "github.com/lino-network/lino/x/vote"
+	valtypes "github.com/lino-network/lino/x/validator/types"
+	votetypes "github.com/lino-network/lino/x/vote/types"
 
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	ttypes "github.com/tendermint/tendermint/types"
@@ -119,6 +119,33 @@ func (broadcast *Broadcast) MakeRegisterMsg(ctx context.Context, referrer, regis
 	return txByte, nil
 }
 
+// MakeRegisterV2Msg return the signed register v2 msg bytes.
+func (broadcast *Broadcast) MakeRegisterV2Msg(
+	ctx context.Context, referrer linotypes.AccOrAddr, registerFee, username, txPubKeyHex,
+	signingPubKeyHex, referrerPrivKeyHex, txPrivKeyHex string, seq1, seq2 uint64) ([]byte, errors.Error) {
+	txPubKey, err := transport.GetPubKeyFromHex(txPubKeyHex)
+	if err != nil {
+		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get tx pub key").AddCause(err)
+	}
+	signingPubKey, err := transport.GetPubKeyFromHex(signingPubKeyHex)
+	if err != nil {
+		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get signing pub key").AddCause(err)
+	}
+	msg := acctypes.RegisterV2Msg{
+		Referrer:             referrer,
+		RegisterFee:          registerFee,
+		NewUser:              linotypes.AccountKey(username),
+		NewTransactionPubKey: txPubKey,
+		NewSigningPubKey:     signingPubKey,
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuildMultiSig(
+		msg, []string{referrerPrivKeyHex, txPrivKeyHex}, []uint64{seq1, seq2}, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
 // Transfer sends a certain amount of LINO token from the sender to the receiver.
 // It composes TransferMsg and then broadcasts the transaction to blockchain.
 // func (broadcast *Broadcast) Transfer(ctx context.Context, sender, receiver, amount, memo,
@@ -137,6 +164,21 @@ func (broadcast *Broadcast) MakeTransferMsg(sender, receiver, amount, memo, priv
 	msg := acctypes.TransferMsg{
 		Sender:   linotypes.AccountKey(sender),
 		Receiver: linotypes.AccountKey(receiver),
+		Amount:   amount,
+		Memo:     memo,
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
+// MakeTransferV2Msg return the signed msg bytes.
+func (broadcast *Broadcast) MakeTransferV2Msg(sender, receiver linotypes.AccOrAddr, amount, memo, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := acctypes.TransferV2Msg{
+		Sender:   sender,
+		Receiver: receiver,
 		Amount:   amount,
 		Memo:     memo,
 	}
@@ -243,27 +285,22 @@ func (broadcast *Broadcast) MakeUpdateAccountMsg(username, jsonMeta,
 // }
 
 // MakeRecoverAccountMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeRecoverAccountMsg(username, newResetPubKeyHex,
-	newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	resetPubKey, err := transport.GetPubKeyFromHex(newResetPubKeyHex)
-	if err != nil {
-		return nil, errors.FailedToGetPubKeyFromHexf("Recover: failed to get Reset pub key").AddCause(err)
-	}
+func (broadcast *Broadcast) MakeRecoverAccountMsg(
+	username, newTransactionPubKeyHex, newSigningPubKeyHex, privKeyHex, newTxPrivKeyHex string, seq1, seq2 uint64) ([]byte, errors.Error) {
 	txPubKey, err := transport.GetPubKeyFromHex(newTransactionPubKeyHex)
 	if err != nil {
 		return nil, errors.FailedToGetPubKeyFromHexf("Recover: failed to get Tx pub key").AddCause(err)
 	}
-	appPubKey, err := transport.GetPubKeyFromHex(newAppPubKeyHex)
+	signingPubKey, err := transport.GetPubKeyFromHex(newSigningPubKeyHex)
 	if err != nil {
-		return nil, errors.FailedToGetPubKeyFromHexf("Recover: failed to get App pub key").AddCause(err)
+		return nil, errors.FailedToGetPubKeyFromHexf("Recover: failed to get Signing pub key").AddCause(err)
 	}
 	msg := acctypes.RecoverMsg{
-		Username:             linotypes.AccountKey(username),
-		NewResetPubKey:       resetPubKey,
-		NewTransactionPubKey: txPubKey,
-		NewAppPubKey:         appPubKey,
+		Username:         linotypes.AccountKey(username),
+		NewSigningPubKey: signingPubKey,
+		NewTxPubKey:      txPubKey,
 	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	txByte, buildErr := broadcast.transport.SignAndBuildMultiSig(msg, []string{privKeyHex, newTxPrivKeyHex}, []uint64{seq1, seq2}, "")
 	if buildErr != nil {
 		return nil, buildErr
 	}
@@ -530,16 +567,15 @@ func (broadcast *Broadcast) MakeUpdatePostMsg(author, title, postID, content str
 // 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
 // }
 
-// MakeValidatorDepositMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeValidatorDepositMsg(username, deposit,
-	validatorPubKey, link, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// MakeValidatorRegisterMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeValidatorRegisterMsg(
+	username, validatorPubKey, link, privKeyHex string, seq uint64) ([]byte, errors.Error) {
 	valPubKey, err := transport.GetPubKeyFromHex(validatorPubKey)
 	if err != nil {
 		return nil, errors.FailedToGetPubKeyFromHexf("ValidatorDeposit: failed to get Val pub key").AddCause(err)
 	}
-	msg := valtypes.ValidatorDepositMsg{
+	msg := valtypes.ValidatorRegisterMsg{
 		Username:  linotypes.AccountKey(username),
-		Deposit:   deposit,
 		ValPubKey: valPubKey,
 		Link:      link,
 	}
@@ -563,18 +599,18 @@ func (broadcast *Broadcast) MakeValidatorDepositMsg(username, deposit,
 // }
 
 // MakeValidatorWithdrawMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeValidatorWithdrawMsg(username, amount,
-	privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := valtypes.ValidatorWithdrawMsg{
-		Username: linotypes.AccountKey(username),
-		Amount:   amount,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeValidatorWithdrawMsg(username, amount,
+// 	privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := valtypes.ValidatorWithdrawMsg{
+// 		Username: linotypes.AccountKey(username),
+// 		Amount:   amount,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // ValidatorRevoke revokes all deposited LINO token of a validator
 // so that the user will not be a validator anymore.
@@ -667,19 +703,19 @@ func (broadcast *Broadcast) MakeStakeOutMsg(username, amount, privKeyHex string,
 // }
 
 // MakeDelegatetMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeDelegatetMsg(delegator, voter, amount,
-	privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := votetypes.DelegateMsg{
-		Delegator: linotypes.AccountKey(delegator),
-		Voter:     linotypes.AccountKey(voter),
-		Amount:    amount,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeDelegatetMsg(delegator, voter, amount,
+// 	privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := votetypes.DelegateMsg{
+// 		Delegator: linotypes.AccountKey(delegator),
+// 		Voter:     linotypes.AccountKey(voter),
+// 		Amount:    amount,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // DelegatorWithdraw withdraws part of delegated LINO token of a delegator
 // to a voter, while the delegation still exists.
@@ -695,18 +731,18 @@ func (broadcast *Broadcast) MakeDelegatetMsg(delegator, voter, amount,
 // }
 
 // MakeDelegatorWithdrawMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeDelegatorWithdrawMsg(delegator, voter, amount, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := votetypes.DelegatorWithdrawMsg{
-		Delegator: linotypes.AccountKey(delegator),
-		Voter:     linotypes.AccountKey(voter),
-		Amount:    amount,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeDelegatorWithdrawMsg(delegator, voter, amount, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := votetypes.DelegatorWithdrawMsg{
+// 		Delegator: linotypes.AccountKey(delegator),
+// 		Voter:     linotypes.AccountKey(voter),
+// 		Amount:    amount,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // ClaimInterest claims interest of a certain user.
 // It composes ClaimInterestMsg and then broadcasts the transaction to blockchain.

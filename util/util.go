@@ -47,3 +47,7 @@ func Min(a, b int64) int64 {
 	}
 	return a
 }
+
+func GetSignerList(signer string) []linotypes.AccOrAddr {
+	return []linotypes.AccOrAddr{linotypes.NewAccOrAddrFromAcc(linotypes.AccountKey(signer))}
+}
