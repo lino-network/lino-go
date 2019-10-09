@@ -20,19 +20,19 @@ func (query *Query) GetGlobalAllocationParam(ctx context.Context) (*param.Global
 	return param, nil
 }
 
-// GetInfraInternalAllocationParam returns the InfraInternalAllocationParam.
-func (query *Query) GetInfraInternalAllocationParam(ctx context.Context) (*param.InfraInternalAllocationParam, error) {
-	resp, err := query.transport.Query(ctx, ParamKVStoreKey, param.QueryInfraInternalAllocationParam, []string{})
-	if err != nil {
-		return nil, err
-	}
+// // GetInfraInternalAllocationParam returns the InfraInternalAllocationParam.
+// func (query *Query) GetInfraInternalAllocationParam(ctx context.Context) (*param.InfraInternalAllocationParam, error) {
+// 	resp, err := query.transport.Query(ctx, ParamKVStoreKey, param.QueryInfraInternalAllocationParam, []string{})
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	param := new(param.InfraInternalAllocationParam)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
-		return nil, err
-	}
-	return param, nil
-}
+// 	param := new(param.InfraInternalAllocationParam)
+// 	if err := query.transport.Cdc.UnmarshalJSON(resp, param); err != nil {
+// 		return nil, err
+// 	}
+// 	return param, nil
+// }
 
 // GetDeveloperParam returns the DeveloperParam.
 func (query *Query) GetDeveloperParam(ctx context.Context) (*param.DeveloperParam, error) {

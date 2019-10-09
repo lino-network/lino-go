@@ -257,6 +257,16 @@ func (api *API) ValidatorRevoke(
 	return resp, err
 }
 
+func (api *API) VoteValidatorMsg(
+	ctx context.Context, username string, validators []string,
+	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	resp, _, err := api.GuaranteeBroadcast(
+		ctx, util.GetSignerList(username), func(seq []uint64) ([]byte, errors.Error) {
+			return api.MakeVoteValidatorMsg(username, validators, privKeyHex, seq[0])
+		})
+	return resp, err
+}
+
 // StakeIn deposits a certain amount of LINO token for a user
 // in order to become a voter.
 // It composes StakeInMsg and then broadcasts the transaction to blockchain.
@@ -408,12 +418,12 @@ func (api *API) UpdateAffiliated(
 
 // ProviderReport reports infra usage of a infra provider in order to get infra inflation.
 // It composes ProviderReportMsg and then broadcasts the transaction to blockchain.
-func (api *API) ProviderReport(ctx context.Context, username string, usage int64, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(username), func(seq []uint64) ([]byte, errors.Error) {
-		return api.MakeProviderReportMsg(username, usage, privKeyHex, seq[0])
-	})
-	return resp, err
-}
+// func (api *API) ProviderReport(ctx context.Context, username string, usage int64, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(username), func(seq []uint64) ([]byte, errors.Error) {
+// 		return api.MakeProviderReportMsg(username, usage, privKeyHex, seq[0])
+// 	})
+// 	return resp, err
+// }
 
 // ChangeGlobalAllocationParam changes GlobalAllocationParam with new value.
 // It composes ChangeGlobalAllocationParamMsg and then broadcasts the transaction to blockchain.
@@ -427,14 +437,14 @@ func (api *API) ChangeGlobalAllocationParam(ctx context.Context, creator string,
 
 // ChangeInfraInternalAllocationParam changes InfraInternalAllocationParam with new value.
 // It composes ChangeInfraInternalAllocationParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeInfraInternalAllocationParam(
-	ctx context.Context, creator string, parameter param.InfraInternalAllocationParam,
-	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seq []uint64) ([]byte, errors.Error) {
-		return api.MakeChangeInfraInternalAllocationParamMsg(creator, parameter, reason, privKeyHex, seq[0])
-	})
-	return resp, err
-}
+// func (api *API) ChangeInfraInternalAllocationParam(
+// 	ctx context.Context, creator string, parameter param.InfraInternalAllocationParam,
+// 	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seq []uint64) ([]byte, errors.Error) {
+// 		return api.MakeChangeInfraInternalAllocationParamMsg(creator, parameter, reason, privKeyHex, seq[0])
+// 	})
+// 	return resp, err
+// }
 
 // ChangeVoteParam changes VoteParam with new value.
 // It composes ChangeVoteParamMsg and then broadcasts the transaction to blockchain.
