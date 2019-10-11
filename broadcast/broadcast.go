@@ -682,6 +682,21 @@ func (broadcast *Broadcast) MakeStakeInMsg(username, deposit,
 	return txByte, nil
 }
 
+// MakeStakeInForMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeStakeInForMsg(sender, receiver, deposit,
+	privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := votetypes.StakeInForMsg{
+		Sender:   linotypes.AccountKey(sender),
+		Deposit:  deposit,
+		Receiver: linotypes.AccountKey(receiver),
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
 // StakeOut withdraws part of LINO token from a voter's deposit.
 // It composes StakeOutMsg and then broadcasts the transaction to blockchain.
 // func (broadcast *Broadcast) StakeOut(ctx context.Context, username, amount,

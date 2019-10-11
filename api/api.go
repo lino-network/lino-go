@@ -278,6 +278,17 @@ func (api *API) StakeIn(
 	return resp, err
 }
 
+// StakeInFor deposits a certain amount of LINO token from sender to receiver
+// in order to become a voter.
+// It composes StakeInForMsg and then broadcasts the transaction to blockchain.
+func (api *API) StakeInFor(
+	ctx context.Context, sender, receiver, deposit, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(sender), func(seq []uint64) ([]byte, errors.Error) {
+		return api.MakeStakeInForMsg(sender, receiver, deposit, privKeyHex, seq[0])
+	})
+	return resp, err
+}
+
 // StakeOut withdraws part of LINO token from a voter's deposit.
 // It composes StakeOutMsg and then broadcasts the transaction to blockchain.
 func (api *API) StakeOut(
