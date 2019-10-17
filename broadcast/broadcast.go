@@ -22,6 +22,7 @@ import (
 	acctypes "github.com/lino-network/lino/x/account/types"
 	devtypes "github.com/lino-network/lino/x/developer/types"
 	posttypes "github.com/lino-network/lino/x/post/types"
+	pricetypes "github.com/lino-network/lino/x/price/types"
 	proposal "github.com/lino-network/lino/x/proposal"
 	valtypes "github.com/lino-network/lino/x/validator/types"
 	votetypes "github.com/lino-network/lino/x/vote/types"
@@ -1436,6 +1437,20 @@ func (broadcast *Broadcast) MakeUpgradeProtocolMsg(creator, link, reason string,
 		Creator: linotypes.AccountKey(creator),
 		Link:    link,
 		Reason:  reason,
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
+// MakeFeedPriceMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeFeedPriceMsg(
+	username string, price linotypes.MiniDollar, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := pricetypes.FeedPriceMsg{
+		Username: linotypes.AccountKey(username),
+		Price:    price,
 	}
 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
 	if buildErr != nil {

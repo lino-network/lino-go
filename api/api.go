@@ -599,6 +599,15 @@ func (api *API) UpgradeProtocol(ctx context.Context, creator, link, reason strin
 	return resp, err
 }
 
+// FeedPrice report lino price to blockchain.
+func (api *API) FeedPrice(
+	ctx context.Context, username string, price linotypes.MiniDollar, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(username), func(seqs []uint64) ([]byte, errors.Error) {
+		return api.MakeFeedPriceMsg(username, price, privKeyHex, seqs[0])
+	})
+	return resp, err
+}
+
 // GuaranteeBroadcast - gurantee broadcast succ unless ctx timeout, which status is unknown.
 // return response and an array of tx hash executed.
 // WARNING-1: Use on lino fullnode version >= 0.2.10 ONLY!
