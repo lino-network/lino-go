@@ -29,6 +29,8 @@ func CodeToDefaultMsg(code CodeType) string {
 		return "timeout"
 	case CodeTxNotFound:
 		return "Tx Not Found"
+	case CodeSequenceNumberNotEnough:
+		return "sequence number not enough"
 	default:
 		return fmt.Sprintf("Unknown code %d", code)
 	}
@@ -127,6 +129,11 @@ func InvalidSequenceNumber(msg string) Error {
 //InvalidSequenceNumberf creates an error with CodeInvalidSequenceNumber and formatted message
 func InvalidSequenceNumberf(format string, args ...interface{}) Error {
 	return newError(CodeInvalidSequenceNumber, fmt.Sprintf(format, args...))
+}
+
+//SequenceNumberNotEnoughf creates an error with CodeSequenceNumberNotEnough and formatted message
+func SequenceNumberNotEnoughf(format string, args ...interface{}) Error {
+	return newError(CodeSequenceNumberNotEnough, fmt.Sprintf(format, args...))
 }
 
 //EmptyResponse creates an error with CodeEmptyResponse

@@ -35,7 +35,7 @@ To connect with latest Lino Blockchain, chain id and node url should be set spec
 
 ```
 api := api.NewLinoAPIFromArgs(&api.Options{
-	ChainID: "lino-testnet-upgrade2",
+	ChainID: "lino-testnet-upgrade4",
 	NodeURL: "https://fullnode.lino.network:443",
 })
 ```
@@ -345,7 +345,7 @@ resp, err := api.UpdateAccount(ctx, username, jsonMeta, privKeyHex)
 ```
 #### Recover 
 ```
-resp, err := api.Recover(ctx, username, newResetPubKeyHex, newTransactionPubKeyHex, newAppPubKeyHex, privKeyHex)
+resp, err := api.Recover(ctx, username, newTxAddr, newTxPubKeyHex, newSigningPubKeyHex, privKeyHex, newTxPrivKeyHex)
 ```
 
 ### Broadcast Post
@@ -383,9 +383,17 @@ resp, err := api.ValidatorDeposit(ctx, username, deposit, validatorPubKey, link,
 ```
 resp, err := api.ValidatorWithdraw(ctx, username, amount, privKeyHex)
 ```
+#### Validator Withdraw
+```
+resp, err := api.ValidatorUpdate(ctx, username, link, privKeyHex)
+```
 #### Validator Revoke
 ```
 resp, err := api.ValidatorRevoke(ctx, username, privKeyHex)
+```
+#### Vote Validators
+```
+resp, err := api.VoteValidator(ctx, username, validators, privKeyHex)
 ```
 
 ### Broadcast Vote
@@ -413,7 +421,7 @@ resp, err := api.RevokeDelegation(ctx, delegator, voter, privKeyHex)
 ### Broadcast Developer
 #### Developer Register
 ```
-resp, err := api.DeveloperRegister(ctx, username, deposit, website, description, appMetaData, privKeyHex)
+resp, err := api.DeveloperRegister(ctx, username, website, description, appMetaData, privKeyHex)
 ```
 #### DeveloperUpdate
 ```

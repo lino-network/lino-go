@@ -140,6 +140,8 @@ github.com/lino-network/lino v0.4.3 h1:usBMA4AtGdWDu8IY8KdNUeSAFOD5Hnkp1nIUzyXJ1
 github.com/lino-network/lino v0.4.3/go.mod h1:Nk+/PrMwkHMuCBmQCqwnHiUFtcdOkkdG637mexZu6jo=
 github.com/lino-network/lino v0.4.4 h1:R44FKv1l5om5w5O5Idq1qdp/cqOsawqDmCPJ0lDzKI0=
 github.com/lino-network/lino v0.4.4/go.mod h1:Nk+/PrMwkHMuCBmQCqwnHiUFtcdOkkdG637mexZu6jo=
+github.com/lino-network/lino v0.5.1 h1:8yJ074jDzNt34ZkJU95MJIlx7CPb9I9Q8Biz/jFuy2g=
+github.com/lino-network/lino v0.5.1/go.mod h1:JM1maZjj6CM28HEaR7p2Wb5Lq1qLWca8C8jMtuR8aMI=
 github.com/magiconair/properties v1.8.0 h1:LLgXmsheXeRoUOBOjtwPQCWIYqM/LU1ayDtDePerRcY=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/magiconair/properties v1.8.1 h1:ZC2Vc7/ZFkGmsVC9KvOjumD+G5lXy2RtTKyzRKO2BQ4=
@@ -225,6 +227,7 @@ github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
+github.com/stumble/gorocksdb v0.0.3 h1:9UU+QA1pqFYJuf9+5p7z1IqdE5k0mma4UAeu2wmX8kA=
 github.com/stumble/gorocksdb v0.0.3/go.mod h1:v6IHdFBXk5DJ1K4FZ0xi+eY737quiiBxYtSWXadLybY=
 github.com/syndtr/goleveldb v1.0.1-0.20190318030020-c3a204f8e965 h1:1oFLiOyVl+W7bnBzGhf7BbIv9loSFQcieWWYIjLqcAw=
 github.com/syndtr/goleveldb v1.0.1-0.20190318030020-c3a204f8e965/go.mod h1:9OrXJhf154huy1nPWmuSrkgjPUtUNhA+Zmy+6AESzuA=

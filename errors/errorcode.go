@@ -19,4 +19,5 @@ const (
 	CodeTxNotFound             // tx not found
 	CodeGuaranteeBroadcastFail // guarantee broadcast fail
 	CodeUnmarshalFailed
+	CodeSequenceNumberNotEnough // for multisig msg return error if sequence number is not enough
 )

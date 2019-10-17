@@ -585,6 +585,20 @@ func (broadcast *Broadcast) MakeValidatorRegisterMsg(
 	return txByte, nil
 }
 
+// MakeValidatorUpdateMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeValidatorUpdateMsg(
+	username, link, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := valtypes.ValidatorUpdateMsg{
+		Username: linotypes.AccountKey(username),
+		Link:     link,
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
 // ValidatorWithdraw withdraws part of LINO token from a validator's deposit,
 // while still keep being a validator.
 // It composes ValidatorDepositMsg and then broadcasts the transaction to blockchain.
@@ -817,7 +831,7 @@ func (broadcast *Broadcast) MakeClaimInterestMsg(username, privKeyHex string, se
 // }
 
 // MakeDeveloperRegisterMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeDeveloperRegisterMsg(username, deposit, website,
+func (broadcast *Broadcast) MakeDeveloperRegisterMsg(username, website,
 	description, appMetaData, privKeyHex string, seq uint64) ([]byte, errors.Error) {
 	msg := devtypes.DeveloperRegisterMsg{
 		Username:    linotypes.AccountKey(username),
