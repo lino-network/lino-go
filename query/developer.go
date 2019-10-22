@@ -27,8 +27,8 @@ func (query *Query) GetDeveloper(ctx context.Context, developerName string) (*mo
 }
 
 // GetIDABalance returns user IDA balance
-func (query *Query) GetIDABalance(ctx context.Context, username string) (*model.IDABank, error) {
-	resp, err := query.transport.Query(ctx, DeveloperKVStoreKey, types.QueryIDABalance, []string{username})
+func (query *Query) GetIDABalance(ctx context.Context, username, app string) (*types.QueryResultIDABalance, error) {
+	resp, err := query.transport.Query(ctx, DeveloperKVStoreKey, types.QueryIDABalance, []string{app, username})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
 		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeAccountNotFound) {
@@ -36,7 +36,7 @@ func (query *Query) GetIDABalance(ctx context.Context, username string) (*model.
 		}
 		return nil, err
 	}
-	bank := new(model.IDABank)
+	bank := new(types.QueryResultIDABalance)
 	if err := query.transport.Cdc.UnmarshalJSON(resp, bank); err != nil {
 		return nil, err
 	}

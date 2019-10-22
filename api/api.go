@@ -131,7 +131,7 @@ func (api *API) Register(ctx context.Context, referrer, registerFee, username, r
 // It composes RegisterMsg and then broadcasts the transaction to blockchain.
 func (api *API) RegisterV2(ctx context.Context, referrer linotypes.AccOrAddr, registerFee, username, newTxAddr, txPubKeyHex,
 	signingPubKeyHex, referrerPrivKeyHex, txPrivKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	addr, e := sdk.AccAddressFromBech32(newTxAddr)
+	addr, e := hex.DecodeString(newTxAddr)
 	if e != nil {
 		return nil, errors.InvalidArg("Invalid Transaction Key Address")
 	}
@@ -165,6 +165,14 @@ func (api *API) TransferV2(
 	ctx context.Context, sender, receiver linotypes.AccOrAddr, amount, memo, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, []linotypes.AccOrAddr{sender}, func(seqs []uint64) ([]byte, errors.Error) {
 		return api.MakeTransferV2Msg(sender, receiver, amount, memo, privKeyHex, seqs[0])
+	})
+	return resp, err
+}
+
+func (api *API) UpdateAccountMeta(
+	ctx context.Context, username string, meta string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(username), func(seqs []uint64) ([]byte, errors.Error) {
+		return api.MakeUpdateAccountMsg(username, meta, privKeyHex, seqs[0])
 	})
 	return resp, err
 }
@@ -677,7 +685,8 @@ func (api *API) safeBroadcastAndWatch(
 			var seq uint64
 			var err error
 			if signer.IsAddr {
-				seq, err = api.Query.GetSeqNumberByAddress(ctx, signer.Addr.String())
+				addr := hex.EncodeToString(signer.Addr)
+				seq, err = api.Query.GetSeqNumberByAddress(ctx, addr)
 			} else {
 				seq, err = api.Query.GetSeqNumber(ctx, string(signer.AccountKey))
 			}
@@ -696,7 +705,8 @@ func (api *API) safeBroadcastAndWatch(
 			var txSeq *accmodel.TxAndSequenceNumber
 			var err error
 			if signer.IsAddr {
-				txSeq, err = api.Query.GetTxAndSequenceNumberByAddress(ctx, signer.Addr.String(), *lastHash)
+				addr := hex.EncodeToString(signer.Addr)
+				txSeq, err = api.Query.GetTxAndSequenceNumberByAddress(ctx, addr, *lastHash)
 				if err != nil {
 					return nil, lastHash, errSeqTxQueryFailed
 				}
@@ -744,7 +754,8 @@ func (api *API) safeBroadcastAndWatch(
 				var txSeq *accmodel.TxAndSequenceNumber
 				var err error
 				if signer.IsAddr {
-					txSeq, err = api.Query.GetTxAndSequenceNumberByAddress(ctx, signer.Addr.String(), *lastHash)
+					addr := hex.EncodeToString(signer.Addr)
+					txSeq, err = api.Query.GetTxAndSequenceNumberByAddress(ctx, addr, *lastHash)
 					if err != nil {
 						return nil, lastHash, errSeqTxQueryFailed
 					}

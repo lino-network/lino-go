@@ -174,6 +174,19 @@ func (broadcast *Broadcast) MakeTransferMsg(sender, receiver, amount, memo, priv
 	return txByte, nil
 }
 
+// MakeAccountMetaUpdateMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeAccountMetaUpdateMsg(username, meta, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := acctypes.UpdateAccountMsg{
+		Username: linotypes.AccountKey(username),
+		JSONMeta: meta,
+	}
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
 // MakeTransferV2Msg return the signed msg bytes.
 func (broadcast *Broadcast) MakeTransferV2Msg(sender, receiver linotypes.AccOrAddr, amount, memo, privKeyHex string, seq uint64) ([]byte, errors.Error) {
 	msg := acctypes.TransferV2Msg{

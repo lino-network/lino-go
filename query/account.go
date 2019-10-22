@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"strings"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/transport"
 	linotypes "github.com/lino-network/lino/types"
@@ -101,7 +102,11 @@ func (query *Query) GetAccountBank(ctx context.Context, username string) (*model
 
 // GetAccountBankByAddress returns account bank info for a specific address.
 func (query *Query) GetAccountBankByAddress(ctx context.Context, address string) (*model.AccountBank, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountBank, []string{address})
+	addr, e := hex.DecodeString(address)
+	if e != nil {
+		return nil, errors.InvalidArgf("Address %s is not hex string", address)
+	}
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountBankByAddress, []string{sdk.AccAddress(addr).String()})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
 		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeAccountBankNotFound) {
@@ -148,6 +153,10 @@ func (query *Query) GetSeqNumber(ctx context.Context, username string) (uint64, 
 func (query *Query) GetSeqNumberByAddress(ctx context.Context, address string) (uint64, error) {
 	bank, err := query.GetAccountBankByAddress(ctx, address)
 	if err != nil {
+		linoe, ok := err.(errors.Error)
+		if ok && linoe.CodeType() == errors.CodeEmptyResponse {
+			return 0, nil
+		}
 		return 0, err
 	}
 	return bank.Sequence, nil
@@ -295,7 +304,11 @@ func (query *Query) GetTxAndSequenceNumberByUsername(ctx context.Context, userna
 
 // GetTxAndSequenceNumberByAddress get sequence from remote then check transaction is valid or not by address.
 func (query *Query) GetTxAndSequenceNumberByAddress(ctx context.Context, address, hash string) (*model.TxAndSequenceNumber, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryTxAndAccountSequence, []string{address, hash, "true"})
+	addr, e := hex.DecodeString(address)
+	if e != nil {
+		return nil, errors.InvalidArgf("Address %s is not hex string", address)
+	}
+	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryTxAndAccountSequence, []string{sdk.AccAddress(addr).String(), hash, "true"})
 	if err != nil {
 		return nil, err
 	}
