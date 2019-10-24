@@ -20,7 +20,7 @@ func (query *Query) GetAccountInfo(ctx context.Context, username string) (*model
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountInfo, []string{username})
 	if err != nil {
 		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeAccountInfoNotFound) {
+		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeAccountNotFound) {
 			return nil, errors.EmptyResponse("account info is not found")
 		}
 		return nil, err
@@ -125,10 +125,6 @@ func (query *Query) GetAccountBankByAddress(ctx context.Context, address string)
 func (query *Query) GetAccountMeta(ctx context.Context, username string) (*model.AccountMeta, error) {
 	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountMeta, []string{username})
 	if err != nil {
-		linoe, ok := err.(errors.Error)
-		if ok && linoe.BlockChainCode() == uint32(linotypes.CodeAccountMetaNotFound) {
-			return nil, errors.EmptyResponse("account meta is not found")
-		}
 		return nil, err
 	}
 	meta := new(model.AccountMeta)

@@ -17,7 +17,7 @@ import (
 	"github.com/lino-network/lino-go/query"
 	"github.com/lino-network/lino-go/transport"
 	"github.com/lino-network/lino-go/util"
-	"github.com/lino-network/lino/param"
+	// "github.com/lino-network/lino/param"
 	linotypes "github.com/lino-network/lino/types"
 	accmodel "github.com/lino-network/lino/x/account/model"
 	"github.com/spf13/viper"
@@ -115,17 +115,17 @@ type MsgBuilderFunc func(seqs []uint64) ([]byte, errors.Error)
 
 // Register registers a new user on blockchain.
 // It composes RegisterMsg and then broadcasts the transaction to blockchain.
-func (api *API) Register(ctx context.Context, referrer, registerFee, username, resetPubKeyHex,
-	transactionPubKeyHex, appPubKeyHex, referrerPrivKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(
-		ctx, util.GetSignerList(referrer),
-		func(seqs []uint64) ([]byte, errors.Error) {
-			return api.MakeRegisterMsg(
-				ctx, referrer, registerFee, username, resetPubKeyHex,
-				transactionPubKeyHex, appPubKeyHex, referrerPrivKeyHex, seqs[0])
-		})
-	return resp, err
-}
+// func (api *API) Register(ctx context.Context, referrer, registerFee, username, resetPubKeyHex,
+// 	transactionPubKeyHex, appPubKeyHex, referrerPrivKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(
+// 		ctx, util.GetSignerList(referrer),
+// 		func(seqs []uint64) ([]byte, errors.Error) {
+// 			return api.MakeRegisterMsg(
+// 				ctx, referrer, registerFee, username, resetPubKeyHex,
+// 				transactionPubKeyHex, appPubKeyHex, referrerPrivKeyHex, seqs[0])
+// 		})
+// 	return resp, err
+// }
 
 // RegisterV2 registers a new user on blockchain.
 // It composes RegisterMsg and then broadcasts the transaction to blockchain.
@@ -385,40 +385,40 @@ func (api *API) DeveloperRevoke(
 // GrantPermission grants a certain (e.g. App) permission to
 // an authorized app with a certain period of time.
 // It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
-func (api *API) GrantPermission(
-	ctx context.Context, username, authorizedApp string,
-	validityPeriodSec int64, grantLevel linotypes.Permission,
-	amount string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(username), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeGrantPermissionMsg(
-			username, authorizedApp, validityPeriodSec, grantLevel, amount, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) GrantPermission(
+// 	ctx context.Context, username, authorizedApp string,
+// 	validityPeriodSec int64, grantLevel linotypes.Permission,
+// 	amount string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(username), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeGrantPermissionMsg(
+// 			username, authorizedApp, validityPeriodSec, grantLevel, amount, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // GrantAppAndPreAuthPermission grants both app and preauth permission to
 // an authorized app with a certain period of time.
 // It composes GrantPermissionMsg and then broadcasts the transaction to blockchain.
-func (api *API) GrantAppAndPreAuthPermission(ctx context.Context, username, authorizedApp string,
-	validityPeriodSec int64, amount string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(username), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeGrantPermissionMsg(
-			username, authorizedApp, validityPeriodSec,
-			linotypes.AppAndPreAuthorizationPermission, amount, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) GrantAppAndPreAuthPermission(ctx context.Context, username, authorizedApp string,
+// 	validityPeriodSec int64, amount string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(username), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeGrantPermissionMsg(
+// 			username, authorizedApp, validityPeriodSec,
+// 			linotypes.AppAndPreAuthorizationPermission, amount, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // RevokePermission revokes the permission given previously to a app.
 // It composes RevokePermissionMsg and then broadcasts the transaction to blockchain.
-func (api *API) RevokePermission(
-	ctx context.Context, username, revokeFrom string, permission linotypes.Permission,
-	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(username), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeRevokePermissionPermissionMsg(username, revokeFrom, permission, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) RevokePermission(
+// 	ctx context.Context, username, revokeFrom string, permission linotypes.Permission,
+// 	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(username), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeRevokePermissionPermissionMsg(username, revokeFrom, permission, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // IDAIssue issues IDA on the blockchain.
 func (api *API) IDAIssue(
@@ -444,6 +444,16 @@ func (api *API) IDATransfer(
 	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(signer), func(seqs []uint64) ([]byte, errors.Error) {
 		return api.MakeIDATransferMsg(app, amount, from, to, signer, privKeyHex, seqs[0])
+	})
+	return resp, err
+}
+
+// IDADonate moves IDA between accounts.
+func (api *API) IDADonate(
+	ctx context.Context, username, author, app, amount, postID, signer, memo string,
+	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(signer), func(seqs []uint64) ([]byte, errors.Error) {
+		return api.MakeIDADonateMsg(username, author, app, amount, postID, signer, memo, privKeyHex, seqs[0])
 	})
 	return resp, err
 }
@@ -479,13 +489,13 @@ func (api *API) UpdateAffiliated(
 
 // ChangeGlobalAllocationParam changes GlobalAllocationParam with new value.
 // It composes ChangeGlobalAllocationParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeGlobalAllocationParam(ctx context.Context, creator string,
-	parameter param.GlobalAllocationParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeChangeGlobalAllocationParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) ChangeGlobalAllocationParam(ctx context.Context, creator string,
+// 	parameter param.GlobalAllocationParam, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeChangeGlobalAllocationParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // ChangeInfraInternalAllocationParam changes InfraInternalAllocationParam with new value.
 // It composes ChangeInfraInternalAllocationParamMsg and then broadcasts the transaction to blockchain.
@@ -500,112 +510,112 @@ func (api *API) ChangeGlobalAllocationParam(ctx context.Context, creator string,
 
 // ChangeVoteParam changes VoteParam with new value.
 // It composes ChangeVoteParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeVoteParam(
-	ctx context.Context, creator string, parameter param.VoteParam,
-	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeChangeVoteParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) ChangeVoteParam(
+// 	ctx context.Context, creator string, parameter param.VoteParam,
+// 	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeChangeVoteParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // ChangeProposalParam changes ProposalParam with new value.
 // It composes ChangeProposalParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeProposalParam(
-	ctx context.Context, creator string, parameter param.ProposalParam,
-	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeChangeProposalParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) ChangeProposalParam(
+// 	ctx context.Context, creator string, parameter param.ProposalParam,
+// 	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeChangeProposalParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // ChangeDeveloperParam changes DeveloperParam with new value.
 // It composes ChangeDeveloperParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeDeveloperParam(
-	ctx context.Context, creator string, parameter param.DeveloperParam,
-	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeChangeDeveloperParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) ChangeDeveloperParam(
+// 	ctx context.Context, creator string, parameter param.DeveloperParam,
+// 	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeChangeDeveloperParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // ChangeValidatorParam changes ValidatorParam with new value.
 // It composes ChangeValidatorParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeValidatorParam(
-	ctx context.Context, creator string, parameter param.ValidatorParam,
-	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeChangeValidatorParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) ChangeValidatorParam(
+// 	ctx context.Context, creator string, parameter param.ValidatorParam,
+// 	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeChangeValidatorParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // ChangeBandwidthParam changes BandwidthParam with new value.
 // It composes ChangeBandwidthParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeBandwidthParam(
-	ctx context.Context, creator string, parameter param.BandwidthParam,
-	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeChangeBandwidthParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) ChangeBandwidthParam(
+// 	ctx context.Context, creator string, parameter param.BandwidthParam,
+// 	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeChangeBandwidthParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // ChangeAccountParam changes AccountParam with new value.
 // It composes ChangeAccountParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangeAccountParam(
-	ctx context.Context, creator string, parameter param.AccountParam,
-	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeChangeAccountParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) ChangeAccountParam(
+// 	ctx context.Context, creator string, parameter param.AccountParam,
+// 	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeChangeAccountParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // ChangePostParam changes PostParam with new value.
 // It composes ChangePostParamMsg and then broadcasts the transaction to blockchain.
-func (api *API) ChangePostParam(
-	ctx context.Context, creator string, parameter param.PostParam,
-	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeChangePostParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) ChangePostParam(
+// 	ctx context.Context, creator string, parameter param.PostParam,
+// 	reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeChangePostParamMsg(creator, parameter, reason, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // DeletePostContent deletes the content of a post on blockchain, which is used
 // for content censorship.
 // It composes DeletePostContentMsg and then broadcasts the transaction to blockchain.
-func (api *API) DeletePostContent(
-	ctx context.Context, creator, postAuthor, postID, reason,
-	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeDeletePostContentMsg(creator, postAuthor, postID, reason, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) DeletePostContent(
+// 	ctx context.Context, creator, postAuthor, postID, reason,
+// 	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeDeletePostContentMsg(creator, postAuthor, postID, reason, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // VoteProposal adds a vote to a certain proposal with agree/disagree.
 // It composes VoteProposalMsg and then broadcasts the transaction to blockchain.
-func (api *API) VoteProposal(
-	ctx context.Context, voter, proposalID string, result bool,
-	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(voter), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeVoteProposalMsg(voter, proposalID, result, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) VoteProposal(
+// 	ctx context.Context, voter, proposalID string, result bool,
+// 	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(voter), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeVoteProposalMsg(voter, proposalID, result, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // UpgradeProtocol upgrades the protocol.
 // It composes UpgradeProtocolMsg and then broadcasts the transaction to blockchain.
-func (api *API) UpgradeProtocol(ctx context.Context, creator, link, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeUpgradeProtocolMsg(creator, link, reason, privKeyHex, seqs[0])
-	})
-	return resp, err
-}
+// func (api *API) UpgradeProtocol(ctx context.Context, creator, link, reason string, privKeyHex string) (*model.BroadcastResponse, errors.Error) {
+// 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(creator), func(seqs []uint64) ([]byte, errors.Error) {
+// 		return api.MakeUpgradeProtocolMsg(creator, link, reason, privKeyHex, seqs[0])
+// 	})
+// 	return resp, err
+// }
 
 // FeedPrice report lino price to blockchain.
 func (api *API) FeedPrice(

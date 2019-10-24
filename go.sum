@@ -142,6 +142,8 @@ github.com/lino-network/lino v0.4.4 h1:R44FKv1l5om5w5O5Idq1qdp/cqOsawqDmCPJ0lDzK
 github.com/lino-network/lino v0.4.4/go.mod h1:Nk+/PrMwkHMuCBmQCqwnHiUFtcdOkkdG637mexZu6jo=
 github.com/lino-network/lino v0.5.1 h1:8yJ074jDzNt34ZkJU95MJIlx7CPb9I9Q8Biz/jFuy2g=
 github.com/lino-network/lino v0.5.1/go.mod h1:JM1maZjj6CM28HEaR7p2Wb5Lq1qLWca8C8jMtuR8aMI=
+github.com/lino-network/lino v0.6.1 h1:SH9pdjdRLB+AfQOi5MMbfgpOY6u0CB72yWtbKKZVODo=
+github.com/lino-network/lino v0.6.1/go.mod h1:nOaJuTHJy+fSqKi6qWZiafS6H3MClbp4sq2WAnIEf0g=
 github.com/magiconair/properties v1.8.0 h1:LLgXmsheXeRoUOBOjtwPQCWIYqM/LU1ayDtDePerRcY=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/magiconair/properties v1.8.1 h1:ZC2Vc7/ZFkGmsVC9KvOjumD+G5lXy2RtTKyzRKO2BQ4=

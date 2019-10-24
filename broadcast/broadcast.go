@@ -17,13 +17,13 @@ import (
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
 	"github.com/lino-network/lino-go/transport"
-	"github.com/lino-network/lino/param"
+	// "github.com/lino-network/lino/param"
 	linotypes "github.com/lino-network/lino/types"
 	acctypes "github.com/lino-network/lino/x/account/types"
 	devtypes "github.com/lino-network/lino/x/developer/types"
 	posttypes "github.com/lino-network/lino/x/post/types"
 	pricetypes "github.com/lino-network/lino/x/price/types"
-	proposal "github.com/lino-network/lino/x/proposal"
+	// proposal "github.com/lino-network/lino/x/proposal"
 	valtypes "github.com/lino-network/lino/x/validator/types"
 	votetypes "github.com/lino-network/lino/x/vote/types"
 
@@ -90,34 +90,34 @@ func NewBroadcast(
 // }
 
 // MakeRegisterMsg return the signed register msg bytes.
-func (broadcast *Broadcast) MakeRegisterMsg(ctx context.Context, referrer, registerFee, username, resetPubKeyHex,
-	transactionPubKeyHex, appPubKeyHex, referrerPrivKeyHex string, seq uint64) ([]byte, errors.Error) {
-	resetPubKey, err := transport.GetPubKeyFromHex(resetPubKeyHex)
-	if err != nil {
-		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get Reset pub key").AddCause(err)
-	}
-	txPubKey, err := transport.GetPubKeyFromHex(transactionPubKeyHex)
-	if err != nil {
-		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
-	}
-	appPubKey, err := transport.GetPubKeyFromHex(appPubKeyHex)
-	if err != nil {
-		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get App pub key").AddCause(err)
-	}
-	msg := acctypes.RegisterMsg{
-		Referrer:             linotypes.AccountKey(referrer),
-		RegisterFee:          registerFee,
-		NewUser:              linotypes.AccountKey(username),
-		NewResetPubKey:       resetPubKey,
-		NewTransactionPubKey: txPubKey,
-		NewAppPubKey:         appPubKey,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, referrerPrivKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeRegisterMsg(ctx context.Context, referrer, registerFee, username, resetPubKeyHex,
+// 	transactionPubKeyHex, appPubKeyHex, referrerPrivKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	resetPubKey, err := transport.GetPubKeyFromHex(resetPubKeyHex)
+// 	if err != nil {
+// 		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get Reset pub key").AddCause(err)
+// 	}
+// 	txPubKey, err := transport.GetPubKeyFromHex(transactionPubKeyHex)
+// 	if err != nil {
+// 		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get Tx pub key").AddCause(err)
+// 	}
+// 	appPubKey, err := transport.GetPubKeyFromHex(appPubKeyHex)
+// 	if err != nil {
+// 		return nil, errors.FailedToGetPubKeyFromHex("Register: failed to get App pub key").AddCause(err)
+// 	}
+// 	msg := acctypes.RegisterMsg{
+// 		Referrer:             linotypes.AccountKey(referrer),
+// 		RegisterFee:          registerFee,
+// 		NewUser:              linotypes.AccountKey(username),
+// 		NewResetPubKey:       resetPubKey,
+// 		NewTransactionPubKey: txPubKey,
+// 		NewAppPubKey:         appPubKey,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, referrerPrivKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // MakeRegisterV2Msg return the signed register v2 msg bytes.
 func (broadcast *Broadcast) MakeRegisterV2Msg(
@@ -428,6 +428,26 @@ func (broadcast *Broadcast) MakeDonateMsg(username, author, amount, postID, from
 		Memo:     memo,
 	}
 
+	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+	if buildErr != nil {
+		return nil, buildErr
+	}
+	return txByte, nil
+}
+
+// MakeIDADonateMsg return the signed msg bytes.
+func (broadcast *Broadcast) MakeIDADonateMsg(
+	username, author, app, amount, postID, signer, memo string,
+	privKeyHex string, seq uint64) ([]byte, errors.Error) {
+	msg := posttypes.IDADonateMsg{
+		Username: linotypes.AccountKey(username),
+		App:      linotypes.AccountKey(app),
+		Amount:   linotypes.IDAStr(amount),
+		Author:   linotypes.AccountKey(author),
+		PostID:   postID,
+		Memo:     memo,
+		Signer:   linotypes.AccountKey(signer),
+	}
 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
 	if buildErr != nil {
 		return nil, buildErr
@@ -997,22 +1017,22 @@ func (broadcast *Broadcast) MakeUpdateAffiliatedMsg(username, app string, activa
 // 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
 // }
 
-// MakeGrantPermissionMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeGrantPermissionMsg(username, authorizedApp string,
-	validityPeriodSec int64, grantLevel linotypes.Permission, amount string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := devtypes.GrantPermissionMsg{
-		Username:          linotypes.AccountKey(username),
-		AuthorizedApp:     linotypes.AccountKey(authorizedApp),
-		ValidityPeriodSec: validityPeriodSec,
-		GrantLevel:        grantLevel,
-		Amount:            amount,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// // MakeGrantPermissionMsg return the signed msg bytes.
+// func (broadcast *Broadcast) MakeGrantPermissionMsg(username, authorizedApp string,
+// 	validityPeriodSec int64, grantLevel linotypes.Permission, amount string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := devtypes.GrantPermissionMsg{
+// 		Username:          linotypes.AccountKey(username),
+// 		AuthorizedApp:     linotypes.AccountKey(authorizedApp),
+// 		ValidityPeriodSec: validityPeriodSec,
+// 		GrantLevel:        grantLevel,
+// 		Amount:            amount,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // GrantAppAndPreAuthPermission grants both app and preauth permission to
 // an authorized app with a certain period of time.
@@ -1095,20 +1115,20 @@ func (broadcast *Broadcast) MakeGrantPermissionMsg(username, authorizedApp strin
 // 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
 // }
 
-// MakeRevokePermissionPermissionMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeRevokePermissionPermissionMsg(username, revokeFrom string, permission linotypes.Permission,
-	privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := devtypes.RevokePermissionMsg{
-		Username:   linotypes.AccountKey(username),
-		RevokeFrom: linotypes.AccountKey(revokeFrom),
-		Permission: permission,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// // MakeRevokePermissionPermissionMsg return the signed msg bytes.
+// func (broadcast *Broadcast) MakeRevokePermissionPermissionMsg(username, revokeFrom string, permission linotypes.Permission,
+// 	privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := devtypes.RevokePermissionMsg{
+// 		Username:   linotypes.AccountKey(username),
+// 		RevokeFrom: linotypes.AccountKey(revokeFrom),
+// 		Permission: permission,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 //
 // infra related tx
@@ -1155,20 +1175,20 @@ func (broadcast *Broadcast) MakeRevokePermissionPermissionMsg(username, revokeFr
 // 	return broadcast.retry(ctx, msg, privKeyHex, seq, "", false, broadcast.maxAttempts, broadcast.initSleepTime)
 // }
 
-// MakeChangeGlobalAllocationParamMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeChangeGlobalAllocationParamMsg(creator string,
-	parameter param.GlobalAllocationParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := proposal.ChangeGlobalAllocationParamMsg{
-		Creator:   linotypes.AccountKey(creator),
-		Parameter: parameter,
-		Reason:    reason,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// // MakeChangeGlobalAllocationParamMsg return the signed msg bytes.
+// func (broadcast *Broadcast) MakeChangeGlobalAllocationParamMsg(creator string,
+// 	parameter param.GlobalAllocationParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := proposal.ChangeGlobalAllocationParamMsg{
+// 		Creator:   linotypes.AccountKey(creator),
+// 		Parameter: parameter,
+// 		Reason:    reason,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // ChangeInfraInternalAllocationParam changes InfraInternalAllocationParam with new value.
 // It composes ChangeInfraInternalAllocationParamMsg and then broadcasts the transaction to blockchain.
@@ -1212,19 +1232,19 @@ func (broadcast *Broadcast) MakeChangeGlobalAllocationParamMsg(creator string,
 // }
 
 // MakeChangeVoteParamMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeChangeVoteParamMsg(creator string,
-	parameter param.VoteParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := proposal.ChangeVoteParamMsg{
-		Creator:   linotypes.AccountKey(creator),
-		Parameter: parameter,
-		Reason:    reason,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeChangeVoteParamMsg(creator string,
+// 	parameter param.VoteParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := proposal.ChangeVoteParamMsg{
+// 		Creator:   linotypes.AccountKey(creator),
+// 		Parameter: parameter,
+// 		Reason:    reason,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // ChangeProposalParam changes ProposalParam with new value.
 // It composes ChangeProposalParamMsg and then broadcasts the transaction to blockchain.
@@ -1239,19 +1259,19 @@ func (broadcast *Broadcast) MakeChangeVoteParamMsg(creator string,
 // }
 
 // MakeChangeProposalParamMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeChangeProposalParamMsg(creator string,
-	parameter param.ProposalParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := proposal.ChangeProposalParamMsg{
-		Creator:   linotypes.AccountKey(creator),
-		Parameter: parameter,
-		Reason:    reason,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeChangeProposalParamMsg(creator string,
+// 	parameter param.ProposalParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := proposal.ChangeProposalParamMsg{
+// 		Creator:   linotypes.AccountKey(creator),
+// 		Parameter: parameter,
+// 		Reason:    reason,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // ChangeDeveloperParam changes DeveloperParam with new value.
 // It composes ChangeDeveloperParamMsg and then broadcasts the transaction to blockchain.
@@ -1266,19 +1286,19 @@ func (broadcast *Broadcast) MakeChangeProposalParamMsg(creator string,
 // }
 
 // MakeChangeDeveloperParamMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeChangeDeveloperParamMsg(creator string,
-	parameter param.DeveloperParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := proposal.ChangeDeveloperParamMsg{
-		Creator:   linotypes.AccountKey(creator),
-		Parameter: parameter,
-		Reason:    reason,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeChangeDeveloperParamMsg(creator string,
+// 	parameter param.DeveloperParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := proposal.ChangeDeveloperParamMsg{
+// 		Creator:   linotypes.AccountKey(creator),
+// 		Parameter: parameter,
+// 		Reason:    reason,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // ChangeValidatorParam changes ValidatorParam with new value.
 // It composes ChangeValidatorParamMsg and then broadcasts the transaction to blockchain.
@@ -1293,19 +1313,19 @@ func (broadcast *Broadcast) MakeChangeDeveloperParamMsg(creator string,
 // }
 
 // MakeChangeValidatorParamMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeChangeValidatorParamMsg(creator string,
-	parameter param.ValidatorParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := proposal.ChangeValidatorParamMsg{
-		Creator:   linotypes.AccountKey(creator),
-		Parameter: parameter,
-		Reason:    reason,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeChangeValidatorParamMsg(creator string,
+// 	parameter param.ValidatorParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := proposal.ChangeValidatorParamMsg{
+// 		Creator:   linotypes.AccountKey(creator),
+// 		Parameter: parameter,
+// 		Reason:    reason,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // ChangeBandwidthParam changes BandwidthParam with new value.
 // It composes ChangeBandwidthParamMsg and then broadcasts the transaction to blockchain.
@@ -1320,19 +1340,19 @@ func (broadcast *Broadcast) MakeChangeValidatorParamMsg(creator string,
 // }
 
 // MakeChangeBandwidthParamMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeChangeBandwidthParamMsg(creator string,
-	parameter param.BandwidthParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := proposal.ChangeBandwidthParamMsg{
-		Creator:   linotypes.AccountKey(creator),
-		Parameter: parameter,
-		Reason:    reason,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeChangeBandwidthParamMsg(creator string,
+// 	parameter param.BandwidthParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := proposal.ChangeBandwidthParamMsg{
+// 		Creator:   linotypes.AccountKey(creator),
+// 		Parameter: parameter,
+// 		Reason:    reason,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // ChangeAccountParam changes AccountParam with new value.
 // It composes ChangeAccountParamMsg and then broadcasts the transaction to blockchain.
@@ -1347,19 +1367,19 @@ func (broadcast *Broadcast) MakeChangeBandwidthParamMsg(creator string,
 // }
 
 // MakeChangeAccountParamMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeChangeAccountParamMsg(creator string,
-	parameter param.AccountParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := proposal.ChangeAccountParamMsg{
-		Creator:   linotypes.AccountKey(creator),
-		Parameter: parameter,
-		Reason:    reason,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeChangeAccountParamMsg(creator string,
+// 	parameter param.AccountParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := proposal.ChangeAccountParamMsg{
+// 		Creator:   linotypes.AccountKey(creator),
+// 		Parameter: parameter,
+// 		Reason:    reason,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // ChangePostParam changes PostParam with new value.
 // It composes ChangePostParamMsg and then broadcasts the transaction to blockchain.
@@ -1374,35 +1394,35 @@ func (broadcast *Broadcast) MakeChangeAccountParamMsg(creator string,
 // }
 
 // MakeChangePostParamMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeChangePostParamMsg(creator string,
-	parameter param.PostParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := proposal.ChangePostParamMsg{
-		Creator:   linotypes.AccountKey(creator),
-		Parameter: parameter,
-		Reason:    reason,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeChangePostParamMsg(creator string,
+// 	parameter param.PostParam, reason string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := proposal.ChangePostParamMsg{
+// 		Creator:   linotypes.AccountKey(creator),
+// 		Parameter: parameter,
+// 		Reason:    reason,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // MakeDeletePostContentMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeDeletePostContentMsg(creator, postAuthor,
-	postID, reason, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	permlink := string(string(postAuthor) + "#" + postID)
-	msg := proposal.DeletePostContentMsg{
-		Creator:  linotypes.AccountKey(creator),
-		Permlink: linotypes.Permlink(permlink),
-		Reason:   reason,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeDeletePostContentMsg(creator, postAuthor,
+// 	postID, reason, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	permlink := string(string(postAuthor) + "#" + postID)
+// 	msg := proposal.DeletePostContentMsg{
+// 		Creator:  linotypes.AccountKey(creator),
+// 		Permlink: linotypes.Permlink(permlink),
+// 		Reason:   reason,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // VoteProposal adds a vote to a certain proposal with agree/disagree.
 // It composes VoteProposalMsg and then broadcasts the transaction to blockchain.
@@ -1417,19 +1437,19 @@ func (broadcast *Broadcast) MakeDeletePostContentMsg(creator, postAuthor,
 // }
 
 // MakeVoteProposalMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeVoteProposalMsg(voter, proposalID string,
-	result bool, privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := proposal.VoteProposalMsg{
-		Voter:      linotypes.AccountKey(voter),
-		ProposalID: linotypes.ProposalKey(proposalID),
-		Result:     result,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeVoteProposalMsg(voter, proposalID string,
+// 	result bool, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := proposal.VoteProposalMsg{
+// 		Voter:      linotypes.AccountKey(voter),
+// 		ProposalID: linotypes.ProposalKey(proposalID),
+// 		Result:     result,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // UpgradeProtocol upgrades the protocol.
 // It composes UpgradeProtocolMsg and then broadcasts the transaction to blockchain.
@@ -1444,19 +1464,19 @@ func (broadcast *Broadcast) MakeVoteProposalMsg(voter, proposalID string,
 // }
 
 // MakeUpgradeProtocolMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeUpgradeProtocolMsg(creator, link, reason string,
-	privKeyHex string, seq uint64) ([]byte, errors.Error) {
-	msg := proposal.UpgradeProtocolMsg{
-		Creator: linotypes.AccountKey(creator),
-		Link:    link,
-		Reason:  reason,
-	}
-	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
-	if buildErr != nil {
-		return nil, buildErr
-	}
-	return txByte, nil
-}
+// func (broadcast *Broadcast) MakeUpgradeProtocolMsg(creator, link, reason string,
+// 	privKeyHex string, seq uint64) ([]byte, errors.Error) {
+// 	msg := proposal.UpgradeProtocolMsg{
+// 		Creator: linotypes.AccountKey(creator),
+// 		Link:    link,
+// 		Reason:  reason,
+// 	}
+// 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
+// 	if buildErr != nil {
+// 		return nil, buildErr
+// 	}
+// 	return txByte, nil
+// }
 
 // MakeFeedPriceMsg return the signed msg bytes.
 func (broadcast *Broadcast) MakeFeedPriceMsg(
