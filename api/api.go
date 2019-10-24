@@ -440,10 +440,10 @@ func (api *API) IDAMint(
 
 // IDATransfer moves IDA between accounts.
 func (api *API) IDATransfer(
-	ctx context.Context, app, amount, from, to, signer string,
+	ctx context.Context, app, amount, from, to, signer, memo string,
 	privKeyHex string) (*model.BroadcastResponse, errors.Error) {
 	resp, _, err := api.GuaranteeBroadcast(ctx, util.GetSignerList(signer), func(seqs []uint64) ([]byte, errors.Error) {
-		return api.MakeIDATransferMsg(app, amount, from, to, signer, privKeyHex, seqs[0])
+		return api.MakeIDATransferMsg(app, amount, from, to, signer, memo, privKeyHex, seqs[0])
 	})
 	return resp, err
 }

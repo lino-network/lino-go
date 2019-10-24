@@ -959,13 +959,14 @@ func (broadcast *Broadcast) MakeIDAMintMsg(username, amount string, privKeyHex s
 }
 
 // MakeIDATransferMsg return the signed msg bytes.
-func (broadcast *Broadcast) MakeIDATransferMsg(app, amount, from, to, signer string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
+func (broadcast *Broadcast) MakeIDATransferMsg(app, amount, from, to, signer, memo string, privKeyHex string, seq uint64) ([]byte, errors.Error) {
 	msg := devtypes.IDATransferMsg{
 		App:    linotypes.AccountKey(app),
 		Amount: linotypes.IDAStr(amount),
 		From:   linotypes.AccountKey(from),
 		To:     linotypes.AccountKey(to),
 		Signer: linotypes.AccountKey(signer),
+		Memo:   memo,
 	}
 	txByte, buildErr := broadcast.transport.SignAndBuild(msg, privKeyHex, seq, "")
 	if buildErr != nil {
