@@ -158,27 +158,6 @@ func (query *Query) GetSeqNumberByAddress(ctx context.Context, address string) (
 	return bank.Sequence, nil
 }
 
-// GetGrantPubKey returns the specific granted pubkey info of a user
-// that has given to the pubKey.
-func (query *Query) GetGrantPubKey(
-	ctx context.Context, username string, grantTo string, permission linotypes.Permission) (*model.GrantPermission, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountGrantPubKeys, []string{username, grantTo})
-	if err != nil {
-		return nil, errors.EmptyResponse("grant pubkey is not found or err")
-	}
-
-	grantPubKeyList := make([]*model.GrantPermission, 0)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, &grantPubKeyList); err != nil {
-		return nil, err
-	}
-	for _, grantPubKey := range grantPubKeyList {
-		if grantPubKey.Permission == permission {
-			return grantPubKey, nil
-		}
-	}
-	return nil, errors.EmptyResponse("grant pubkey is not found")
-}
-
 // GetReputation returns rewards of a user.
 // func (query *Query) GetReputation(ctx context.Context, username string) (*linotypes.Coin, error) {
 // 	resp, err := query.transport.Query(ctx, ReputationKVStore, types, []string{username})
@@ -217,20 +196,6 @@ func (query *Query) GetGrantPubKey(
 //
 // Range Query
 //
-
-// GetAllGrantPubKeys returns a list of all granted public keys of a user.
-func (query *Query) GetAllGrantPubKeys(ctx context.Context, username string) ([]*model.GrantPermission, error) {
-	resp, err := query.transport.Query(ctx, AccountKVStoreKey, types.QueryAccountAllGrantPubKeys, []string{username})
-	if err != nil {
-		return nil, errors.EmptyResponse("grant pub key is not found")
-	}
-	grantPubKeyList := make([]*model.GrantPermission, 0)
-	if err := query.transport.Cdc.UnmarshalJSON(resp, &grantPubKeyList); err != nil {
-		return nil, err
-	}
-
-	return grantPubKeyList, nil
-}
 
 // GetAllFollowingMeta returns all following meta of a user.
 func (query *Query) SignWithSha256(ctx context.Context, payload string, privKey crypto.PrivKey) ([]byte, error) {
