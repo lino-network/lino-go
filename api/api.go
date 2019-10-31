@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lino-network/lino-go/broadcast"
 	"github.com/lino-network/lino-go/errors"
 	"github.com/lino-network/lino-go/model"
@@ -203,7 +202,7 @@ func (api *API) UpdateAccount(
 func (api *API) Recover(
 	ctx context.Context, username, newTxAddr, newTxPubKeyHex, newSigningPubKeyHex,
 	privKeyHex string, newTxPrivKeyHex string) (*model.BroadcastResponse, errors.Error) {
-	addr, e := sdk.AccAddressFromBech32(newTxAddr)
+	addr, e := hex.DecodeString(newTxAddr)
 	if e != nil {
 		return nil, errors.InvalidArg("Invalid Transaction Key Address")
 	}

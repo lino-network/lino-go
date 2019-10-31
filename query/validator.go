@@ -39,3 +39,17 @@ func (query *Query) GetAllValidators(ctx context.Context) (*model.ValidatorList,
 	}
 	return validatorList, nil
 }
+
+// GetElectionVoteList returns all election validator list.
+func (query *Query) GetElectionVoteList(ctx context.Context, username string) (*model.ElectionVoteList, error) {
+	resp, err := query.transport.Query(ctx, ValidatorKVStoreKey, validator.QueryElectionVoteList, []string{username})
+	if err != nil {
+		return nil, err
+	}
+
+	voteList := new(model.ElectionVoteList)
+	if err := query.transport.Cdc.UnmarshalJSON(resp, voteList); err != nil {
+		return voteList, err
+	}
+	return voteList, nil
+}
