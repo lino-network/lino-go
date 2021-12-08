@@ -1,3 +1,4 @@
 vendor/
 example/example
 .DS_Store
+.idea
